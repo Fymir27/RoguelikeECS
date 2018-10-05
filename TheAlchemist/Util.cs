@@ -6,6 +6,18 @@ using System.Threading.Tasks;
 
 namespace TheAlchemist
 {
+    enum Direction
+    {
+        North,   
+        NorthEast,  
+        Eeast,
+        SouthEast,
+        South,
+        SouthWest,
+        West,
+        NorthWest
+    }
+
     static class Util
     {
         // gets called for every new type of component/entity/...
@@ -26,6 +38,13 @@ namespace TheAlchemist
             {
                 return ++counter;
             }
+        }
+
+        // returns Direction 180 degrees from param direction
+        public static Direction getOppositeDirection(Direction direction)
+        {
+            int nrDirections = 8;
+            return (Direction)(((int)direction + nrDirections / 2) % nrDirections);
         }
     }
 }
