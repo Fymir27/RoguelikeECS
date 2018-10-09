@@ -17,3 +17,21 @@ C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\
 C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\obj\Debug\TheAlchemist.exe
 C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\obj\Debug\TheAlchemist.pdb
 C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\Content\Square.xnb
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\obj\Debug\TheAlchemist.exe
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\obj\Debug\TheAlchemist.pdb
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\x86\SDL2.dll
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\x64\SDL2.dll
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\x86\soft_oal.dll
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\x64\soft_oal.dll
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\x86\libSDL2-2.0.so.0
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\x64\libSDL2-2.0.so.0
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\x86\libopenal.so.1
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\x64\libopenal.so.1
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\libSDL2-2.0.0.dylib
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\libopenal.1.dylib
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\MonoGame.Framework.dll.config
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\Content\Square.xnb
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\TheAlchemist.exe
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\TheAlchemist.pdb
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\MonoGame.Framework.dll
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\obj\Debug\TheAlchemist.csprojResolveAssemblyReference.cache
