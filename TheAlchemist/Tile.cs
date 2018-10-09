@@ -17,7 +17,6 @@ namespace TheAlchemist
         }
 
         Type type;
-        Entity entity;
         //Item[] items;
         
         public Tile()

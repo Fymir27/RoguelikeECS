@@ -8,8 +8,17 @@ using System.Threading.Tasks;
 
 namespace TheAlchemist.Components
 {
-    class TransformComponent
+    class TransformComponent : Component<TransformComponent>
     {
-        public Vector2 Position { get; set; }
+        Vector2 position;
+        public Vector2 Position
+        {
+            get { return position; }
+            set
+            {
+                position = value;
+                Console.WriteLine("Position set to: " + position);
+            }
+        }
     }
 }

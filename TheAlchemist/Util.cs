@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TheAlchemist
 {
-    enum Direction
+    public enum Direction
     {
         North,   
         NorthEast,  
@@ -26,6 +26,7 @@ namespace TheAlchemist
             static int counter = 0;
             public static int Get()
             {
+                Console.WriteLine("TypeID for" + typeof(T) + " is: " + (counter + 1));
                 return ++counter;
             }
         }

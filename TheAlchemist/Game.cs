@@ -3,9 +3,13 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 using System;
+using System.Collections.Generic;
 
 namespace TheAlchemist
 {
+    using Systems;
+    using Components;
+
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
@@ -13,6 +17,9 @@ namespace TheAlchemist
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+
+        InputSystem inputSystem;
+        MovementSystem movementSystem;
 
         public static Random Random { get; } = new Random();
 
@@ -36,13 +43,18 @@ namespace TheAlchemist
             Floor test = Floor.ReadFromFile("map.txt");
             System.Console.WriteLine(test);
 
-            Components.IComponent component1 = new Components.PlayerComponent();
-            Components.IComponent component2 = new Components.HealthComponent();
-            Components.IComponent component3 = new Components.PlayerComponent();
+            List<IComponent> playerComponents = new List<IComponent>();
+            playerComponents.Add(new TransformComponent());
+            playerComponents.Add(new HealthComponent());
+            playerComponents.Add(new PlayerComponent());
 
-            Console.WriteLine(component1);
-            Console.WriteLine(component2);
-            Console.WriteLine(component3);
+            int player = EntityManager.createEntity();
+            EntityManager.addComponentsToEntity(player, playerComponents);
+
+            EntityManager.Dump();
+
+            inputSystem = new InputSystem();
+            movementSystem = new MovementSystem(inputSystem);
 
             base.Initialize();
         }
@@ -79,9 +91,8 @@ namespace TheAlchemist
             //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             //Exit();
 
-            // TODO: Add your update logic here
-            
-            Systems.InputSystem.CheckInput();
+            // TODO: Add your update logic here        
+            inputSystem.Run();
 
             base.Update(gameTime);
         }

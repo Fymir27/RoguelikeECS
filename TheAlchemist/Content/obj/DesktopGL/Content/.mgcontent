@@ -4,7 +4,7 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
-    <File>C:/Users/Oliver/Source/Repos/RoguelikeECS/TheAlchemist/Content/Square.png</File>
+    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/Square.png</File>
   </SourceFiles>
   <DestFiles>
     <File xsi:nil="true" />

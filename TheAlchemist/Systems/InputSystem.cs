@@ -8,10 +8,20 @@ using Microsoft.Xna.Framework.Input;
 
 namespace TheAlchemist.Systems
 {
-    static class InputSystem
+    using Components;
+
+    class InputSystem
     {
-        static Keys lastInput;
-        public static void CheckInput()
+        public event MovementEventHandler MovementEvent;
+        Keys lastInput;
+        int player = 0; // 0 is an invalid entity ID
+
+        public InputSystem()
+        {
+            player = EntityManager.GetEntitiesWithComponent(PlayerComponent.TypeID)[0];
+        }
+
+        public void Run()
         {
             KeyboardState keyboard = Keyboard.GetState();
             Keys[] keysPressed = keyboard.GetPressedKeys();
@@ -33,8 +43,13 @@ namespace TheAlchemist.Systems
             {
                 lastInput = Keys.Up;
                 Console.WriteLine("Up pressed");
-                //send Movement event
+                RaiseMovementEvent(player, Direction.North);
             }
+        }
+
+        private void RaiseMovementEvent(int entity, Direction dir)
+        {
+            MovementEvent?.Invoke(entity, dir);
         }
     }
 }

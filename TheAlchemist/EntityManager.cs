@@ -24,6 +24,7 @@ namespace TheAlchemist
         // returns an array of entity IDs that have a specific component attached
         public static int[] GetEntitiesWithComponent(int componentTypeID)
         {
+            Console.WriteLine("EntityManger::GetEntitiesWithComponent called with componentTypeID = " + componentTypeID);           
             return entitiesWithComponent[componentTypeID].ToArray();
         }
 
@@ -34,9 +35,29 @@ namespace TheAlchemist
         }
 
         
-        public static void GetComponentOfEntity(int entityID, int componentTypeID)
+        public static IComponent GetComponentOfEntity(int entityID, int componentTypeID)
         {
-            // TODO:
+            foreach(var component in entities[entityID])
+            {
+                if(component.TypeID == componentTypeID)
+                {
+                    return component;
+                }
+            }
+            return null;
+        }
+
+        public static IComponent GetComponentOfEntity<T>(int entityID) where T : Component<T>
+        {
+            var componentTypeID = Component<T>.TypeID;
+            foreach (var component in entities[entityID])
+            {
+                if (component.TypeID == componentTypeID)
+                {
+                    return component;
+                }
+            }
+            return null;
         }
 
         // creates new Entity with an empty list of components and returns its ID
@@ -69,6 +90,37 @@ namespace TheAlchemist
             }
 
             entitiesWithComponent[componentType].Add(entityID);
+            entities[entityID].Add(component);
+        }
+
+        // debug
+        public static void Dump()
+        {
+            Console.WriteLine("----- DEBUG -----");
+
+            Console.WriteLine("Entities: ");
+            foreach(var key in entities.Keys)
+            {
+                Console.Write(key + ": [");
+                foreach (var item in entities[key])
+                {
+                    Console.Write(item.TypeID + ", ");
+                }
+                Console.WriteLine("]");
+            }
+
+            Console.WriteLine("EntitiesWithComponent ");
+            foreach (var key in entitiesWithComponent.Keys)
+            {
+                Console.Write(key + ": [");
+                foreach (var item in entitiesWithComponent[key])
+                {
+                    Console.Write(item + ", ");
+                }
+                Console.WriteLine("]");
+            }
+
+            Console.WriteLine("----- DEBUG -----");
         }
     }
 }
