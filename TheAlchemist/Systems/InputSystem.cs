@@ -42,8 +42,22 @@ namespace TheAlchemist.Systems
             if(keysPressed.Any(item => item == Keys.Up))
             {
                 lastInput = Keys.Up;
-                Console.WriteLine("Up pressed");
                 RaiseMovementEvent(player, Direction.North);
+            }
+            else if (keysPressed.Any(item => item == Keys.Right))
+            {
+                lastInput = Keys.Right;
+                RaiseMovementEvent(player, Direction.East);
+            }
+            else if (keysPressed.Any(item => item == Keys.Down))
+            {
+                lastInput = Keys.Down;
+                RaiseMovementEvent(player, Direction.South);
+            }
+            else if (keysPressed.Any(item => item == Keys.Left))
+            {
+                lastInput = Keys.Left;
+                RaiseMovementEvent(player, Direction.West);
             }
         }
 
