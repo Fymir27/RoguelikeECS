@@ -16,48 +16,35 @@ namespace TheAlchemist
         static Dictionary<int, List<int>> entitiesWithComponent = new Dictionary<int, List<int>>();
 
         // maps from entity ID to a list of components it has
-        static Dictionary<int, List<IComponent>> entities = new Dictionary<int, List<IComponent>>();
+        static Dictionary<int, List<IComponent>> componentsOfEntity = new Dictionary<int, List<IComponent>>();
+
+        // maps from component Type ID to list of components of that type
+        static Dictionary<int, List<IComponent>> componentsOfType = new Dictionary<int, List<IComponent>>();
 
         // running counter for entiy IDs (ID 0 is unused)
         static int entityIDCounter = 1;
 
         // returns an array of entity IDs that have a specific component attached
-        public static int[] GetEntitiesWithComponent(int componentTypeID)
+        public static int[] GetEntitiesWithComponent<T>() where T : Component<T>
         {
-            Console.WriteLine("EntityManger::GetEntitiesWithComponent called with componentTypeID = " + componentTypeID);           
-            return entitiesWithComponent[componentTypeID].ToArray();
+            return entitiesWithComponent[Component<T>.TypeID].ToArray();
+        }
+
+        // returns all components of Type T
+        public static T[] GetAllComponents<T>() where T : Component<T>
+        {
+            return componentsOfType[Component<T>.TypeID].ConvertAll(component => component as T).ToArray();
         }
 
         // returns a list of all components attached to specific entity
         public static IComponent[] GetAllComponentsOfEntity(int entityID)
         {
-            return entities[entityID].ToArray();
+            return componentsOfEntity[entityID].ToArray();
         }
 
-        
-        public static IComponent GetComponentOfEntity(int entityID, int componentTypeID)
-        {
-            foreach(var component in entities[entityID])
-            {
-                if(component.TypeID == componentTypeID)
-                {
-                    return component;
-                }
-            }
-            return null;
-        }
-
-        public static IComponent GetComponentOfEntity<T>(int entityID) where T : Component<T>
-        {
-            var componentTypeID = Component<T>.TypeID;
-            foreach (var component in entities[entityID])
-            {
-                if (component.TypeID == componentTypeID)
-                {
-                    return component;
-                }
-            }
-            return null;
+        public static T GetComponentOfEntity<T>(int entityID) where T : Component<T>
+        {           
+            return componentsOfEntity[entityID].FirstOrDefault(x => x.TypeID == Component<T>.TypeID) as T;
         }
 
         // creates new Entity with an empty list of components and returns its ID
@@ -65,7 +52,7 @@ namespace TheAlchemist
         {
             int entityID = entityIDCounter++;
 
-            entities.Add(entityID, new List<IComponent>());
+            componentsOfEntity.Add(entityID, new List<IComponent>());
             
             return entityID;
         }
@@ -82,15 +69,22 @@ namespace TheAlchemist
         // adds a single component to an entity
         public static void addComponentToEntity(int entityID, IComponent component)
         {
+            component.EntityID = entityID;
+            componentsOfEntity[entityID].Add(component);
+
             int componentType = component.TypeID;
 
             if (!entitiesWithComponent.ContainsKey(componentType))
             {
                 entitiesWithComponent.Add(componentType, new List<int>());
             }
-
             entitiesWithComponent[componentType].Add(entityID);
-            entities[entityID].Add(component);
+
+            if (!componentsOfType.ContainsKey(componentType))
+            {
+                componentsOfType.Add(componentType, new List<IComponent>());
+            }
+            componentsOfType[componentType].Add(component);          
         }
 
         // debug
@@ -99,12 +93,12 @@ namespace TheAlchemist
             Console.WriteLine("----- DEBUG -----");
 
             Console.WriteLine("Entities: ");
-            foreach(var key in entities.Keys)
+            foreach(var key in componentsOfEntity.Keys)
             {
                 Console.Write(key + ": [");
-                foreach (var item in entities[key])
+                foreach (var item in componentsOfEntity[key])
                 {
-                    Console.Write(item.TypeID + ", ");
+                    Console.Write(item.ComponentID + ", ");
                 }
                 Console.WriteLine("]");
             }
@@ -116,6 +110,17 @@ namespace TheAlchemist
                 foreach (var item in entitiesWithComponent[key])
                 {
                     Console.Write(item + ", ");
+                }
+                Console.WriteLine("]");
+            }
+
+            Console.WriteLine("ComponentsOfType ");
+            foreach (var key in componentsOfType.Keys)
+            {
+                Console.Write(key + ": [");
+                foreach (var item in componentsOfType[key])
+                {
+                    Console.Write(item.ComponentID + ", ");
                 }
                 Console.WriteLine("]");
             }

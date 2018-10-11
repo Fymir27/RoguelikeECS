@@ -20,10 +20,14 @@ namespace TheAlchemist
 
         InputSystem inputSystem;
         MovementSystem movementSystem;
+        RenderSystem renderSystem;
 
         public static Random Random { get; } = new Random();
 
         Texture2D textureSquare;
+        Texture2D texturePlayer;
+
+        int player;
         
         public Game()
         {
@@ -48,13 +52,18 @@ namespace TheAlchemist
             playerComponents.Add(new HealthComponent());
             playerComponents.Add(new PlayerComponent());
 
-            int player = EntityManager.createEntity();
+           
+
+            player = EntityManager.createEntity();
             EntityManager.addComponentsToEntity(player, playerComponents);
 
-            EntityManager.Dump();
+            //EntityManager.Dump();
 
             inputSystem = new InputSystem();
             movementSystem = new MovementSystem(inputSystem);
+            renderSystem = new RenderSystem();
+
+            EntityManager.Dump();
 
             base.Initialize();
         }
@@ -70,6 +79,13 @@ namespace TheAlchemist
 
             // TODO: use this.Content to load your game content here
             textureSquare = Content.Load<Texture2D>("square");
+            texturePlayer = Content.Load<Texture2D>("player");
+
+            var renderableComponent = new RenderableComponent();
+            renderableComponent.Visible = true;
+            renderableComponent.Texture = texturePlayer;
+
+            EntityManager.addComponentToEntity(player, renderableComponent);
         }
 
         /// <summary>
@@ -103,11 +119,12 @@ namespace TheAlchemist
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.White);
 
             // TODO: Add your drawing code here
             spriteBatch.Begin();
-            spriteBatch.Draw(textureSquare, new Vector2(0, 0), Color.Red);
+            //spriteBatch.Draw(textureSquare, new Vector2(0, 0), Color.Red);
+            renderSystem.Run(spriteBatch);
             spriteBatch.End();
 
             base.Draw(gameTime);

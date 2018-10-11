@@ -18,7 +18,7 @@ namespace TheAlchemist.Systems
 
         public InputSystem()
         {
-            player = EntityManager.GetEntitiesWithComponent(PlayerComponent.TypeID)[0];
+            player = EntityManager.GetEntitiesWithComponent<PlayerComponent>().FirstOrDefault();
         }
 
         public void Run()

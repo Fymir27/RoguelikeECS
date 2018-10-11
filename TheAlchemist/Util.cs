@@ -26,8 +26,7 @@ namespace TheAlchemist
         {
             static int counter = 0;
             public static int Get()
-            {
-                Console.WriteLine("TypeID for" + typeof(T) + " is: " + (counter + 1));
+            {             
                 return ++counter;
             }
         }

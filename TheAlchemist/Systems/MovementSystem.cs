@@ -22,7 +22,7 @@ namespace TheAlchemist.Systems
 
         private void HandleMovementEvent(int entity, Direction dir)
         {
-            var playerTransform = (TransformComponent)EntityManager.GetComponentOfEntity(entity, TransformComponent.TypeID);
+            var playerTransform = EntityManager.GetComponentOfEntity<TransformComponent>(entity);
             playerTransform.Position += Util.GetUnitVectorInDirection(dir);
         }
     }

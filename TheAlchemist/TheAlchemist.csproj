@@ -46,6 +46,7 @@
     <Compile Include="Components\HealthComponent.cs" />
     <Compile Include="Components\IComponent.cs" />
     <Compile Include="Components\PlayerComponent.cs" />
+    <Compile Include="Components\RenderableComponent.cs" />
     <Compile Include="Components\TransformComponent.cs" />
     <Compile Include="EntityManager.cs" />
     <Compile Include="Floor.cs" />
@@ -54,6 +55,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\MovementSystem.cs" />
+    <Compile Include="Systems\RenderSystem.cs" />
     <Compile Include="Tile.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
