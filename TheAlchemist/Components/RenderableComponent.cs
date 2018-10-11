@@ -23,10 +23,5 @@ namespace TheAlchemist.Components
                     .Position;
             }
         }
-        public void setTexture(Texture2D texture)
-        {
-            Texture = texture;
-            Console.WriteLine("Texture set");
-        }
     }
 }

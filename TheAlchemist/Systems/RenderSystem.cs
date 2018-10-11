@@ -20,14 +20,10 @@ namespace TheAlchemist.Systems
                 .Where(component => component.Visible)
                 .ToArray();
 
-            Console.WriteLine("Now rendering " + renderedComponents.Length + "Components");
-
             foreach (var item in renderedComponents)
             {
                 spriteBatch.Draw(item.Texture, item.Position, Color.White);
             }
-
-            Console.WriteLine("RenderSystemDone");
         }
     }
 }
