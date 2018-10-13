@@ -9,6 +9,16 @@ namespace TheAlchemist
 {
     class Floor
     {
+        // one tile entity per tile
+        // one character entity per tile
+        // a list of items per tile 
+        int[,] tiles;
+        int[,] characters;
+        List<int>[,] items;
+    }
+    /*
+    class Floor
+    {
         Tile[,] tiles;
 
         public Floor(int width, int height)
@@ -44,7 +54,7 @@ namespace TheAlchemist
 
         public static Floor ReadFromFile(string filename)
         {
-            string contentPath = @"C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\Content";
+            string contentPath = @"C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\Content";
             string[] rows = File.ReadAllLines(contentPath + @"\" + filename);
             int width = rows[0].Length;
             int height = rows.Length;
@@ -60,4 +70,5 @@ namespace TheAlchemist
             return floor;
         }
     }
+    */
 }

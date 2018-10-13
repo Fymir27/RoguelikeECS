@@ -8,6 +8,14 @@ namespace TheAlchemist
 {
     class Tile
     {
+        int Character { get; set; }
+        List<int> Items { get; set; } = new List<int>();
+        int Terrain { get; set; }
+    }
+
+    /*
+    class Tile
+    {
         public enum Type
         {
             Floor,
@@ -48,4 +56,5 @@ namespace TheAlchemist
             return ((int)type).ToString();
         }
     }
+    */
 }

@@ -44,8 +44,8 @@ namespace TheAlchemist
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            Floor test = Floor.ReadFromFile("map.txt");
-            System.Console.WriteLine(test);
+            //Floor test = Floor.ReadFromFile("map.txt");
+            //System.Console.WriteLine(test);
 
             List<IComponent> playerComponents = new List<IComponent>();
             playerComponents.Add(new TransformComponent());
