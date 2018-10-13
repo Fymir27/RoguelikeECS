@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace TheAlchemist
 {
+    
+
     public enum Direction
     {
         North,   
@@ -21,6 +23,8 @@ namespace TheAlchemist
 
     static class Util
     {
+        public static int TileSize { get; } = 10;
+
         // gets called for every new type of component/entity/...
         public static class TypeID<T>
         {

@@ -11,8 +11,9 @@ namespace TheAlchemist
     {
         static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
 
-        public static void AddTexture(string name, Texture2D texture)
+        public static void AddTexture(Texture2D texture)
         {
+            string name = texture.Name;
             if(texture == null)
             {
                 Console.WriteLine("Texture wasn't loaded correctly! => " + name);

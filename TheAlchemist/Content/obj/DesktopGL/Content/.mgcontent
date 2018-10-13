@@ -6,8 +6,10 @@
   <SourceFiles>
     <File>C:/Users/Oliver/Source/Repos/RoguelikeECS/TheAlchemist/Content/player.png</File>
     <File>C:/Users/Oliver/Source/Repos/RoguelikeECS/TheAlchemist/Content/Square.png</File>
+    <File>C:/Users/Oliver/Source/Repos/RoguelikeECS/TheAlchemist/Content/wall.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
   </DestFiles>

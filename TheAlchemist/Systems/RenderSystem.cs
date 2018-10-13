@@ -22,7 +22,7 @@ namespace TheAlchemist.Systems
 
             foreach (var item in renderedComponents)
             {
-                spriteBatch.Draw(item.Texture, item.Position, Color.White);
+                spriteBatch.Draw(TextureManager.GetTexture(item.Texture), item.Position, Color.White);
             }
         }
     }

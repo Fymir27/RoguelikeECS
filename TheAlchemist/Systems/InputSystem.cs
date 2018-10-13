@@ -36,7 +36,7 @@ namespace TheAlchemist.Systems
             if(keysPressed.Any(item => item == lastInput))
             {
                 //TODO: allow holding of key if pressed for long enough
-                //return;
+                return;
             }
 
             if(keysPressed.Any(item => item == Keys.Up))

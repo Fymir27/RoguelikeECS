@@ -4,3 +4,4 @@ TheAlchemist/bin/DesktopGL/AnyCPU/Debug/TheAlchemist.exe
 TheAlchemist/bin/DesktopGL/AnyCPU/Debug/TheAlchemist.pdb
 TheAlchemist/obj/Debug/TheAlchemist.exe
 TheAlchemist/obj/Debug/TheAlchemist.pdb
+/TheAlchemist/Components/ColliderComponent.cs

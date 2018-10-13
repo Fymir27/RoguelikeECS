@@ -37,3 +37,4 @@ C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debu
 C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\obj\Debug\TheAlchemist.csprojResolveAssemblyReference.cache
 C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\Content\player.xnb
 C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\Content\player.xnb
+C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\Content\wall.xnb
