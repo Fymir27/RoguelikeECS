@@ -24,6 +24,8 @@ namespace TheAlchemist
     static class Util
     {
         public static int TileSize { get; } = 10;
+        public static int PlayerID { get; set; } = 0;
+        public static Floor CurrentFloor { get; set; } = null;
 
         // gets called for every new type of component/entity/...
         public static class TypeID<T>

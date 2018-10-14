@@ -21,6 +21,7 @@ namespace TheAlchemist
         InputSystem inputSystem;
         MovementSystem movementSystem;
         RenderSystem renderSystem;
+        CollisionSystem collisionSystem;
 
         public static Random Random { get; } = new Random();
 
@@ -44,35 +45,22 @@ namespace TheAlchemist
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            //Floor test = Floor.ReadFromFile("map.txt");
+            Floor test = new Floor(10, 10);
+            Util.CurrentFloor = test;
             //System.Console.WriteLine(test);
-
-            List<IComponent> playerComponents = new List<IComponent>();
-            playerComponents.Add(new TransformComponent() { Position = new Vector2(1, 1) });
-            playerComponents.Add(new HealthComponent());
-            playerComponents.Add(new PlayerComponent());
-            playerComponents.Add(new RenderableComponent { Visible = true, Texture = "player" });
-
-            player = EntityManager.createEntity();
-            EntityManager.addComponentsToEntity(player, playerComponents);
-
-            int wall1 = EntityManager.createEntity();
-            int wall2 = EntityManager.createEntity();
-            int wall3 = EntityManager.createEntity();
-
-            EntityManager.addComponentToEntity(wall1, new TransformComponent() { Position = new Vector2(0, 0) });
-            EntityManager.addComponentToEntity(wall2, new TransformComponent() { Position = new Vector2(1, 0) });
-            EntityManager.addComponentToEntity(wall3, new TransformComponent() { Position = new Vector2(0, 1) });
-
-            EntityManager.addComponentToEntity(wall1, new RenderableComponent() { Visible = true, Texture = "wall" });
-            EntityManager.addComponentToEntity(wall2, new RenderableComponent() { Visible = true, Texture = "wall" });
-            EntityManager.addComponentToEntity(wall3, new RenderableComponent() { Visible = true, Texture = "wall" });
 
             //EntityManager.Dump();
 
+            // instantiate all the systems
             inputSystem = new InputSystem();
-            movementSystem = new MovementSystem(inputSystem);
+            movementSystem = new MovementSystem();
             renderSystem = new RenderSystem();
+            collisionSystem = new CollisionSystem();
+
+            // hook up all events with their handlers
+            inputSystem.MovementEvent += movementSystem.HandleMovementEvent;
+            movementSystem.CollisionEvent += collisionSystem.HandleCollision;
+         
 
             EntityManager.Dump();
 

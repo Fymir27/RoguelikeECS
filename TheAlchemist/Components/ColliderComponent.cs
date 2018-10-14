@@ -8,7 +8,6 @@ namespace TheAlchemist.Components
 {
     class ColliderComponent : Component<ColliderComponent>
     {
-        bool Solid { get; set; } = true;
-
+        public bool Solid { get; set; } = true;
     }
 }

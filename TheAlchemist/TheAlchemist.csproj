@@ -54,6 +54,7 @@
     <Compile Include="Game.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Systems\CollisionSystem.cs" />
     <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\MovementSystem.cs" />
     <Compile Include="Systems\RenderSystem.cs" />

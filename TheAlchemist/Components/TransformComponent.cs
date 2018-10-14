@@ -17,7 +17,7 @@ namespace TheAlchemist.Components
             set
             {
                 position = value;
-                Console.WriteLine("Position set to: " + position);
+                //Console.WriteLine("Position set to: " + position);
             }
         }
     }
