@@ -113,7 +113,7 @@ namespace TheAlchemist
                 }
             }
 
-            terrain[1, 1] = Util.PlayerID = createPlayer(new Vector2(1, 1));
+            characters[1, 1] = Util.PlayerID = createPlayer(new Vector2(1, 1));
         }
 
         public bool IsOutOfBounds(Vector2 pos)
@@ -123,6 +123,7 @@ namespace TheAlchemist
             if (x < 0 || x >= width ||
                 y < 0 || y >= height)
             {
+                Console.WriteLine(pos + " is out of bounds!");
                 return true;
             }
             return false;

@@ -1,7 +1,5 @@
-.vs/TheAlchemist/v15/.suo
-.vs/TheAlchemist/v15/sqlite3/storage.ide
+.vs
 TheAlchemist/bin/DesktopGL/AnyCPU/Debug/TheAlchemist.exe
 TheAlchemist/bin/DesktopGL/AnyCPU/Debug/TheAlchemist.pdb
 TheAlchemist/obj/Debug/TheAlchemist.exe
 TheAlchemist/obj/Debug/TheAlchemist.pdb
-/TheAlchemist/Components/ColliderComponent.cs
