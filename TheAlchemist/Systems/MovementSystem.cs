@@ -29,7 +29,7 @@ namespace TheAlchemist.Systems
             var floor = Util.CurrentFloor;
 
             int otherCharacter = floor.GetCharacter(newPos);
-            if(otherCharacter != 0)
+            if(otherCharacter != 0 && EntityManager.GetComponentOfEntity<ColliderComponent>(otherCharacter) != null)
             {
                 if(RaiseCollisionEvent(entity, otherCharacter)) // check if other character cant be stepped on / is solid
                 {
@@ -38,7 +38,7 @@ namespace TheAlchemist.Systems
             }
 
             int terrain = floor.GetTerrain(newPos);
-            if(terrain != 0)
+            if(terrain != 0 && EntityManager.GetComponentOfEntity<ColliderComponent>(terrain) != null)
             {
                 if(RaiseCollisionEvent(entity, terrain)) // check if terrain is solid
                 {
