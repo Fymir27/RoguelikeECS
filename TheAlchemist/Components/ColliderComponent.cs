@@ -9,5 +9,11 @@ namespace TheAlchemist.Components
     class ColliderComponent : Component<ColliderComponent>
     {
         public bool Solid { get; set; } = true;
+
+        public ColliderComponent(bool solid = true)
+        {
+            EntityID = 0;
+            Solid = solid;
+        }
     }
 }

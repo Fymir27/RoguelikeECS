@@ -9,6 +9,7 @@ namespace TheAlchemist
 {
     using Systems;
     using Components;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// This is the main type for your game.
@@ -52,6 +53,17 @@ namespace TheAlchemist
             // TODO: Add your initialization logic here
             Floor test = new Floor(10, 10);
             Util.CurrentFloor = test;
+
+
+            //int entity = EntityManager.createEntity();
+            //EntityManager.addComponentToEntity(entity, new ColliderComponent() { Solid = true });
+            //EntityManager.addComponentToEntity(entity, new TransformComponent());
+
+            //string serializedEM = EntityManager.ToJson();
+            //Log.Message(serializedEM);
+            //EntityManager.InitFromJson(serializedEM);
+            //Log.Message(EntityManager.ToJson());
+
             //System.Console.WriteLine(test);
 
             //EntityManager.Dump();
@@ -68,6 +80,8 @@ namespace TheAlchemist
          
 
             EntityManager.Dump();
+
+
 
             base.Initialize();
         }

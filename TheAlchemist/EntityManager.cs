@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,14 +13,39 @@ namespace TheAlchemist
     // an entity is just an int (ID) and is not a concrete object
     class EntityManager
     {
+        public int i = 3;
+
+        [JsonProperty]
         // maps from component Type ID to List of entities that have that specific component attached
         static Dictionary<int, List<int>> entitiesWithComponent = new Dictionary<int, List<int>>();
 
+        [JsonProperty]
         // maps from entity ID to a list of components it has
         static Dictionary<int, List<IComponent>> componentsOfEntity = new Dictionary<int, List<IComponent>>();
 
+        [JsonProperty]
         // maps from component Type ID to list of components of that type
         static Dictionary<int, List<IComponent>> componentsOfType = new Dictionary<int, List<IComponent>>();
+
+        public static string ToJson()
+        {
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.TypeNameHandling = TypeNameHandling.Auto;
+            string em = JsonConvert.SerializeObject(new EntityManager(), Formatting.Indented, settings);
+            entitiesWithComponent = new Dictionary<int, List<int>>();
+            componentsOfEntity = new Dictionary<int, List<IComponent>>();
+            componentsOfType = new Dictionary<int, List<IComponent>>();
+            return em;
+        }
+
+        public static void InitFromJson(string json)
+        {
+            //Dump();
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.TypeNameHandling = TypeNameHandling.Auto;
+            JsonConvert.DeserializeObject<EntityManager>(json, settings);
+            //Dump();
+        }
 
         // running counter for entiy IDs (ID 0 is unused)
         static int entityIDCounter = 1;

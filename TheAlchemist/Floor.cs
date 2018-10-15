@@ -9,15 +9,20 @@ using Microsoft.Xna.Framework;
 namespace TheAlchemist
 {
     using Components;
+    using Newtonsoft.Json;
 
     class Floor
     {
+        [JsonProperty]
         int width, height;
         // one terrain entity per tile
         // one character entity per tile
-        // a list of items per tile 
+        // a list of items per tile
+        [JsonProperty]
         int[,] terrain;
+        [JsonProperty]
         int[,] characters;
+        [JsonProperty]
         List<int>[,] items;
 
         public int GetTerrain(Vector2 pos)
@@ -158,6 +163,11 @@ namespace TheAlchemist
 
             return wall;
         } 
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
     /*
     class Floor

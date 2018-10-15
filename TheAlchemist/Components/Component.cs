@@ -15,8 +15,8 @@ namespace TheAlchemist.Components
         protected int entityID = 0;
 
         int IComponent.TypeID { get { return typeID; } }
-        int IComponent.ComponentID { get { return componentID; } }
-        int IComponent.EntityID
+        int IComponent.ComponentID { get { return componentID; }  }
+        public int EntityID
         {
             get
             {
@@ -27,7 +27,11 @@ namespace TheAlchemist.Components
                 entityID = value;
             }
         }
-        
+       
+        public Component()
+        {
+
+        }
 
         public override string ToString()
         {
