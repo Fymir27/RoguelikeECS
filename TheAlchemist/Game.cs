@@ -26,9 +26,9 @@ namespace TheAlchemist
         public static Random Random { get; } = new Random();
 
         Texture2D textureSquare;
-        Texture2D texturePlayer;
+        //Texture2D texturePlayer;
 
-        int player;
+        //int player;
         
         public Game()
         {
@@ -44,6 +44,11 @@ namespace TheAlchemist
         /// </summary>
         protected override void Initialize()
         {
+            Log.Init(AppDomain.CurrentDomain.BaseDirectory + "/log.html");
+            Log.Message("Initializing...");
+            Log.Warning("Warning!");
+            Log.Error("Error!");
+
             // TODO: Add your initialization logic here
             Floor test = new Floor(10, 10);
             Util.CurrentFloor = test;
@@ -90,6 +95,7 @@ namespace TheAlchemist
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+            Log.End();
         }
 
         /// <summary>

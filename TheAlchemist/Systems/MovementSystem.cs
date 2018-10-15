@@ -57,10 +57,8 @@ namespace TheAlchemist.Systems
         // returns wether entityB was solid
         private bool RaiseCollisionEvent(int entityA, int entityB)
         {
-            if (CollisionEvent != null)
-                return CollisionEvent(entityA, entityB);
-            else
-                return false;
+            // SHOULD throw an exception if collision event is unhandled
+            return CollisionEvent(entityA, entityB);
         }
     }
 }
