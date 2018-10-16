@@ -13,8 +13,6 @@ namespace TheAlchemist
     // an entity is just an int (ID) and is not a concrete object
     class EntityManager
     {
-        public int i = 3;
-
         [JsonProperty]
         // maps from component Type ID to List of entities that have that specific component attached
         static Dictionary<int, List<int>> entitiesWithComponent = new Dictionary<int, List<int>>();
@@ -29,13 +27,11 @@ namespace TheAlchemist
 
         public static string ToJson()
         {
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.TypeNameHandling = TypeNameHandling.Auto;
-            string em = JsonConvert.SerializeObject(new EntityManager(), Formatting.Indented, settings);
-            entitiesWithComponent = new Dictionary<int, List<int>>();
-            componentsOfEntity = new Dictionary<int, List<IComponent>>();
-            componentsOfType = new Dictionary<int, List<IComponent>>();
-            return em;
+            return JsonConvert.SerializeObject(new EntityManager(), Formatting.Indented, new JsonSerializerSettings() {
+                TypeNameHandling = TypeNameHandling.Auto,
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects
+            });
+
         }
 
         public static void InitFromJson(string json)
@@ -45,6 +41,14 @@ namespace TheAlchemist
             settings.TypeNameHandling = TypeNameHandling.Auto;
             JsonConvert.DeserializeObject<EntityManager>(json, settings);
             //Dump();
+        }
+
+        // only used for debugging!
+        public static void Reset()
+        {
+            entitiesWithComponent = new Dictionary<int, List<int>>();
+            componentsOfEntity = new Dictionary<int, List<IComponent>>();
+            componentsOfType = new Dictionary<int, List<IComponent>>();
         }
 
         // running counter for entiy IDs (ID 0 is unused)

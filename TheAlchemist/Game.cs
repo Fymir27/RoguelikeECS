@@ -51,7 +51,7 @@ namespace TheAlchemist
             Log.Error("Error!");
 
             // TODO: Add your initialization logic here
-            Floor test = new Floor(10, 10);
+            Floor test = new Floor(5, 5);
             Util.CurrentFloor = test;
 
 
@@ -59,10 +59,12 @@ namespace TheAlchemist
             //EntityManager.addComponentToEntity(entity, new ColliderComponent() { Solid = true });
             //EntityManager.addComponentToEntity(entity, new TransformComponent());
 
-            //string serializedEM = EntityManager.ToJson();
-            //Log.Message(serializedEM);
-            //EntityManager.InitFromJson(serializedEM);
-            //Log.Message(EntityManager.ToJson());
+            string serializedEM = EntityManager.ToJson();
+            Log.Data(serializedEM);
+
+            EntityManager.Reset();
+            EntityManager.InitFromJson(serializedEM);
+            Log.Message(EntityManager.ToJson());
 
             //System.Console.WriteLine(test);
 

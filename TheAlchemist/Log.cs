@@ -23,27 +23,33 @@ namespace TheAlchemist
         {
             TimeStamp();
             logFile.WriteLine(message);
-            logFile.WriteLine("</br>");
+            Newline();
+            logFile.Flush();
+        }
+
+        public static void Data(string data)
+        {
+            TimeStamp();
+            logFile.WriteLine("[DATA]");
+            Newline();
+            logFile.Write(GetHTMLString("pre", null, data));
+            Newline();
             logFile.Flush();
         }
 
         public static void Warning(string message)
         {
-            logFile.Write("<font color=\"orange\">");
             TimeStamp();
-            logFile.Write("[WARNING] " + message);
-            logFile.WriteLine("</font>");
-            logFile.WriteLine("</br>");
+            logFile.Write(GetHTMLString("font", new Dictionary<string, string>() { { "color", "orange"} }, "[WARNING] " + message));
+            Newline();
             logFile.Flush();
         }
 
         public static void Error(string message)
         {
-            logFile.Write("<font color=\"red\">");
             TimeStamp();
-            logFile.Write("[ERROR] " + message);
-            logFile.WriteLine("</font>");
-            logFile.WriteLine("</br>");
+            logFile.Write(GetHTMLString("font", new Dictionary<string, string>() { { "color", "red" } }, "[ERROR] " + message));
+            Newline();
             logFile.Flush();
         }
 
@@ -58,5 +64,25 @@ namespace TheAlchemist
         {
             logFile.Write("[" + DateTime.Now.ToLongTimeString() + "] ");
         }
+
+        static string GetHTMLString(string tag, Dictionary<string, string> attributes, string message)
+        {
+            var sb = new StringBuilder();
+            sb.Append("<" + tag);
+
+            if(attributes != null)
+                attributes.Keys.ToList().ForEach(key => sb.Append(" " + key + "=" + attributes[key]));
+
+            sb.Append(">");
+            sb.Append(message);
+            sb.Append("</" + tag + ">");
+            return sb.ToString();
+        }
+
+        static void Newline()
+        {
+            logFile.WriteLine("</br>");
+        }
+
     }
 }
