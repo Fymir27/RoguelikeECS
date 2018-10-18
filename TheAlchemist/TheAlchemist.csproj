@@ -42,13 +42,18 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Components\ArmorComponent.cs" />
     <Compile Include="Components\ColliderComponent.cs" />
     <Compile Include="Components\Component.cs" />
+    <Compile Include="Components\DescriptionComponent.cs" />
+    <Compile Include="Components\EqupimentComponent.cs" />
     <Compile Include="Components\HealthComponent.cs" />
     <Compile Include="Components\IComponent.cs" />
+    <Compile Include="Components\NPCComponent.cs" />
     <Compile Include="Components\PlayerComponent.cs" />
     <Compile Include="Components\RenderableComponent.cs" />
     <Compile Include="Components\TransformComponent.cs" />
+    <Compile Include="Components\WeaponComponent.cs" />
     <Compile Include="EntityManager.cs" />
     <Compile Include="Floor.cs" />
     <Compile Include="Game.cs" />
@@ -56,8 +61,11 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Systems\CollisionSystem.cs" />
+    <Compile Include="Systems\CombatSystem.cs" />
+    <Compile Include="Systems\HealthSystem.cs" />
     <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\MovementSystem.cs" />
+    <Compile Include="Systems\NPCBehaviourSystem.cs" />
     <Compile Include="Systems\RenderSystem.cs" />
     <Compile Include="TextureManager.cs" />
     <Compile Include="Tile.cs" />

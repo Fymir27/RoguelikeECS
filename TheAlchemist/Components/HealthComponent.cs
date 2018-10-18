@@ -8,9 +8,8 @@ namespace TheAlchemist.Components
 {
     class HealthComponent : Component<HealthComponent>
     {
-        public HealthComponent()
-        {
-            
-        }
+        public float Amount { get; set; }
+        public float Max { get; set; }
+        public float Regeneration { get; set; }
     }
 }

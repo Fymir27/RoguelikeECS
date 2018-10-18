@@ -16,6 +16,8 @@ namespace TheAlchemist.Systems
     class MovementSystem
     {
         public event CollisionEventHandler CollisionEvent;
+        public event BasicAttackHandler BasicAttackEvent;
+        public event PlayerTurnOverHandler PlayerTurnOverEvent;
 
         public MovementSystem()
         {
@@ -31,10 +33,8 @@ namespace TheAlchemist.Systems
             int otherCharacter = floor.GetCharacter(newPos);
             if(otherCharacter != 0 && EntityManager.GetComponentOfEntity<ColliderComponent>(otherCharacter) != null)
             {
-                if(RaiseCollisionEvent(entity, otherCharacter)) // check if other character cant be stepped on / is solid
-                {
-                    return;
-                }
+                RaiseBasicAttackEvent(entity, otherCharacter);
+                return;
             }
 
             int terrain = floor.GetTerrain(newPos);
@@ -51,7 +51,9 @@ namespace TheAlchemist.Systems
             floor.SetCharacter(entityTransform.Position, 0);
             floor.SetCharacter(newPos, entity);
             entityTransform.Position = newPos;
-            
+
+            if (entity == Util.PlayerID)
+                RaisePlayerTurnOverEvent();
         }
 
         // returns wether entityB was solid
@@ -59,6 +61,16 @@ namespace TheAlchemist.Systems
         {
             // SHOULD throw an exception if collision event is unhandled
             return CollisionEvent(entityA, entityB);
+        }
+
+        private void RaiseBasicAttackEvent(int attacker, int defender)
+        {
+            BasicAttackEvent?.Invoke(attacker, defender);
+        }
+
+        private void RaisePlayerTurnOverEvent()
+        {
+            PlayerTurnOverEvent?.Invoke();
         }
     }
 }

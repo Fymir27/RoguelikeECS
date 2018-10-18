@@ -36,7 +36,7 @@ namespace TheAlchemist
 
         public int GetCharacter(Vector2 pos)
         {
-            if(!IsOutOfBounds(pos))
+            if(IsOutOfBounds(pos))
             {
                 return 0;
             }
@@ -119,6 +119,29 @@ namespace TheAlchemist
             }
 
             characters[1, 1] = Util.PlayerID = createPlayer(new Vector2(1, 1));
+
+            int testEnemy = EntityManager.createEntity();
+            int testArmor = EntityManager.createEntity();
+            int testWeapon = EntityManager.createEntity();
+
+            EntityManager.addComponentToEntity(testArmor, new ArmorComponent() { FlatMitigation = 2 });
+            EntityManager.addComponentToEntity(testWeapon, new WeaponComponent() { Damage = 5 });
+
+            List<IComponent> enemyComponents = new List<IComponent>()
+            {
+                new NPCComponent(),
+                new HealthComponent() { Amount = 20, Max = 20, Regeneration = 1 },
+                new EquipmentComponent() { Weapon = testWeapon , Armor = testArmor },
+                new TransformComponent() { Position = new Vector2(3, 3) },
+                new ColliderComponent() { Solid = false },
+                new RenderableComponent() { Visible = true, Texture = "enemy" }
+            };
+
+            EntityManager.addComponentsToEntity(testEnemy, enemyComponents);
+
+
+
+            characters[3, 3] = testEnemy;
         }
 
         public bool IsOutOfBounds(Vector2 pos)
@@ -137,13 +160,21 @@ namespace TheAlchemist
         public int createPlayer(Vector2 pos)
         {
             int player = EntityManager.createEntity();
+            int playerWeapon = EntityManager.createEntity();
+            int playerArmor = EntityManager.createEntity();
 
-            List<IComponent> playerComponents = new List<IComponent>();
-            playerComponents.Add(new TransformComponent() { Position = pos });
-            playerComponents.Add(new HealthComponent());
-            playerComponents.Add(new PlayerComponent());
-            playerComponents.Add(new RenderableComponent { Visible = true, Texture = "player" });
-            playerComponents.Add(new ColliderComponent() { Solid = false });
+            EntityManager.addComponentToEntity(playerWeapon, new WeaponComponent() { Damage = 5 });
+            EntityManager.addComponentToEntity(playerArmor, new ArmorComponent() { PercentMitigation = 20, FlatMitigation = 3});
+
+            List<IComponent> playerComponents = new List<IComponent>()
+            {
+                new TransformComponent() { Position = pos },
+                new HealthComponent() { Amount = 30, Max = 30, Regeneration = 2 },
+                new PlayerComponent(),
+                new RenderableComponent { Visible = true, Texture = "player" },
+                new ColliderComponent() { Solid = false },
+                new EquipmentComponent() { Weapon = playerWeapon, Armor = playerArmor }
+            };
 
             EntityManager.addComponentsToEntity(player, playerComponents);
 

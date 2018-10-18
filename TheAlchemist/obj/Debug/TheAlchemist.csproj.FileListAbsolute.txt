@@ -63,3 +63,4 @@ C:\Users\Oliver\Source\Repos\Fymir27\RoguelikeECS\TheAlchemist\obj\Debug\TheAlch
 C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\Content\wall.xnb
 C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\Newtonsoft.Json.dll
 C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\Newtonsoft.Json.xml
+C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\Content\enemy.xnb

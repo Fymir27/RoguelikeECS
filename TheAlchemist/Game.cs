@@ -23,6 +23,9 @@ namespace TheAlchemist
         MovementSystem movementSystem;
         RenderSystem renderSystem;
         CollisionSystem collisionSystem;
+        HealthSystem healthSystem;
+        CombatSystem combatSystem;
+        NPCBehaviourSystem npcBehaviourSystem;
 
         public static Random Random { get; } = new Random();
 
@@ -51,20 +54,13 @@ namespace TheAlchemist
             Log.Error("Error!");
 
             // TODO: Add your initialization logic here
-            Floor test = new Floor(5, 5);
+            Floor test = new Floor(7, 7);
             Util.CurrentFloor = test;
 
 
             //int entity = EntityManager.createEntity();
             //EntityManager.addComponentToEntity(entity, new ColliderComponent() { Solid = true });
             //EntityManager.addComponentToEntity(entity, new TransformComponent());
-
-            string serializedEM = EntityManager.ToJson();
-            Log.Data(serializedEM);
-
-            EntityManager.Reset();
-            EntityManager.InitFromJson(serializedEM);
-            Log.Message(EntityManager.ToJson());
 
             //System.Console.WriteLine(test);
 
@@ -75,13 +71,26 @@ namespace TheAlchemist
             movementSystem = new MovementSystem();
             renderSystem = new RenderSystem();
             collisionSystem = new CollisionSystem();
+            healthSystem = new HealthSystem();
+            combatSystem = new CombatSystem();
+            npcBehaviourSystem = new NPCBehaviourSystem();
 
             // hook up all events with their handlers
             inputSystem.MovementEvent += movementSystem.HandleMovementEvent;
-            movementSystem.CollisionEvent += collisionSystem.HandleCollision;
-         
 
-            EntityManager.Dump();
+            npcBehaviourSystem.EnemyMovedEvent += movementSystem.HandleMovementEvent;
+
+            movementSystem.CollisionEvent += collisionSystem.HandleCollision;
+            movementSystem.BasicAttackEvent += combatSystem.HandleBasicAttack;
+            movementSystem.PlayerTurnOverEvent += npcBehaviourSystem.EnemyTurn;
+
+            combatSystem.HealthLostEvent += healthSystem.HandleLostHealth;
+            combatSystem.PlayerTurnOverEvent += npcBehaviourSystem.EnemyTurn;
+
+            
+            
+
+            //EntityManager.Dump();
 
 
 
@@ -102,6 +111,7 @@ namespace TheAlchemist
 
             TextureManager.AddTexture(Content.Load<Texture2D>("player"));
             TextureManager.AddTexture(Content.Load<Texture2D>("wall"));
+            TextureManager.AddTexture(Content.Load<Texture2D>("enemy"));
         }
 
         /// <summary>
