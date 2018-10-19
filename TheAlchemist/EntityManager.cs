@@ -87,6 +87,13 @@ namespace TheAlchemist
             return entityID;
         }
 
+        public static int createEntity(List<IComponent> components)
+        {
+            int entityID = createEntity();
+            addComponentsToEntity(entityID, components);
+            return entityID;            
+        }
+
         // adds multiple components to an entity
         public static void addComponentsToEntity(int entityID, List<IComponent> components)
         {

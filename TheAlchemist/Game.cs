@@ -18,6 +18,7 @@ namespace TheAlchemist
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        SpriteFont defaultFont;
 
         InputSystem inputSystem;
         MovementSystem movementSystem;
@@ -29,10 +30,6 @@ namespace TheAlchemist
 
         public static Random Random { get; } = new Random();
 
-        Texture2D textureSquare;
-        //Texture2D texturePlayer;
-
-        //int player;
         
         public Game()
         {
@@ -54,9 +51,17 @@ namespace TheAlchemist
             Log.Error("Error!");
 
             // TODO: Add your initialization logic here
-            Floor test = new Floor(7, 7);
+            Floor test = new Floor(10, 10);
             Util.CurrentFloor = test;
 
+            var playerHealthComponent = EntityManager.GetComponentOfEntity<HealthComponent>(Util.PlayerID);
+
+            int lowerFloorBorder = Util.TileSize * 10;
+            int UI = EntityManager.createEntity(new List<IComponent>()
+            {
+                new RenderableTextComponent() { Position = new Vector2(10, lowerFloorBorder + 10), Text = "Player HP: " },
+                new RenderableTextComponent() { Position = new Vector2(90, lowerFloorBorder + 10), GetTextFrom = playerHealthComponent.GetString }
+            });
 
             //int entity = EntityManager.createEntity();
             //EntityManager.addComponentToEntity(entity, new ColliderComponent() { Solid = true });
@@ -107,8 +112,7 @@ namespace TheAlchemist
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            textureSquare = Content.Load<Texture2D>("square");
-
+            Util.DefaultFont = Content.Load<SpriteFont>("default");
             TextureManager.AddTexture(Content.Load<Texture2D>("player"));
             TextureManager.AddTexture(Content.Load<Texture2D>("wall"));
             TextureManager.AddTexture(Content.Load<Texture2D>("enemy"));
@@ -152,6 +156,7 @@ namespace TheAlchemist
             spriteBatch.Begin();
             //spriteBatch.Draw(textureSquare, new Vector2(0, 0), Color.Red);
             renderSystem.Run(spriteBatch);
+            //spriteBatch.DrawString(Util.DefaultFont, "Player HP: (30|30)", new Vector2(10, Util.TileSize * 10 + 10), Color.Black);
             spriteBatch.End();
 
             base.Draw(gameTime);

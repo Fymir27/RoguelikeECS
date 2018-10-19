@@ -11,5 +11,10 @@ namespace TheAlchemist.Components
         public float Amount { get; set; }
         public float Max { get; set; }
         public float Regeneration { get; set; }
+
+        public string GetString()
+        {
+            return "(" + Amount + "|" + Max + ")";
+        }
     }
 }

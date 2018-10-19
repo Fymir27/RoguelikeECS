@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/player.png</SourceFile>
-  <SourceTime>2018-10-11T02:06:23.4586669+02:00</SourceTime>
-  <DestFile>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/bin/DesktopGL/Content/player.xnb</DestFile>
-  <DestTime>2018-10-15T11:39:49.9683125+02:00</DestTime>
+  <SourceFile>C:/Users/Oliver/Source/Repos/Fymir27/RoguelikeECS/TheAlchemist/Content/player.png</SourceFile>
+  <SourceTime>2018-10-13T20:20:19.1822942+02:00</SourceTime>
+  <DestFile>C:/Users/Oliver/Source/Repos/Fymir27/RoguelikeECS/TheAlchemist/Content/bin/DesktopGL/Content/player.xnb</DestFile>
+  <DestTime>2018-10-19T18:20:50.1406226+02:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2018-09-23T23:55:52+02:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

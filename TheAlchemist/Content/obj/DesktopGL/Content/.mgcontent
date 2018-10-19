@@ -4,12 +4,14 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
-    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/enemy.png</File>
-    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/player.png</File>
-    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/Square.png</File>
-    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/wall.png</File>
+    <File>C:/Users/Oliver/Source/Repos/Fymir27/RoguelikeECS/TheAlchemist/Content/default.spritefont</File>
+    <File>C:/Users/Oliver/Source/Repos/Fymir27/RoguelikeECS/TheAlchemist/Content/enemy.png</File>
+    <File>C:/Users/Oliver/Source/Repos/Fymir27/RoguelikeECS/TheAlchemist/Content/player.png</File>
+    <File>C:/Users/Oliver/Source/Repos/Fymir27/RoguelikeECS/TheAlchemist/Content/Square.png</File>
+    <File>C:/Users/Oliver/Source/Repos/Fymir27/RoguelikeECS/TheAlchemist/Content/wall.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

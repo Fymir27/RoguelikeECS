@@ -134,7 +134,7 @@ namespace TheAlchemist
                 new EquipmentComponent() { Weapon = testWeapon , Armor = testArmor },
                 new TransformComponent() { Position = new Vector2(3, 3) },
                 new ColliderComponent() { Solid = false },
-                new RenderableComponent() { Visible = true, Texture = "enemy" }
+                new RenderableSpriteComponent() { Visible = true, Texture = "enemy" }
             };
 
             EntityManager.addComponentsToEntity(testEnemy, enemyComponents);
@@ -171,7 +171,7 @@ namespace TheAlchemist
                 new TransformComponent() { Position = pos },
                 new HealthComponent() { Amount = 30, Max = 30, Regeneration = 2 },
                 new PlayerComponent(),
-                new RenderableComponent { Visible = true, Texture = "player" },
+                new RenderableSpriteComponent { Visible = true, Texture = "player" },
                 new ColliderComponent() { Solid = false },
                 new EquipmentComponent() { Weapon = playerWeapon, Armor = playerArmor }
             };
@@ -187,7 +187,7 @@ namespace TheAlchemist
 
             List<IComponent> wallComponents = new List<IComponent>();
             wallComponents.Add(new TransformComponent() { Position = pos });
-            wallComponents.Add(new RenderableComponent() { Visible = true, Texture = "wall" });
+            wallComponents.Add(new RenderableSpriteComponent() { Visible = true, Texture = "wall" });
             wallComponents.Add(new ColliderComponent() { Solid = true });
 
             EntityManager.addComponentsToEntity(wall, wallComponents);

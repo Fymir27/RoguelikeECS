@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,6 @@ using System.Threading.Tasks;
 namespace TheAlchemist
 {
     
-
     public enum Direction
     {
         North,   
@@ -26,6 +26,7 @@ namespace TheAlchemist
         public static int TileSize { get; } = 10;
         public static int PlayerID { get; set; } = 0;
         public static Floor CurrentFloor { get; set; } = null;
+        public static SpriteFont DefaultFont { get; set; } = null;
 
         // gets called for every new type of component/entity/...
         public static class TypeID<T>
