@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 
 namespace TheAlchemist.Components
 {
+    using Systems; // for access to description system
+
     class RenderableComponent<T> : Component<T> where T : Component<T>
     {
         public bool Visible { get; set; } = true;
@@ -24,11 +26,19 @@ namespace TheAlchemist.Components
                 if (hasFixedPosition)
                     return fixedPosition;
 
-                Vector2 worldPos = EntityManager
-                    .GetComponentOfEntity<TransformComponent>(entityID)
-                    .Position;
-                int tileSize = Util.TileSize;
-                return new Vector2(worldPos.X * tileSize, worldPos.Y * tileSize); // converted to screen pos
+                try
+                {
+                    Vector2 worldPos = EntityManager
+                        .GetComponentOfEntity<TransformComponent>(entityID)
+                        .Position;
+                    int tileSize = Util.TileSize;
+                    return new Vector2(worldPos.X * tileSize, worldPos.Y * tileSize); // converted to screen pos
+                }
+                catch(NullReferenceException)
+                {
+                    Log.Error("RenderableComponent has neither a fixed Position nor can it find a TransformComponent!" + DescriptionSystem.GetName(EntityID) + " (Entity " + EntityID + ", Component " + componentID + ")");
+                    throw;
+                }
             }
             set
             {
@@ -50,6 +60,8 @@ namespace TheAlchemist.Components
     
     class RenderableTextComponent : RenderableComponent<RenderableTextComponent>
     {
+        // if this is set manually the component will have a fixed text
+        // dynamic text can be configured by setting GetTextFrom instead
         public string Text
         {
             get
@@ -58,7 +70,8 @@ namespace TheAlchemist.Components
                     return fixedText;
                 if (GetTextFrom != null)
                     return GetTextFrom();
-                return "";
+                Log.Warning("No renderable text available! " + DescriptionSystem.GetName(EntityID) + " (Entity " + EntityID + ", Component " + componentID + ")");
+                return fixedText = "[MISSING TEXT]";
             }
             set
             {

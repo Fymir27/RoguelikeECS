@@ -57,24 +57,56 @@ namespace TheAlchemist
         // returns an array of entity IDs that have a specific component attached
         public static int[] GetEntitiesWithComponent<T>() where T : Component<T>
         {
-            return entitiesWithComponent[Component<T>.TypeID].ToArray();
+            try
+            {
+                return entitiesWithComponent[Component<T>.TypeID].ToArray();
+            }
+            catch (KeyNotFoundException)
+            {
+                Log.Warning("No such Component exists! (" + typeof(T) + ")");
+            }
+            return new int[0];
         }
 
         // returns all components of Type T
         public static T[] GetAllComponents<T>() where T : Component<T>
-        {
-            return componentsOfType[Component<T>.TypeID].ConvertAll(component => component as T).ToArray();
+        {        
+            try
+            {
+                return componentsOfType[Component<T>.TypeID].ConvertAll(component => component as T).ToArray();
+            }
+            catch (KeyNotFoundException)
+            {
+                Log.Warning("No such Component exists! (" + typeof(T) + ")");
+            }
+            return new T[0];
         }
 
         // returns a list of all components attached to specific entity
         public static IComponent[] GetAllComponentsOfEntity(int entityID)
         {
-            return componentsOfEntity[entityID].ToArray();
+            try
+            {
+                return componentsOfEntity[entityID].ToArray();
+            }
+            catch (KeyNotFoundException)
+            {
+                Log.Error("No such entity! (" + entityID + ")");
+                throw;
+            }
         }
 
         public static T GetComponentOfEntity<T>(int entityID) where T : Component<T>
-        {           
-            return componentsOfEntity[entityID].FirstOrDefault(x => x.TypeID == Component<T>.TypeID) as T;
+        {                  
+            try
+            {
+                return componentsOfEntity[entityID].FirstOrDefault(x => x.TypeID == Component<T>.TypeID) as T;
+            }
+            catch (KeyNotFoundException)
+            {
+                Log.Error("No such entity! (" + entityID + ")");
+                throw;
+            }
         }
 
         // creates new Entity with an empty list of components and returns its ID

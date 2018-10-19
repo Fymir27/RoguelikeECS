@@ -46,9 +46,9 @@ namespace TheAlchemist
         protected override void Initialize()
         {
             Log.Init(AppDomain.CurrentDomain.BaseDirectory + "/log.html");
+
             Log.Message("Initializing...");
-            Log.Warning("Warning!");
-            Log.Error("Error!");
+            
 
             // TODO: Add your initialization logic here
             Floor test = new Floor(10, 10);
@@ -59,8 +59,10 @@ namespace TheAlchemist
             int lowerFloorBorder = Util.TileSize * 10;
             int UI = EntityManager.createEntity(new List<IComponent>()
             {
+                new DescriptionComponent() { Name = "UI", Description = "Displays stuff you probably want to know!"},
                 new RenderableTextComponent() { Position = new Vector2(10, lowerFloorBorder + 10), Text = "Player HP: " },
-                new RenderableTextComponent() { Position = new Vector2(90, lowerFloorBorder + 10), GetTextFrom = playerHealthComponent.GetString }
+                new RenderableTextComponent() { Position = new Vector2(90, lowerFloorBorder + 10), GetTextFrom = playerHealthComponent.GetString },
+                new RenderableTextComponent() { Position = new Vector2(10, lowerFloorBorder + 30) }
             });
 
             //int entity = EntityManager.createEntity();

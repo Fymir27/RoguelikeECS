@@ -13,15 +13,18 @@ namespace TheAlchemist
         [STAThread]
         static void Main()
         {
-            try
-            {
+            
+         
                 using (var game = new Game())
                     game.Run();
-            }
+            
+            /*
             catch(NullReferenceException e)
             {
                 Console.WriteLine("[Error] Whoops, something appears to be missing!" + "\n" + e.StackTrace);
+                //throw e;
             }
+            */
         }
     }
 }

@@ -20,7 +20,7 @@ namespace TheAlchemist.Systems
 
         public bool HandleCollision(int entityA, int entityB)
         {
-            Console.WriteLine("Collision between objects: " + entityA + " - " + entityB);
+            //Console.WriteLine("Collision between objects: " + entityA + " - " + entityB);
             var colliderB = EntityManager.GetComponentOfEntity<ColliderComponent>(entityB);
             if (colliderB == null)
                 return false;
