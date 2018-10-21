@@ -23,9 +23,6 @@ namespace TheAlchemist.Systems
             var healthComponent = EntityManager.GetComponentOfEntity<HealthComponent>(entity);
 
             healthComponent.Amount += amountGained;
-
-            if (healthComponent.Amount > healthComponent.Max)
-                healthComponent.Amount = healthComponent.Max;
         }
 
         public void HandleLostHealth(int entity, float amountLost)
@@ -34,9 +31,23 @@ namespace TheAlchemist.Systems
 
             healthComponent.Amount -= amountLost;
 
-            Log.Message("Entity " + entity + " HP: " + healthComponent.Amount + "|" + healthComponent.Max + " (-" + amountLost + ")");
+            // ded
+            if (healthComponent.Amount <= 0)
+                EntityManager.RemoveEntity(entity);
 
-            // TODO: what if character dies?
+            //Log.Message("Entity " + entity + " HP: " + healthComponent.Amount + "|" + healthComponent.Max + " (-" + amountLost + ")");
+        }
+
+        public void Regenerate(int entity)
+        {
+            var healthComponent = EntityManager.GetComponentOfEntity<HealthComponent>(entity);
+
+            healthComponent.RegenerationProgress += healthComponent.RegenerationAmount;
+        }
+
+        public void RegneratePlayer()
+        {
+            Regenerate(Util.PlayerID);
         }
     }
 }

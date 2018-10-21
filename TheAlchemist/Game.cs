@@ -57,14 +57,14 @@ namespace TheAlchemist
             var playerHealthComponent = EntityManager.GetComponentOfEntity<HealthComponent>(Util.PlayerID);
 
             int lowerFloorBorder = Util.TileSize * 10;
-            int UI = EntityManager.createEntity(new List<IComponent>()
+            int UI = EntityManager.CreateEntity(new List<IComponent>()
             {
                 new DescriptionComponent() { Name = "UI", Description = "Displays stuff you probably want to know!"},
                 new RenderableTextComponent() { Position = new Vector2(10, lowerFloorBorder + 10), Text = "Player HP: " },
-                new RenderableTextComponent() { Position = new Vector2(90, lowerFloorBorder + 10), GetTextFrom = playerHealthComponent.GetString },
-                new RenderableTextComponent() { Position = new Vector2(10, lowerFloorBorder + 30) }
+                new RenderableTextComponent() { Position = new Vector2(90, lowerFloorBorder + 10), GetTextFrom = playerHealthComponent.GetString }
             });
 
+            Log.Data(DescriptionSystem.GetDebugInfoEntity(Util.PlayerID));
             //int entity = EntityManager.createEntity();
             //EntityManager.addComponentToEntity(entity, new ColliderComponent() { Solid = true });
             //EntityManager.addComponentToEntity(entity, new TransformComponent());
@@ -89,10 +89,14 @@ namespace TheAlchemist
 
             movementSystem.CollisionEvent += collisionSystem.HandleCollision;
             movementSystem.BasicAttackEvent += combatSystem.HandleBasicAttack;
+            movementSystem.PlayerTurnOverEvent += healthSystem.RegneratePlayer;
             movementSystem.PlayerTurnOverEvent += npcBehaviourSystem.EnemyTurn;
+            
 
             combatSystem.HealthLostEvent += healthSystem.HandleLostHealth;
+            combatSystem.PlayerTurnOverEvent += healthSystem.RegneratePlayer;
             combatSystem.PlayerTurnOverEvent += npcBehaviourSystem.EnemyTurn;
+            
 
             
             

@@ -110,7 +110,7 @@ namespace TheAlchemist
         }
 
         // creates new Entity with an empty list of components and returns its ID
-        public static int createEntity()
+        public static int CreateEntity()
         {
             int entityID = entityIDCounter++;
 
@@ -119,24 +119,24 @@ namespace TheAlchemist
             return entityID;
         }
 
-        public static int createEntity(List<IComponent> components)
+        public static int CreateEntity(List<IComponent> components)
         {
-            int entityID = createEntity();
-            addComponentsToEntity(entityID, components);
+            int entityID = CreateEntity();
+            AddComponentsToEntity(entityID, components);
             return entityID;            
         }
 
         // adds multiple components to an entity
-        public static void addComponentsToEntity(int entityID, List<IComponent> components)
+        public static void AddComponentsToEntity(int entityID, List<IComponent> components)
         {
             foreach (var component in components)
             {
-                addComponentToEntity(entityID, component);
+                AddComponentToEntity(entityID, component);
             }
         }
 
         // adds a single component to an entity
-        public static void addComponentToEntity(int entityID, IComponent component)
+        public static void AddComponentToEntity(int entityID, IComponent component)
         {
             component.EntityID = entityID;
             componentsOfEntity[entityID].Add(component);
@@ -155,6 +155,38 @@ namespace TheAlchemist
             }
             componentsOfType[componentType].Add(component);          
         }
+
+        public static void RemoveEntity(int entityID)
+        {
+            Log.Message("Entity before removal:");
+            Log.Data(Systems.DescriptionSystem.GetDebugInfoEntity(entityID));
+            foreach(var key in entitiesWithComponent.Keys)
+            {
+                entitiesWithComponent[key].Remove(entityID);
+            }
+            componentsOfEntity[entityID].ForEach(component =>
+            {
+                if(component.TypeID == TransformComponent.TypeID)
+                {
+                    var transform = (TransformComponent)component;
+                    var pos = transform.Position;
+                    var floor = Util.CurrentFloor;
+
+                    if (floor.GetCharacter(pos) == entityID)
+                        floor.SetCharacter(pos, 0);
+                    else if (floor.GetTerrain(pos) == entityID)
+                        floor.SetTerrain(pos, 0);
+                    else if (floor.GetItems(pos).Contains(entityID))
+                        floor.GetItems(pos); //TODO: remove item!
+                }
+                componentsOfType[component.TypeID].Remove(component);
+            });
+            componentsOfEntity.Remove(entityID);
+            Dump();
+            //Log.Data(ToJson());
+        }
+
+        
 
         // debug
         public static void Dump()
