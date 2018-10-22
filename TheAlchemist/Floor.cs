@@ -25,6 +25,81 @@ namespace TheAlchemist
         [JsonProperty]
         List<int>[,] items;
 
+        public Floor(string path)
+        {
+            StreamReader file = new StreamReader(path);
+
+            List<List<int>> tmpTerrain = new List<List<int>>();
+
+            int y = 0;
+            while(!file.EndOfStream)
+            {
+                int x = 0;
+                var row = file.ReadLine();
+                tmpTerrain.Add(new List<int>());
+                foreach (var tile in row)
+                {
+                    switch(tile)
+                    {
+                        case '#':
+                            tmpTerrain[y].Add(CreateWall(new Vector2(x, y)));
+                            break;
+
+                        case '+':
+                            tmpTerrain[y].Add(CreateDoor(new Vector2(x, y)));
+                            break;
+
+                        default:
+                            tmpTerrain[y].Add(0);
+                            break;
+                    }
+                    x++;
+                }
+                if(x > 0)
+                    y++;
+            }
+
+            this.width = tmpTerrain[0].Count;
+            this.height = y;
+
+            terrain = new int[width, height];
+            characters = new int[width, height];
+            items = new List<int>[width, height]; // don't initialize each List yet to save space!
+
+            for (y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    terrain[x, y] = tmpTerrain[y][x];
+                }
+            }
+
+            characters[1, 1] = Util.PlayerID = CreatePlayer(new Vector2(1, 1));
+
+            int testEnemy = EntityManager.CreateEntity();
+            int testArmor = EntityManager.CreateEntity();
+            int testWeapon = EntityManager.CreateEntity();
+
+            EntityManager.AddComponentToEntity(testArmor, new ArmorComponent() { FlatMitigation = 2 });
+            EntityManager.AddComponentToEntity(testWeapon, new WeaponComponent() { Damage = 10 });
+
+            List<IComponent> enemyComponents = new List<IComponent>()
+            {
+                new NPCComponent(),
+                new HealthComponent() { Amount = 20, Max = 20, RegenerationAmount = 1 },
+                new EquipmentComponent() { Weapon = testWeapon , Armor = testArmor },
+                new TransformComponent() { Position = new Vector2(3, 3) },
+                new ColliderComponent() { Solid = false },
+                new RenderableSpriteComponent() { Visible = true, Texture = "enemy" }
+            };
+
+            EntityManager.AddComponentsToEntity(testEnemy, enemyComponents);
+
+
+
+            characters[3, 3] = testEnemy;
+        }
+
         public int GetTerrain(Vector2 pos)
         {
             if(IsOutOfBounds(pos))
@@ -109,16 +184,16 @@ namespace TheAlchemist
                     // create sourrounding wall
                     if(y == 0 || y == height - 1)
                     {
-                        terrain[x, y] = createWall(new Vector2(x, y));
+                        terrain[x, y] = CreateWall(new Vector2(x, y));
                     }
                     else if(x == 0 || x == width - 1)
                     {
-                        terrain[x, y] = createWall(new Vector2(x, y));
+                        terrain[x, y] = CreateWall(new Vector2(x, y));
                     }                      
                 }
             }
 
-            characters[1, 1] = Util.PlayerID = createPlayer(new Vector2(1, 1));
+            characters[1, 1] = Util.PlayerID = CreatePlayer(new Vector2(1, 1));
 
             int testEnemy = EntityManager.CreateEntity();
             int testArmor = EntityManager.CreateEntity();
@@ -157,7 +232,7 @@ namespace TheAlchemist
             return false;
         }
 
-        public int createPlayer(Vector2 pos)
+        public int CreatePlayer(Vector2 pos)
         {
             int player = EntityManager.CreateEntity();
             int playerWeapon = EntityManager.CreateEntity();
@@ -182,7 +257,7 @@ namespace TheAlchemist
             return player;
         }
 
-        public int createWall(Vector2 pos)
+        public int CreateWall(Vector2 pos)
         {
             int wall = EntityManager.CreateEntity();
 
@@ -195,6 +270,16 @@ namespace TheAlchemist
 
             return wall;
         } 
+
+        public int CreateDoor(Vector2 pos)
+        {
+            return EntityManager.CreateEntity(new List<IComponent>()
+            {
+                new TransformComponent() { Position = pos },
+                new RenderableSpriteComponent() { Texture = "door" },
+                new ColliderComponent() { Solid = false }
+            });
+        }
 
         public string ToJson()
         {

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/Oliver/Source/Repos/Fymir27/RoguelikeECS/TheAlchemist/Content/enemy.png</SourceFile>
-  <SourceTime>2018-10-19T18:19:45.3989792+02:00</SourceTime>
-  <DestFile>C:/Users/Oliver/Source/Repos/Fymir27/RoguelikeECS/TheAlchemist/Content/bin/DesktopGL/Content/enemy.xnb</DestFile>
-  <DestTime>2018-10-19T18:20:50.0485999+02:00</DestTime>
+  <SourceFile>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/enemy.png</SourceFile>
+  <SourceTime>2018-10-18T23:22:24.64444+02:00</SourceTime>
+  <DestFile>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/bin/DesktopGL/Content/enemy.xnb</DestFile>
+  <DestTime>2018-10-21T23:08:58.519555+02:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2018-09-23T23:55:52+02:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

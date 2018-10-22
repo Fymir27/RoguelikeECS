@@ -9,8 +9,7 @@ namespace TheAlchemist
 {
     using Systems;
     using Components;
-    using Newtonsoft.Json;
-
+    
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
@@ -27,10 +26,11 @@ namespace TheAlchemist
         HealthSystem healthSystem;
         CombatSystem combatSystem;
         NPCBehaviourSystem npcBehaviourSystem;
+        InteractionSystem interactionSystem;
 
         public static Random Random { get; } = new Random();
 
-        
+               
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -48,10 +48,10 @@ namespace TheAlchemist
             Log.Init(AppDomain.CurrentDomain.BaseDirectory + "/log.html");
 
             Log.Message("Initializing...");
-            
 
             // TODO: Add your initialization logic here
-            Floor test = new Floor(10, 10);
+            //Floor test = new Floor(10, 10);
+            Floor test = new Floor(AppDomain.CurrentDomain.BaseDirectory + "/map.txt");
             Util.CurrentFloor = test;
 
             var playerHealthComponent = EntityManager.GetComponentOfEntity<HealthComponent>(Util.PlayerID);
@@ -81,6 +81,7 @@ namespace TheAlchemist
             healthSystem = new HealthSystem();
             combatSystem = new CombatSystem();
             npcBehaviourSystem = new NPCBehaviourSystem();
+            interactionSystem = new InteractionSystem();
 
             // hook up all events with their handlers
             inputSystem.MovementEvent += movementSystem.HandleMovementEvent;
@@ -96,13 +97,6 @@ namespace TheAlchemist
             combatSystem.HealthLostEvent += healthSystem.HandleLostHealth;
             combatSystem.PlayerTurnOverEvent += healthSystem.RegneratePlayer;
             combatSystem.PlayerTurnOverEvent += npcBehaviourSystem.EnemyTurn;
-            
-
-            
-            
-
-            //EntityManager.Dump();
-
 
 
             base.Initialize();
@@ -119,9 +113,10 @@ namespace TheAlchemist
 
             // TODO: use this.Content to load your game content here
             Util.DefaultFont = Content.Load<SpriteFont>("default");
-            TextureManager.AddTexture(Content.Load<Texture2D>("player"));
-            TextureManager.AddTexture(Content.Load<Texture2D>("wall"));
-            TextureManager.AddTexture(Content.Load<Texture2D>("enemy"));
+
+            string[] textures = { "player", "enemy", "wall", "door" };
+            TextureManager.Init(Content);
+            TextureManager.LoadTextures(textures);
         }
 
         /// <summary>

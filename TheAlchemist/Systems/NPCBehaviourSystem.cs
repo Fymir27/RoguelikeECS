@@ -23,7 +23,6 @@ namespace TheAlchemist.Systems
             {
                 // get random direction (for now only 4 directional)              
                 Direction dir = (Direction)(Game.Random.Next(0, 4) * 2);
-                //Console.WriteLine("npc " + npc + " -> random dir: " + dir);
                 RaiseEnemyMovedEvent(npc, dir);
             }
         }

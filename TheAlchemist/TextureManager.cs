@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,12 @@ namespace TheAlchemist
     static class TextureManager
     {
         static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
+        static ContentManager contentManager;
+
+        public static void Init(ContentManager contentManager)
+        {
+            TextureManager.contentManager = contentManager;
+        }
 
         public static void AddTexture(Texture2D texture)
         {
@@ -20,6 +27,14 @@ namespace TheAlchemist
                 return;
             }
             textures.Add(name, texture);
+        }
+
+        public static void LoadTextures(string[] textures)
+        {
+            foreach (var texture in textures)
+            {
+                AddTexture(contentManager.Load<Texture2D>(texture));
+            }
         }
 
         public static Texture2D GetTexture(string name)

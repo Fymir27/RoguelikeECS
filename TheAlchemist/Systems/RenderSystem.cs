@@ -15,19 +15,23 @@ namespace TheAlchemist.Systems
     {
         public void Run(SpriteBatch spriteBatch)
         {
-            //renderedSprites = 
-            EntityManager
+            var renderedSprites = EntityManager
                 .GetAllComponents<RenderableSpriteComponent>()
-                .Where(component => component.Visible)
-                .ToList()
-                .ForEach(sprite => spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, Color.White));
+                .Where(component => component.Visible);
 
-            //renderedText 
-            EntityManager
+            foreach(var sprite in renderedSprites)
+            {
+                spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, Color.White);
+            }
+
+            var renderedTexts = EntityManager
                 .GetAllComponents<RenderableTextComponent>()
-                .Where(text => text.Visible)
-                .ToList()
-                .ForEach(text => spriteBatch.DrawString(text.Font, text.Text, text.Position, Color.Black));
+                .Where(text => text.Visible);
+
+            foreach (var text in renderedTexts)
+            {
+                spriteBatch.DrawString(text.Font, text.Text, text.Position, Color.Black);
+            }
         }
     }
 }

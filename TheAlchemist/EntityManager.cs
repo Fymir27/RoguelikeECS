@@ -25,6 +25,7 @@ namespace TheAlchemist
         // maps from component Type ID to list of components of that type
         static Dictionary<int, List<IComponent>> componentsOfType = new Dictionary<int, List<IComponent>>();
 
+        // returns serialized state of entity manager as string
         public static string ToJson()
         {
             return JsonConvert.SerializeObject(new EntityManager(), Formatting.Indented, new JsonSerializerSettings() {
@@ -34,13 +35,12 @@ namespace TheAlchemist
 
         }
 
+        // deserializes entity manager from string
         public static void InitFromJson(string json)
         {
-            //Dump();
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.TypeNameHandling = TypeNameHandling.Auto;
             JsonConvert.DeserializeObject<EntityManager>(json, settings);
-            //Dump();
         }
 
         // only used for debugging!
@@ -54,40 +54,40 @@ namespace TheAlchemist
         // running counter for entiy IDs (ID 0 is unused)
         static int entityIDCounter = 1;
 
-        // returns an array of entity IDs that have a specific component attached
-        public static int[] GetEntitiesWithComponent<T>() where T : Component<T>
+        // returns entities hhat have a specific type of component attached
+        public static IEnumerable<int> GetEntitiesWithComponent<T>() where T : Component<T>
         {
             try
             {
-                return entitiesWithComponent[Component<T>.TypeID].ToArray();
+                return entitiesWithComponent[Component<T>.TypeID];
+            }
+            catch (KeyNotFoundException)
+            {
+                Log.Warning("No entity with such Component exists! (" + typeof(T) + ")");
+                return new List<int>();
+            }
+        }
+
+        // returns all components of specific type
+        public static IEnumerable<T> GetAllComponents<T>() where T : Component<T>
+        {
+            try
+            {
+                return componentsOfType[Component<T>.TypeID].Cast<T>();
             }
             catch (KeyNotFoundException)
             {
                 Log.Warning("No such Component exists! (" + typeof(T) + ")");
+                return Enumerable.Empty<T>();
             }
-            return new int[0];
         }
 
-        // returns all components of Type T
-        public static T[] GetAllComponents<T>() where T : Component<T>
-        {        
-            try
-            {
-                return componentsOfType[Component<T>.TypeID].ConvertAll(component => component as T).ToArray();
-            }
-            catch (KeyNotFoundException)
-            {
-                Log.Warning("No such Component exists! (" + typeof(T) + ")");
-            }
-            return new T[0];
-        }
-
-        // returns a list of all components attached to specific entity
-        public static IComponent[] GetAllComponentsOfEntity(int entityID)
+        // returns all components attached to specific a entity
+        public static IEnumerable<IComponent> GetAllComponentsOfEntity(int entityID)
         {
             try
             {
-                return componentsOfEntity[entityID].ToArray();
+                return componentsOfEntity[entityID];
             }
             catch (KeyNotFoundException)
             {
@@ -119,6 +119,7 @@ namespace TheAlchemist
             return entityID;
         }
 
+        // creates new Entity with list of components and returns its ID
         public static int CreateEntity(List<IComponent> components)
         {
             int entityID = CreateEntity();
@@ -156,37 +157,42 @@ namespace TheAlchemist
             componentsOfType[componentType].Add(component);          
         }
 
+        // "deletes" an entity
         public static void RemoveEntity(int entityID)
         {
-            Log.Message("Entity before removal:");
-            Log.Data(Systems.DescriptionSystem.GetDebugInfoEntity(entityID));
-            foreach(var key in entitiesWithComponent.Keys)
+            try
             {
-                entitiesWithComponent[key].Remove(entityID);
-            }
-            componentsOfEntity[entityID].ForEach(component =>
-            {
-                if(component.TypeID == TransformComponent.TypeID)
+                foreach (var key in entitiesWithComponent.Keys)
                 {
-                    var transform = (TransformComponent)component;
-                    var pos = transform.Position;
-                    var floor = Util.CurrentFloor;
-
-                    if (floor.GetCharacter(pos) == entityID)
-                        floor.SetCharacter(pos, 0);
-                    else if (floor.GetTerrain(pos) == entityID)
-                        floor.SetTerrain(pos, 0);
-                    else if (floor.GetItems(pos).Contains(entityID))
-                        floor.GetItems(pos); //TODO: remove item!
+                    entitiesWithComponent[key].Remove(entityID);
                 }
-                componentsOfType[component.TypeID].Remove(component);
-            });
-            componentsOfEntity.Remove(entityID);
-            Dump();
-            //Log.Data(ToJson());
-        }
 
-        
+                foreach (var component in componentsOfEntity[entityID])
+                {
+                    if (component.TypeID == TransformComponent.TypeID)
+                    {
+                        var transform = (TransformComponent)component;
+                        var pos = transform.Position;
+                        var floor = Util.CurrentFloor;
+
+                        // check if entity was character/tile/item
+                        if (floor.GetCharacter(pos) == entityID)
+                            floor.SetCharacter(pos, 0);
+                        else if (floor.GetTerrain(pos) == entityID)
+                            floor.SetTerrain(pos, 0);
+                        //TODO: remove item!
+                    }
+                    componentsOfType[component.TypeID].Remove(component);
+                }
+
+                componentsOfEntity.Remove(entityID);
+            }
+            catch(KeyNotFoundException)
+            {
+                Log.Error("No such entity! (" + entityID + ")");
+                throw;
+            }
+        }
 
         // debug
         public static void Dump()
