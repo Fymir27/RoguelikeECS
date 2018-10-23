@@ -273,11 +273,15 @@ namespace TheAlchemist
 
         public int CreateDoor(Vector2 pos)
         {
+            var doorComponent = new DoorComponent() { Open = false, TextureClosed = "doorClosed", TextureOpen = "doorOpened" };
             return EntityManager.CreateEntity(new List<IComponent>()
             {
+                doorComponent,
+                new InteractableComponent() { },
                 new TransformComponent() { Position = pos },
-                new RenderableSpriteComponent() { Texture = "door" },
-                new ColliderComponent() { Solid = false }
+                new RenderableSpriteComponent() { Texture = doorComponent.Open ? doorComponent.TextureOpen : doorComponent.TextureClosed },
+                new ColliderComponent() { Solid = true },
+                //new RenderableTextComponent() { GetTextFrom = () => doorComponent.Open.ToString() }
             });
         }
 

@@ -38,8 +38,16 @@ namespace TheAlchemist
         }
 
         public static Texture2D GetTexture(string name)
-        { 
-            return textures.ContainsKey(name) ? textures[name] : null;
+        {
+            try
+            {
+                return textures[name];
+            }
+            catch(KeyNotFoundException)
+            {
+                Log.Error("No such texture loaded: " + name);
+                throw;
+            }
         }
 
         public static void PrintLoadedTextures()

@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace TheAlchemist
 {
+    using Systems;
+    using Components;
     
     public enum Direction
     {
@@ -21,12 +23,18 @@ namespace TheAlchemist
         NorthWest
     }
 
+    public delegate void TurnOverHandler(int entity);
+
     static class Util
     {
+        public static event TurnOverHandler TurnOverEvent;
+
         public static int TileSize { get; } = 10;
         public static int PlayerID { get; set; } = 0;
         public static Floor CurrentFloor { get; set; } = null;
         public static SpriteFont DefaultFont { get; set; } = null;
+
+        public static bool PlayerTurnOver { get; set; } = false;
 
         // gets called for every new type of component/entity/...
         public static class TypeID<T>
@@ -76,6 +84,16 @@ namespace TheAlchemist
                     Console.WriteLine("No vector known for " + dir);
                     return new Vector2(0, 0);
             }
+        }
+
+        public static void TurnOver(int entity)
+        {
+            Log.Message("Turn over for " + DescriptionSystem.GetNameWithID(entity));
+
+            TurnOverEvent?.Invoke(entity);
+
+            if (entity == PlayerID)
+                PlayerTurnOver = true;
         }
     }
 }

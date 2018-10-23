@@ -90,13 +90,10 @@ namespace TheAlchemist
 
             movementSystem.CollisionEvent += collisionSystem.HandleCollision;
             movementSystem.BasicAttackEvent += combatSystem.HandleBasicAttack;
-            movementSystem.PlayerTurnOverEvent += healthSystem.RegneratePlayer;
-            movementSystem.PlayerTurnOverEvent += npcBehaviourSystem.EnemyTurn;
-            
-
+            movementSystem.InteractionEvent += interactionSystem.HandleInteraction;
+            Util.TurnOverEvent += healthSystem.RegenerateEntity;
             combatSystem.HealthLostEvent += healthSystem.HandleLostHealth;
-            combatSystem.PlayerTurnOverEvent += healthSystem.RegneratePlayer;
-            combatSystem.PlayerTurnOverEvent += npcBehaviourSystem.EnemyTurn;
+
 
 
             base.Initialize();
@@ -114,7 +111,7 @@ namespace TheAlchemist
             // TODO: use this.Content to load your game content here
             Util.DefaultFont = Content.Load<SpriteFont>("default");
 
-            string[] textures = { "player", "enemy", "wall", "door" };
+            string[] textures = { "player", "enemy", "wall", "doorOpened", "doorClosed" };
             TextureManager.Init(Content);
             TextureManager.LoadTextures(textures);
         }
@@ -139,8 +136,16 @@ namespace TheAlchemist
             //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             //Exit();
 
-            // TODO: Add your update logic here        
-            inputSystem.Run();
+            // TODO: Add your update logic here
+            if (Util.PlayerTurnOver)
+            {
+                npcBehaviourSystem.EnemyTurn();
+                Util.PlayerTurnOver = false;
+            }
+            else
+            {
+                inputSystem.Run();
+            }
 
             base.Update(gameTime);
         }

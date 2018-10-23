@@ -22,11 +22,7 @@ namespace TheAlchemist.Systems
         {
             //Console.WriteLine("Collision between objects: " + entityA + " - " + entityB);
             var colliderB = EntityManager.GetComponentOfEntity<ColliderComponent>(entityB);
-            if (colliderB == null)
-                return false;
-            if (colliderB.Solid)
-                return true;
-            return false;
+            return colliderB.Solid;
         }
     }
 }

@@ -13,7 +13,6 @@ namespace TheAlchemist.Systems
     class CombatSystem
     {
         public event HealthLostHandler HealthLostEvent;
-        public event PlayerTurnOverHandler PlayerTurnOverEvent;
 
         public void HandleBasicAttack(int attacker, int defender)
         {
@@ -46,18 +45,12 @@ namespace TheAlchemist.Systems
 
             RaiseHealthLostEvent(defender, damage);
 
-            if (attacker == Util.PlayerID)
-                RaisePlayerTurnOverEvent();
+            Util.TurnOver(attacker);
         }
 
         void RaiseHealthLostEvent(int entity, float amount)
         {
             HealthLostEvent?.Invoke(entity, amount);
-        }
-
-        private void RaisePlayerTurnOverEvent()
-        {
-            PlayerTurnOverEvent?.Invoke();
         }
     }
 }

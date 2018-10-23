@@ -8,8 +8,6 @@ namespace TheAlchemist.Systems
 {
     using Components;
 
-    public delegate void PlayerTurnOverHandler();
-
     // plans and executes behaviour of enemies and other npcs
     class NPCBehaviourSystem
     {
