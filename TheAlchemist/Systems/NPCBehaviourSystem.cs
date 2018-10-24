@@ -22,7 +22,9 @@ namespace TheAlchemist.Systems
                 // get random direction (for now only 4 directional)              
                 Direction dir = (Direction)(Game.Random.Next(0, 4) * 2);
                 RaiseEnemyMovedEvent(npc, dir);
+                //var newPosition = EntityManager.GetComponentOfEntity<TransformComponent>(npc).Position;
             }
+
         }
 
         private void RaiseEnemyMovedEvent(int entity, Direction dir)

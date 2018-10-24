@@ -53,7 +53,7 @@ namespace TheAlchemist
             //Floor test = new Floor(10, 10);
             Floor test = new Floor(AppDomain.CurrentDomain.BaseDirectory + "/map.txt");
             Util.CurrentFloor = test;
-            test.CalculateCellVisibility();
+            test.CalculateTileVisibility();
 
             var playerHealthComponent = EntityManager.GetComponentOfEntity<HealthComponent>(Util.PlayerID);
 

@@ -15,12 +15,21 @@ namespace TheAlchemist.Systems
     {
         public void Run(SpriteBatch spriteBatch)
         {
+            // seen by player
+            var seenPositions = Util.CurrentFloor.GetSeenPositions();
+
             var renderedSprites = EntityManager
                 .GetAllComponents<RenderableSpriteComponent>()
                 .Where(component => component.Visible);
 
-            foreach(var sprite in renderedSprites)
+            foreach (var sprite in renderedSprites)
             {
+                var transform = EntityManager.GetComponentOfEntity<TransformComponent>(sprite.EntityID);
+                if (EntityManager.GetComponentOfEntity<NPCComponent>(sprite.EntityID) != null &&
+                    !seenPositions.Any(pos => pos == transform.Position))
+                {
+                    continue; // only render npcs on seen positions
+                }
                 spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, Color.White);
             }
 
@@ -31,25 +40,26 @@ namespace TheAlchemist.Systems
             foreach (var text in renderedTexts)
             {
                 spriteBatch.DrawString(text.Font, text.Text, text.Position, Color.Black);
-            }
-
-            var seenPositions = Util.CurrentFloor.GetSeenPositions();
+            } 
 
             for (int y = 0; y < Util.CurrentFloor.Height; y++)
             {
                 for (int x = 0; x < Util.CurrentFloor.Width; x++)
                 {
                     var pos = new Vector2(x, y);
-                    if (!Util.CurrentFloor.GetSeenPositions().Any(seenPos => seenPos == pos))
+                    if (!seenPositions.Any(seenPos => seenPos == pos))
                     {
-                        spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), Color.Black);
+                        if (Util.CurrentFloor.isDiscovered(pos))
+                        {
+                            spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), new Color(Color.Black, 0.7f));
+                        }
+                        else
+                        {
+                            spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), Color.Black);
+                        }
                     }
+
                 }
-            }
-            foreach(var pos in seenPositions)
-            {
-                //spriteBatch.DrawString(Util.DefaultFont, "#", Util.WorldToScreenPosition(pos) + new Vector2(2, -6), Color.LightGray);
-                
             }
         }
     }

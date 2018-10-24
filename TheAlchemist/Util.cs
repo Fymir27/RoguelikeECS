@@ -96,7 +96,7 @@ namespace TheAlchemist
         {
             Log.Message("Turn over for " + DescriptionSystem.GetNameWithID(entity));
 
-            CurrentFloor.CalculateCellVisibility();
+            CurrentFloor.CalculateTileVisibility();
 
             TurnOverEvent?.Invoke(entity);
 

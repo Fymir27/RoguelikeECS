@@ -111,7 +111,7 @@ namespace TheAlchemist
 
 
 
-            characters[3, 3] = testEnemy;
+            characters[10, 10] = testEnemy;
         }
 
 
@@ -149,7 +149,7 @@ namespace TheAlchemist
         // ---|---
         // 5/4|3\2
         //
-        public void CalculateCellVisibility()
+        public void CalculateTileVisibility()
         { 
             bool AngleBetween(float angle, float bigger, float smaller)
             {
@@ -175,17 +175,12 @@ namespace TheAlchemist
                 // 0 :         @
                 //
 
-                Log.Message("Octant " + octant);
-
                 int obstaclesFound = 0;
                 List<float> startingAngles = new List<float>();
                 List<float> endAngles = new List<float>();
 
                 for (int row = 1; row <= playerRange; row++)
-                {
-                    Log.Message("  Row " + row);
-                    
-
+                {                   
                     int blocksInRow = row + 1;
                     float angleDifference = 1f / blocksInRow;
 
@@ -201,15 +196,12 @@ namespace TheAlchemist
                         float centreAngle = startingAngle + angleDifference / 2f;
                         float endAngle = startingAngle + angleDifference;
 
-                        Log.Message("Angles: " + startingAngle + ", " + centreAngle + ", " + endAngle);
-
                         //check if cell is blocked
                         bool blocked = false;
                         bool centreBlocked = false;
                         bool startingBlocked = false;
                         bool endBlocked = false;
 
-                        Log.Message("Blocking angles: ");
                         for (int i = 0; i < obstaclesFound - obstaclesThisRow; i++)
                         {
                             Log.Message(startingAngles[i] + " , " + endAngles[i]);
@@ -221,11 +213,8 @@ namespace TheAlchemist
                             if (AngleBetween(endAngle, endAngles[i], startingAngles[i]))
                                 endBlocked = true;
 
-                            Log.Message("C/S/E blocked: " + centreBlocked + startingBlocked + endBlocked);
-
                             if(centreBlocked && startingBlocked && endBlocked)
                             {
-                                Log.Message("Tile is blocked! " + pos);
                                 blocked = true;
                                 break;
                             }
@@ -233,7 +222,6 @@ namespace TheAlchemist
 
                         if(!blocked)
                         {
-                            Log.Message("Not blocked!");
                             seen.Add(pos);
                         }
 
@@ -247,17 +235,30 @@ namespace TheAlchemist
                                 endAngles.Add(endAngle);
                                 obstaclesFound++;
                                 obstaclesThisRow++;
-                                Log.Message("Obstacle found! " + pos);
                             }
                         }
                     }
                 }
             }
+            seen.ForEach(pos => discovered[(int)pos.X, (int)pos.Y] = true);
         }
 
         public IEnumerable<Vector2> GetSeenPositions()
         {
             return seen;
+        }
+
+        public bool isDiscovered(Vector2 pos)
+        {
+            try
+            {
+                return discovered[(int)pos.X, (int)pos.Y];
+            }
+            catch(IndexOutOfRangeException)
+            {
+                Log.Error("Invalid Position! " + pos);
+                throw;
+            }
         }
 
         public int GetTerrain(Vector2 pos)
