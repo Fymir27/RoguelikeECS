@@ -32,16 +32,7 @@ namespace TheAlchemist.Systems
                 }
                 spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, Color.White);
             }
-
-            var renderedTexts = EntityManager
-                .GetAllComponents<RenderableTextComponent>()
-                .Where(text => text.Visible);
-
-            foreach (var text in renderedTexts)
-            {
-                spriteBatch.DrawString(text.Font, text.Text, text.Position, Color.Black);
-            } 
-
+         
             for (int y = 0; y < Util.CurrentFloor.Height; y++)
             {
                 for (int x = 0; x < Util.CurrentFloor.Width; x++)
@@ -60,6 +51,15 @@ namespace TheAlchemist.Systems
                     }
 
                 }
+            }
+
+            var renderedTexts = EntityManager
+               .GetAllComponents<RenderableTextComponent>()
+               .Where(text => text.Visible);
+
+            foreach (var text in renderedTexts)
+            {
+                spriteBatch.DrawString(text.Font, text.Text, text.Position, Color.Black);
             }
         }
     }

@@ -94,7 +94,7 @@ namespace TheAlchemist
 
         public static void TurnOver(int entity)
         {
-            Log.Message("Turn over for " + DescriptionSystem.GetNameWithID(entity));
+            //Log.Message("Turn over for " + DescriptionSystem.GetNameWithID(entity));
 
             CurrentFloor.CalculateTileVisibility();
 

@@ -204,8 +204,6 @@ namespace TheAlchemist
 
                         for (int i = 0; i < obstaclesFound - obstaclesThisRow; i++)
                         {
-                            Log.Message(startingAngles[i] + " , " + endAngles[i]);
-
                             if (AngleBetween(centreAngle, endAngles[i], startingAngles[i]))
                                 centreBlocked = true;
                             if (AngleBetween(startingAngle, endAngles[i], startingAngles[i]))
@@ -387,7 +385,7 @@ namespace TheAlchemist
             if (x < 0 || x >= width ||
                 y < 0 || y >= height)
             {
-                Log.Warning(pos + " is out of bounds!");
+                //Log.Warning(pos + " is out of bounds!");
                 return true;
             }
             return false;
