@@ -95,7 +95,7 @@ namespace TheAlchemist
             int testWeapon = EntityManager.CreateEntity();
 
             EntityManager.AddComponentToEntity(testArmor, new ArmorComponent() { FlatMitigation = 2 });
-            EntityManager.AddComponentToEntity(testWeapon, new WeaponComponent() { Damage = 10 });
+            EntityManager.AddComponentToEntity(testWeapon, new WeaponComponent() { Damage = 5 });
 
             List<IComponent> enemyComponents = new List<IComponent>()
             {
@@ -211,14 +211,26 @@ namespace TheAlchemist
                             if (AngleBetween(endAngle, endAngles[i], startingAngles[i]))
                                 endBlocked = true;
 
-                            if(centreBlocked && startingBlocked && endBlocked)
+                            switch (Util.FOV)
                             {
-                                blocked = true;
-                                break;
+                                case FOV.Permissive:
+                                    blocked = centreBlocked && startingBlocked && endBlocked;
+                                    break;
+
+                                case FOV.Medium:
+                                    blocked = centreBlocked && (startingBlocked || endBlocked);
+                                    break;
+
+                                case FOV.Restricted:
+                                    blocked = centreBlocked || startingBlocked || endBlocked;
+                                    break;
                             }
+
+                            if (blocked)
+                                break;
                         }
 
-                        if(!blocked)
+                        if (!blocked)
                         {
                             seen.Add(pos);
                         }
@@ -234,7 +246,7 @@ namespace TheAlchemist
                                 obstaclesFound++;
                                 obstaclesThisRow++;
                             }
-                        }
+                        }                      
                     }
                 }
             }
@@ -246,7 +258,7 @@ namespace TheAlchemist
             return seen;
         }
 
-        public bool isDiscovered(Vector2 pos)
+        public bool IsDiscovered(Vector2 pos)
         {
             try
             {
@@ -359,7 +371,7 @@ namespace TheAlchemist
             int testWeapon = EntityManager.CreateEntity();
 
             EntityManager.AddComponentToEntity(testArmor, new ArmorComponent() { FlatMitigation = 2 });
-            EntityManager.AddComponentToEntity(testWeapon, new WeaponComponent() { Damage = 10 });
+            EntityManager.AddComponentToEntity(testWeapon, new WeaponComponent() { Damage = 5 });
 
             List<IComponent> enemyComponents = new List<IComponent>()
             {

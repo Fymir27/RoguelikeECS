@@ -23,6 +23,13 @@ namespace TheAlchemist
         NorthWest
     }
 
+    public enum FOV
+    {
+        Permissive = 1,
+        Medium = 2,
+        Restricted = 3
+    }
+
     public delegate void TurnOverHandler(int entity);
 
     static class Util
@@ -36,6 +43,8 @@ namespace TheAlchemist
 
         public static bool PlayerTurnOver { get; set; } = false;
 
+        public static FOV FOV = FOV.Medium;   
+    
         // gets called for every new type of component/entity/...
         public static class TypeID<T>
         {

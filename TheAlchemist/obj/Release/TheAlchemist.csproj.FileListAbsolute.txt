@@ -24,3 +24,5 @@ C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\
 C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\obj\Release\TheAlchemist.csproj.CoreCompileInputs.cache
 C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\obj\Release\TheAlchemist.exe
 C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\obj\Release\TheAlchemist.pdb
+C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\bin\DesktopGL\AnyCPU\Release\Content\doorClosed.xnb
+C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\bin\DesktopGL\AnyCPU\Release\Content\doorOpened.xnb

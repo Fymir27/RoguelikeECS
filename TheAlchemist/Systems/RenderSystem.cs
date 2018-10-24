@@ -25,6 +25,7 @@ namespace TheAlchemist.Systems
             foreach (var sprite in renderedSprites)
             {
                 var transform = EntityManager.GetComponentOfEntity<TransformComponent>(sprite.EntityID);
+
                 if (EntityManager.GetComponentOfEntity<NPCComponent>(sprite.EntityID) != null &&
                     !seenPositions.Any(pos => pos == transform.Position))
                 {
@@ -33,6 +34,7 @@ namespace TheAlchemist.Systems
                 spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, Color.White);
             }
          
+            // mask hidden and discovered tiles
             for (int y = 0; y < Util.CurrentFloor.Height; y++)
             {
                 for (int x = 0; x < Util.CurrentFloor.Width; x++)
@@ -40,7 +42,7 @@ namespace TheAlchemist.Systems
                     var pos = new Vector2(x, y);
                     if (!seenPositions.Any(seenPos => seenPos == pos))
                     {
-                        if (Util.CurrentFloor.isDiscovered(pos))
+                        if (Util.CurrentFloor.IsDiscovered(pos))
                         {
                             spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), new Color(Color.Black, 0.7f));
                         }
