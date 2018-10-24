@@ -53,10 +53,11 @@ namespace TheAlchemist
             //Floor test = new Floor(10, 10);
             Floor test = new Floor(AppDomain.CurrentDomain.BaseDirectory + "/map.txt");
             Util.CurrentFloor = test;
+            test.CalculateCellVisibility();
 
             var playerHealthComponent = EntityManager.GetComponentOfEntity<HealthComponent>(Util.PlayerID);
 
-            int lowerFloorBorder = Util.TileSize * 10;
+            int lowerFloorBorder = Util.TileSize * test.Height;
             int UI = EntityManager.CreateEntity(new List<IComponent>()
             {
                 new DescriptionComponent() { Name = "UI", Description = "Displays stuff you probably want to know!"},
@@ -111,7 +112,7 @@ namespace TheAlchemist
             // TODO: use this.Content to load your game content here
             Util.DefaultFont = Content.Load<SpriteFont>("default");
 
-            string[] textures = { "player", "enemy", "wall", "doorOpened", "doorClosed" };
+            string[] textures = { "player", "enemy", "wall", "doorOpened", "doorClosed", "square" };
             TextureManager.Init(Content);
             TextureManager.LoadTextures(textures);
         }

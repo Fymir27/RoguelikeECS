@@ -31,8 +31,7 @@ namespace TheAlchemist.Components
                     Vector2 worldPos = EntityManager
                         .GetComponentOfEntity<TransformComponent>(entityID)
                         .Position;
-                    int tileSize = Util.TileSize;
-                    return new Vector2(worldPos.X * tileSize, worldPos.Y * tileSize); // converted to screen pos
+                    return Util.WorldToScreenPosition(worldPos);
                 }
                 catch(NullReferenceException)
                 {

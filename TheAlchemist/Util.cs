@@ -56,6 +56,12 @@ namespace TheAlchemist
             }
         }
 
+        // transforms world position to screen position based on tile size
+        public static Vector2 WorldToScreenPosition(Vector2 worldPos)
+        {
+            return new Vector2(worldPos.X * TileSize, worldPos.Y * TileSize);
+        }
+
         // returns Direction 180 degrees from param direction
         public static Direction getOppositeDirection(Direction direction)
         {
@@ -89,6 +95,8 @@ namespace TheAlchemist
         public static void TurnOver(int entity)
         {
             Log.Message("Turn over for " + DescriptionSystem.GetNameWithID(entity));
+
+            CurrentFloor.CalculateCellVisibility();
 
             TurnOverEvent?.Invoke(entity);
 

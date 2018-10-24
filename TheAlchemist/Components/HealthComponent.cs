@@ -39,7 +39,7 @@ namespace TheAlchemist.Components
 
         public string GetString()
         {
-            return "(" + Amount + "|" + Max + ") " + "RegenProgress: " + RegenerationProgress;
+            return "(" + Amount + "|" + Max + ")";
         }
     }
 }

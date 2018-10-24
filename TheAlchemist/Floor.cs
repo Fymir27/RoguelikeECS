@@ -25,21 +25,28 @@ namespace TheAlchemist
         [JsonProperty]
         List<int>[,] items;
 
+        // discovered by the player
+        bool[,] discovered;
+        // seen by player at this moment
+        List<Vector2> seen = new List<Vector2>();
+
         public Floor(string path)
         {
             StreamReader file = new StreamReader(path);
 
             List<List<int>> tmpTerrain = new List<List<int>>();
 
+            Vector2 playerPos = new Vector2(1, 1);
+
             int y = 0;
-            while(!file.EndOfStream)
+            while (!file.EndOfStream)
             {
                 int x = 0;
                 var row = file.ReadLine();
                 tmpTerrain.Add(new List<int>());
                 foreach (var tile in row)
                 {
-                    switch(tile)
+                    switch (tile)
                     {
                         case '#':
                             tmpTerrain[y].Add(CreateWall(new Vector2(x, y)));
@@ -49,13 +56,18 @@ namespace TheAlchemist
                             tmpTerrain[y].Add(CreateDoor(new Vector2(x, y)));
                             break;
 
+                        case '@':
+                            playerPos = new Vector2(x, y);
+                            tmpTerrain[y].Add(0);
+                            break;
+
                         default:
                             tmpTerrain[y].Add(0);
                             break;
                     }
                     x++;
                 }
-                if(x > 0)
+                if (x > 0)
                     y++;
             }
 
@@ -66,6 +78,8 @@ namespace TheAlchemist
             characters = new int[width, height];
             items = new List<int>[width, height]; // don't initialize each List yet to save space!
 
+            discovered = new bool[width, height];
+
             for (y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
@@ -74,7 +88,7 @@ namespace TheAlchemist
                 }
             }
 
-            characters[1, 1] = Util.PlayerID = CreatePlayer(new Vector2(1, 1));
+            characters[(int)playerPos.X, (int)playerPos.Y] = Util.PlayerID = CreatePlayer(playerPos);
 
             int testEnemy = EntityManager.CreateEntity();
             int testArmor = EntityManager.CreateEntity();
@@ -88,7 +102,7 @@ namespace TheAlchemist
                 new NPCComponent(),
                 new HealthComponent() { Amount = 20, Max = 20, RegenerationAmount = 1 },
                 new EquipmentComponent() { Weapon = testWeapon , Armor = testArmor },
-                new TransformComponent() { Position = new Vector2(3, 3) },
+                new TransformComponent() { Position = new Vector2(10, 10) },
                 new ColliderComponent() { Solid = false },
                 new RenderableSpriteComponent() { Visible = true, Texture = "enemy" }
             };
@@ -98,6 +112,152 @@ namespace TheAlchemist
 
 
             characters[3, 3] = testEnemy;
+        }
+
+
+        struct Octant
+        {
+            public Vector2 PosChangePerRow;
+            public Vector2 PosChangePerBlock;
+
+            public Octant(Vector2 posChangePerRow, Vector2 posChangePerBlock)
+            {
+                PosChangePerRow = posChangePerRow;
+                PosChangePerBlock = posChangePerBlock;
+            }
+        }
+
+        Octant[] octants = new Octant[]
+        {
+            new Octant(new Vector2(0, -1), new Vector2(1, 0)),  // 0
+            new Octant(new Vector2(1, 0), new Vector2(0, -1)),  // 1
+            new Octant(new Vector2(1, 0), new Vector2(0, 1)),   // 2
+            new Octant(new Vector2(0, 1), new Vector2(1, 0)),   // 3 
+            new Octant(new Vector2(0, 1), new Vector2(-1, 0)),  // 4
+            new Octant(new Vector2(-1, 0), new Vector2(0, -1)), // 5
+            new Octant(new Vector2(-1, 0), new Vector2(0, 1)),  // 6
+            new Octant(new Vector2(0, -1), new Vector2(-1, 0)), // 7
+        };
+
+        public int Width { get => width; set => width = value; }
+        public int Height { get => height; set => height = value; }
+
+        // determines which cells are visible to the player and updates them accordingly
+        // taken from: http://www.roguebasin.com/index.php?title=Restrictive_Precise_Angle_Shadowcasting
+        // octants:
+        // 6\7|0/1
+        // ---|---
+        // 5/4|3\2
+        //
+        public void CalculateCellVisibility()
+        { 
+            bool AngleBetween(float angle, float bigger, float smaller)
+            {
+                return angle >= smaller && angle <= bigger;
+            }
+
+            int playerRange = 4;
+            Vector2 playerPos = EntityManager.GetComponentOfEntity<TransformComponent>(Util.PlayerID).Position;
+            discovered[(int)playerPos.X, (int)playerPos.Y] = true;          
+            seen.Clear();
+            seen.Add(playerPos);
+
+            for (int octant = 0; octant < 8; octant++)
+            {
+                // Octant (here: NorthNorthWest):
+                // calculation always from orthagonal line to diagonal 
+                // (block nr. 0 always lies on orthagonal line)
+                // rows numbered like this:
+                //
+                // 3 :   . . . .
+                // 2 :     . . .
+                // 1 :       . .
+                // 0 :         @
+                //
+
+                Log.Message("Octant " + octant);
+
+                int obstaclesFound = 0;
+                List<float> startingAngles = new List<float>();
+                List<float> endAngles = new List<float>();
+
+                for (int row = 1; row <= playerRange; row++)
+                {
+                    Log.Message("  Row " + row);
+                    
+
+                    int blocksInRow = row + 1;
+                    float angleDifference = 1f / blocksInRow;
+
+                    int obstaclesThisRow = 0;
+
+                    for(int block = 0; block < blocksInRow; block ++)
+                    {
+                        Vector2 pos = playerPos +
+                            octants[octant].PosChangePerRow * row +
+                            octants[octant].PosChangePerBlock * block;
+
+                        float startingAngle = angleDifference * block;
+                        float centreAngle = startingAngle + angleDifference / 2f;
+                        float endAngle = startingAngle + angleDifference;
+
+                        Log.Message("Angles: " + startingAngle + ", " + centreAngle + ", " + endAngle);
+
+                        //check if cell is blocked
+                        bool blocked = false;
+                        bool centreBlocked = false;
+                        bool startingBlocked = false;
+                        bool endBlocked = false;
+
+                        Log.Message("Blocking angles: ");
+                        for (int i = 0; i < obstaclesFound - obstaclesThisRow; i++)
+                        {
+                            Log.Message(startingAngles[i] + " , " + endAngles[i]);
+
+                            if (AngleBetween(centreAngle, endAngles[i], startingAngles[i]))
+                                centreBlocked = true;
+                            if (AngleBetween(startingAngle, endAngles[i], startingAngles[i]))
+                                startingBlocked = true;
+                            if (AngleBetween(endAngle, endAngles[i], startingAngles[i]))
+                                endBlocked = true;
+
+                            Log.Message("C/S/E blocked: " + centreBlocked + startingBlocked + endBlocked);
+
+                            if(centreBlocked && startingBlocked && endBlocked)
+                            {
+                                Log.Message("Tile is blocked! " + pos);
+                                blocked = true;
+                                break;
+                            }
+                        }
+
+                        if(!blocked)
+                        {
+                            Log.Message("Not blocked!");
+                            seen.Add(pos);
+                        }
+
+                        int curTerrain = GetTerrain(pos);
+                        if (curTerrain != 0)
+                        {
+                            var collider = EntityManager.GetComponentOfEntity<Components.ColliderComponent>(GetTerrain(pos));
+                            if (collider != null && collider.Solid)
+                            {
+                                startingAngles.Add(startingAngle);
+                                endAngles.Add(endAngle);
+                                obstaclesFound++;
+                                obstaclesThisRow++;
+                                Log.Message("Obstacle found! " + pos);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<Vector2> GetSeenPositions()
+        {
+            return seen;
         }
 
         public int GetTerrain(Vector2 pos)

@@ -68,7 +68,7 @@
 /processorParam:TextureFormat=Color
 /build:player.png
 
-#begin Square.png
+#begin square.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -78,7 +78,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Square.png
+/build:square.png
 
 #begin wall.png
 /importer:TextureImporter
