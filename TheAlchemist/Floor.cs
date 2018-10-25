@@ -29,6 +29,8 @@ namespace TheAlchemist
         bool[,] discovered;
         // seen by player at this moment
         List<Vector2> seen = new List<Vector2>();
+        // precalculated for visibility calc.
+        float[][] angles = CalculateAngles(5);
 
         public Floor(string path)
         {
@@ -194,9 +196,10 @@ namespace TheAlchemist
                             octants[octant].PosChangePerRow * row +
                             octants[octant].PosChangePerBlock * block;
 
-                        float startingAngle = angleDifference * block;
-                        float centreAngle = startingAngle + angleDifference / 2f;
-                        float endAngle = startingAngle + angleDifference;
+                        int indexStartingAngle = block * 2;
+                        float startingAngle = angles[row][indexStartingAngle];
+                        float centreAngle   = angles[row][indexStartingAngle + 1];
+                        float endAngle      = angles[row][indexStartingAngle + 2];
 
                         // check if cell is blocked
                         bool blocked = false;
@@ -534,6 +537,28 @@ namespace TheAlchemist
         public string ToJson()
         {
             return JsonConvert.SerializeObject(this);
+        }
+
+        private static float[][] CalculateAngles(int maxRows)
+        {
+            float[][] result = new float[maxRows][];
+            for (int i = 1; i < maxRows; i++)
+            {
+                int blocks = i + 1;
+                int angleCount = blocks * 2 + 1; // space for all start/centre/end angles
+                float angleDifferenceHalf = 1f / (blocks * 2);
+
+                result[i] = new float[angleCount]; 
+               
+                result[i][0] = 0f;
+                result[i][angleCount - 1] = 1f;
+
+                for(int j = 1; j < (angleCount - 1); j++)
+                {
+                    result[i][j] = result[i][j - 1] + angleDifferenceHalf;
+                }
+            }
+            return result;
         }
     }
     /*
