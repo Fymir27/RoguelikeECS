@@ -46,9 +46,11 @@
     <Compile Include="Components\ColliderComponent.cs" />
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\DescriptionComponent.cs" />
+    <Compile Include="Components\DoorComponent.cs" />
     <Compile Include="Components\EqupimentComponent.cs" />
     <Compile Include="Components\HealthComponent.cs" />
     <Compile Include="Components\IComponent.cs" />
+    <Compile Include="Components\InteractableComponent.cs" />
     <Compile Include="Components\NPCComponent.cs" />
     <Compile Include="Components\PlayerComponent.cs" />
     <Compile Include="Components\RenderableComponent.cs" />
@@ -65,6 +67,7 @@
     <Compile Include="Systems\DescriptionSystem.cs" />
     <Compile Include="Systems\HealthSystem.cs" />
     <Compile Include="Systems\InputSystem.cs" />
+    <Compile Include="Systems\InteractionSystem.cs" />
     <Compile Include="Systems\MovementSystem.cs" />
     <Compile Include="Systems\NPCBehaviourSystem.cs" />
     <Compile Include="Systems\RenderSystem.cs" />

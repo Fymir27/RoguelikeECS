@@ -13,9 +13,12 @@ namespace TheAlchemist.Components
         protected static int typeID = Util.TypeID<IComponent>.Get();
         protected int componentID = Util.UniqueID<IComponent>.Get();
         protected int entityID = 0;
+        protected static Type type = typeof(T);
 
-        int IComponent.TypeID { get { return typeID; } }
-        int IComponent.ComponentID { get { return componentID; }  }
+        int IComponent.TypeID { get => typeID; }
+        int IComponent.ComponentID { get => componentID; }
+        Type IComponent.Type { get => type; }
+
         public int EntityID
         {
             get
@@ -33,9 +36,16 @@ namespace TheAlchemist.Components
 
         }
 
+        /*
         public override string ToString()
         {
            return GetType() + ", TypeID: " + typeID + ", ComponentID: " + componentID;
+        }
+        */
+
+        public T GetConcreteComponent()
+        {
+            return (T)Convert.ChangeType(this, typeof(T));
         }
     }
 }

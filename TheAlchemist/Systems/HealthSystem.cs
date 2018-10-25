@@ -38,16 +38,11 @@ namespace TheAlchemist.Systems
             //Log.Message("Entity " + entity + " HP: " + healthComponent.Amount + "|" + healthComponent.Max + " (-" + amountLost + ")");
         }
 
-        public void Regenerate(int entity)
+        public void RegenerateEntity(int entity)
         {
             var healthComponent = EntityManager.GetComponentOfEntity<HealthComponent>(entity);
 
             healthComponent.RegenerationProgress += healthComponent.RegenerationAmount;
-        }
-
-        public void RegneratePlayer()
-        {
-            Regenerate(Util.PlayerID);
         }
     }
 }

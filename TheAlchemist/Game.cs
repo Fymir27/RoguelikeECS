@@ -9,8 +9,7 @@ namespace TheAlchemist
 {
     using Systems;
     using Components;
-    using Newtonsoft.Json;
-
+    
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
@@ -27,10 +26,11 @@ namespace TheAlchemist
         HealthSystem healthSystem;
         CombatSystem combatSystem;
         NPCBehaviourSystem npcBehaviourSystem;
+        InteractionSystem interactionSystem;
 
         public static Random Random { get; } = new Random();
 
-        
+               
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -48,15 +48,16 @@ namespace TheAlchemist
             Log.Init(AppDomain.CurrentDomain.BaseDirectory + "/log.html");
 
             Log.Message("Initializing...");
-            
 
             // TODO: Add your initialization logic here
-            Floor test = new Floor(10, 10);
+            //Floor test = new Floor(10, 10);
+            Floor test = new Floor(AppDomain.CurrentDomain.BaseDirectory + "/map.txt");
             Util.CurrentFloor = test;
+            test.CalculateTileVisibility();
 
             var playerHealthComponent = EntityManager.GetComponentOfEntity<HealthComponent>(Util.PlayerID);
 
-            int lowerFloorBorder = Util.TileSize * 10;
+            int lowerFloorBorder = Util.TileSize * test.Height;
             int UI = EntityManager.CreateEntity(new List<IComponent>()
             {
                 new DescriptionComponent() { Name = "UI", Description = "Displays stuff you probably want to know!"},
@@ -81,6 +82,7 @@ namespace TheAlchemist
             healthSystem = new HealthSystem();
             combatSystem = new CombatSystem();
             npcBehaviourSystem = new NPCBehaviourSystem();
+            interactionSystem = new InteractionSystem();
 
             // hook up all events with their handlers
             inputSystem.MovementEvent += movementSystem.HandleMovementEvent;
@@ -89,19 +91,9 @@ namespace TheAlchemist
 
             movementSystem.CollisionEvent += collisionSystem.HandleCollision;
             movementSystem.BasicAttackEvent += combatSystem.HandleBasicAttack;
-            movementSystem.PlayerTurnOverEvent += healthSystem.RegneratePlayer;
-            movementSystem.PlayerTurnOverEvent += npcBehaviourSystem.EnemyTurn;
-            
-
+            movementSystem.InteractionEvent += interactionSystem.HandleInteraction;
+            Util.TurnOverEvent += healthSystem.RegenerateEntity;
             combatSystem.HealthLostEvent += healthSystem.HandleLostHealth;
-            combatSystem.PlayerTurnOverEvent += healthSystem.RegneratePlayer;
-            combatSystem.PlayerTurnOverEvent += npcBehaviourSystem.EnemyTurn;
-            
-
-            
-            
-
-            //EntityManager.Dump();
 
 
 
@@ -119,9 +111,10 @@ namespace TheAlchemist
 
             // TODO: use this.Content to load your game content here
             Util.DefaultFont = Content.Load<SpriteFont>("default");
-            TextureManager.AddTexture(Content.Load<Texture2D>("player"));
-            TextureManager.AddTexture(Content.Load<Texture2D>("wall"));
-            TextureManager.AddTexture(Content.Load<Texture2D>("enemy"));
+
+            string[] textures = { "player", "enemy", "wall", "doorOpened", "doorClosed", "square" };
+            TextureManager.Init(Content);
+            TextureManager.LoadTextures(textures);
         }
 
         /// <summary>
@@ -144,8 +137,16 @@ namespace TheAlchemist
             //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             //Exit();
 
-            // TODO: Add your update logic here        
-            inputSystem.Run();
+            // TODO: Add your update logic here
+            if (Util.PlayerTurnOver)
+            {
+                npcBehaviourSystem.EnemyTurn();
+                Util.PlayerTurnOver = false;
+            }
+            else
+            {
+                inputSystem.Run();
+            }
 
             base.Update(gameTime);
         }

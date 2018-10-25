@@ -59,6 +59,21 @@ namespace TheAlchemist.Systems
                 lastInput = Keys.Left;
                 RaiseMovementEvent(player, Direction.West);
             }
+            else if(keysPressed.Any(item => item == Keys.D1))
+            {
+                Util.FOV = FOV.Permissive;
+                Util.CurrentFloor.CalculateTileVisibility();
+            }
+            else if (keysPressed.Any(item => item == Keys.D2))
+            {
+                Util.FOV = FOV.Medium;
+                Util.CurrentFloor.CalculateTileVisibility();
+            }
+            else if (keysPressed.Any(item => item == Keys.D3))
+            {
+                Util.FOV = FOV.Restricted;
+                Util.CurrentFloor.CalculateTileVisibility();
+            }
         }
 
         private void RaiseMovementEvent(int entity, Direction dir)

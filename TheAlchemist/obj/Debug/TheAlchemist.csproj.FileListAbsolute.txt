@@ -68,3 +68,7 @@ C:\Users\Oliver\Source\Repos\Fymir27\RoguelikeECS\TheAlchemist\bin\DesktopGL\Any
 C:\Users\Oliver\Source\Repos\Fymir27\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\Newtonsoft.Json.dll
 C:\Users\Oliver\Source\Repos\Fymir27\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\Newtonsoft.Json.xml
 C:\Users\Oliver\Source\Repos\Fymir27\RoguelikeECS\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\Content\default.xnb
+C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\Content\default.xnb
+C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\Content\door.xnb
+C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\Content\doorClosed.xnb
+C:\Users\Oliver\Documents\Visual Studio 2017\Projects\TheAlchemist\TheAlchemist\bin\DesktopGL\AnyCPU\Debug\Content\doorOpened.xnb

@@ -20,6 +20,30 @@
 /processorParam:TextureFormat=Compressed
 /build:default.spritefont
 
+#begin doorClosed.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:doorClosed.png
+
+#begin doorOpened.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:doorOpened.png
+
 #begin enemy.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -44,7 +68,7 @@
 /processorParam:TextureFormat=Color
 /build:player.png
 
-#begin Square.png
+#begin square.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -54,7 +78,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Square.png
+/build:square.png
 
 #begin wall.png
 /importer:TextureImporter
