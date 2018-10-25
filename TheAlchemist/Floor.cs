@@ -179,6 +179,8 @@ namespace TheAlchemist
                 List<float> startingAngles = new List<float>();
                 List<float> endAngles = new List<float>();
 
+                //Log.Message("Octant " + octant);
+
                 for (int row = 1; row <= playerRange; row++)
                 {                   
                     int blocksInRow = row + 1;
@@ -196,11 +198,23 @@ namespace TheAlchemist
                         float centreAngle = startingAngle + angleDifference / 2f;
                         float endAngle = startingAngle + angleDifference;
 
-                        //check if cell is blocked
+                        // check if cell is blocked
                         bool blocked = false;
                         bool centreBlocked = false;
                         bool startingBlocked = false;
                         bool endBlocked = false;
+
+                        // check if cell is solid
+                        bool solid = false;
+                        int curTerrain = GetTerrain(pos);
+                        if (curTerrain != 0)
+                        {
+                            var collider = EntityManager.GetComponentOfEntity<Components.ColliderComponent>(GetTerrain(pos));
+                            if (collider != null && collider.Solid)
+                            {
+                                solid = true;
+                            }
+                        }
 
                         for (int i = 0; i < obstaclesFound - obstaclesThisRow; i++)
                         {
@@ -211,46 +225,107 @@ namespace TheAlchemist
                             if (AngleBetween(endAngle, endAngles[i], startingAngles[i]))
                                 endBlocked = true;
 
-                            switch (Util.FOV)
+                            
+
+                            if (solid)
                             {
-                                case FOV.Permissive:
-                                    blocked = centreBlocked && startingBlocked && endBlocked;
-                                    break;
+                                blocked = startingBlocked && endBlocked;
+                            }
+                            else
+                            {
+                                
+                                switch (Util.FOV)
+                                {
+                                    // bugged! dont use!
+                                    case FOV.Permissive:
+                                        blocked = true; // centreBlocked && startingBlocked && endBlocked;
+                                        break;
 
-                                case FOV.Medium:
-                                    blocked = centreBlocked && (startingBlocked || endBlocked);
-                                    break;
+                                    case FOV.Medium:
+                                        blocked = centreBlocked && (startingBlocked || endBlocked);
+                                        break;
 
-                                case FOV.Restricted:
-                                    blocked = centreBlocked || startingBlocked || endBlocked;
-                                    break;
+                                    case FOV.Restricted:
+                                        blocked = centreBlocked || startingBlocked || endBlocked;
+                                        break;
+                                }
                             }
 
-                            if (blocked)
+                            if(blocked)
+                            {
                                 break;
+                            }
+
+                        }
+
+                        /*
+                        Log.Message("Current block's angles: " + startingAngle + ", " + centreAngle + ", " + endAngle);
+                        Log.Message("Blocked: " + startingBlocked + centreBlocked + endBlocked);
+                        string angles = "";
+                        for (int i = 0; i < startingAngles.Count; i++)
+                        {
+                            angles += startingAngles[i] + "|" + endAngles[i] + ", ";
+                        }
+                        Log.Message("Currently blocked angles: " + angles);
+                        */
+
+                        if (!blocked)
+                        {
+                            if(solid)
+                            {
+                                // add new blocked range and increase obstacle count
+                                startingAngles.Add(startingAngle);
+                                endAngles.Add(endAngle);
+                                obstaclesFound++;
+                                obstaclesThisRow++;
+                            }
+                            seen.Add(pos);
+                        }
+
+                        /*
+                        curTerrain = GetTerrain(pos);
+                        if (curTerrain != 0)
+                        {
+                            var collider = EntityManager.GetComponentOfEntity<Components.ColliderComponent>(GetTerrain(pos));
+                            if (collider != null && collider.Solid)
+                            {
+                                blocked = startingBlocked && endBlocked;
+
+                                if (!blocked)
+                                {
+                                    Log.Message(pos + "Solid tile unblocked! SCE unblocked: " + !startingBlocked + !centreBlocked + !endBlocked);
+                                    Log.Message("Current block's angles: " + startingAngle + ", " + centreAngle + ", " + endAngle);
+                                    string angles = "";
+                                    for (int i = 0; i < startingAngles.Count; i++)
+                                    {
+                                        angles += startingAngles[i] + "|" + endAngles[i] + ", ";
+                                    } 
+                                    Log.Message("Currently blocked angles: " + angles);
+                                    
+                                    
+                                }
+                            }
                         }
 
                         if (!blocked)
                         {
                             seen.Add(pos);
                         }
-
-                        int curTerrain = GetTerrain(pos);
-                        if (curTerrain != 0)
-                        {
-                            var collider = EntityManager.GetComponentOfEntity<Components.ColliderComponent>(GetTerrain(pos));
-                            if (collider != null && collider.Solid)
-                            {
-                                startingAngles.Add(startingAngle);
-                                endAngles.Add(endAngle);
-                                obstaclesFound++;
-                                obstaclesThisRow++;
-                            }
-                        }                      
+                        */
                     }
                 }
             }
-            seen.ForEach(pos => discovered[(int)pos.X, (int)pos.Y] = true);
+
+            int x = 0;
+            int y = 0;
+            try
+            {           
+                seen.ForEach(pos => discovered[x = (int)pos.X, y = (int)pos.Y] = true);
+            }
+            catch(IndexOutOfRangeException)
+            {
+                Log.Warning(x + "|" + y + " is out of range! (Calculate visibilty)");
+            }
         }
 
         public IEnumerable<Vector2> GetSeenPositions()

@@ -15,13 +15,13 @@ namespace TheAlchemist.Systems
     {
         public bool HandleInteraction(int actor, int other)
         {
-            Log.Message("Interaction between " + actor + " and " + other);
+            Log.Message("Interaction between " + actor + "," + DescriptionSystem.GetName(actor) + " and " + other);
 
             var door = EntityManager.GetComponentOfEntity<DoorComponent>(other);
 
             if(door != null)
             {
-                Log.Message("Its a door!");
+                //Log.Message("Its a door!");
 
                 door.Open = true;
 

@@ -34,6 +34,8 @@ namespace TheAlchemist.Systems
                 sb.AppendLine(component.GetType().ToString());
                 foreach(var item in component.GetType().GetProperties())
                 {
+                    if (item.Name == "EntityID")
+                        continue;
                     sb.AppendLine("[ " + item.Name + ": " + item.GetValue(component) + " ]");
                 }
                 sb.AppendLine();
