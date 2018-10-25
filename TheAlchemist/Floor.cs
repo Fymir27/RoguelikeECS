@@ -183,19 +183,30 @@ namespace TheAlchemist
 
                 //Log.Message("Octant " + octant);
 
+                // remember position of row on orhtagonal line
+                //
+                //       x
+                //       X
+                //       X
+                // x x x @ x x x   <= xs are orthagonal positions
+                //       x
+                //       x
+                //       x
+                //
+                var posOrthagonal = playerPos;
+
                 for (int row = 1; row <= playerRange; row++)
                 {                   
                     int blocksInRow = row + 1;
-                    float angleDifference = 1f / blocksInRow;
-
                     int obstaclesThisRow = 0;
+
+                    posOrthagonal += octants[octant].PosChangePerRow;
+
+                    //var pos = new Vector2(posOrthagonal.X, posOrthagonal.Y);
+                    var pos = posOrthagonal;
 
                     for(int block = 0; block < blocksInRow; block ++)
                     {
-                        Vector2 pos = playerPos +
-                            octants[octant].PosChangePerRow * row +
-                            octants[octant].PosChangePerBlock * block;
-
                         int indexStartingAngle = block * 2;
                         float startingAngle = angles[row][indexStartingAngle];
                         float centreAngle   = angles[row][indexStartingAngle + 1];
@@ -285,36 +296,8 @@ namespace TheAlchemist
                             seen.Add(pos);
                         }
 
-                        /*
-                        curTerrain = GetTerrain(pos);
-                        if (curTerrain != 0)
-                        {
-                            var collider = EntityManager.GetComponentOfEntity<Components.ColliderComponent>(GetTerrain(pos));
-                            if (collider != null && collider.Solid)
-                            {
-                                blocked = startingBlocked && endBlocked;
-
-                                if (!blocked)
-                                {
-                                    Log.Message(pos + "Solid tile unblocked! SCE unblocked: " + !startingBlocked + !centreBlocked + !endBlocked);
-                                    Log.Message("Current block's angles: " + startingAngle + ", " + centreAngle + ", " + endAngle);
-                                    string angles = "";
-                                    for (int i = 0; i < startingAngles.Count; i++)
-                                    {
-                                        angles += startingAngles[i] + "|" + endAngles[i] + ", ";
-                                    } 
-                                    Log.Message("Currently blocked angles: " + angles);
-                                    
-                                    
-                                }
-                            }
-                        }
-
-                        if (!blocked)
-                        {
-                            seen.Add(pos);
-                        }
-                        */
+                        // move to next block
+                        pos += octants[octant].PosChangePerBlock;
                     }
                 }
             }
