@@ -14,8 +14,9 @@ namespace TheAlchemist.Systems
     {
         public void PickUpItem(int character, Vector2 position)
         {
-            int item = Util.CurrentFloor.GetItems(position).First();
+            int item = Util.CurrentFloor.GetFirstItem(position);
             Log.Message(DescriptionSystem.GetNameWithID(character) + " picked up " + DescriptionSystem.GetNameWithID(item));
+            Util.CurrentFloor.RemoveItem(position, item);
         }
 
         public void UseItem(int character, int item)

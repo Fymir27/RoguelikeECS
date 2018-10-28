@@ -352,6 +352,26 @@ namespace TheAlchemist
             return characters[(int)pos.X, (int)pos.Y];
         }
 
+        public int GetFirstItem(Vector2 pos)
+        {
+            if(IsOutOfBounds(pos))
+            {
+                return 0;
+            }
+
+            var itemsHere = items[(int)pos.X, (int)pos.Y];
+
+            if (itemsHere == null)
+                return 0;
+
+            if (itemsHere.Count == 0) // shouldn't happen; List should be null instead
+            {
+                return 0;
+            }
+
+            return itemsHere.First();
+        }
+
         public IEnumerable<int> GetItems(Vector2 pos)
         {
             if (IsOutOfBounds(pos))
@@ -364,6 +384,35 @@ namespace TheAlchemist
                 return new int[0];
             }
             return itemList;
+        }
+
+        public void RemoveItem(Vector2 pos, int item)
+        {
+            if(IsOutOfBounds(pos))
+            {
+                Log.Warning("Trying to remove item out of bounds! " + pos);
+                Log.Data(Systems.DescriptionSystem.GetDebugInfoEntity(item));
+                return;
+            }
+
+            var itemsHere = items[(int)pos.X, (int)pos.Y];
+
+            if(itemsHere == null)
+            {
+                Log.Warning("Trying to remove item that's not here! " + pos);
+                Log.Data(Systems.DescriptionSystem.GetDebugInfoEntity(item));
+                return;
+            }
+
+            if(itemsHere.Count == 0 || !itemsHere.Contains(item))
+            {
+                Log.Warning("Trying to remove item that's not here! " + pos);
+                Log.Data(Systems.DescriptionSystem.GetDebugInfoEntity(item));
+                return;
+            }
+
+            itemsHere.Remove(item);
+            if (itemsHere.Count == 0) itemsHere = null; // remove List to save space
         }
 
         public void SetTerrain(Vector2 pos, int terrain)
@@ -386,19 +435,43 @@ namespace TheAlchemist
 
         public void AddItems(Vector2 pos, List<int> items)
         {
-            if(IsOutOfBounds(pos))
+            if (IsOutOfBounds(pos))
             {
+                Log.Warning("Trying to add items out of bounds! " + pos);
                 return;
             }
 
-            var existingItems = this.items[(int)pos.X, (int)pos.Y];
-            if(existingItems == null)
+            var itemsHere = this.items[(int)pos.X, (int)pos.Y];
+
+            if (itemsHere == null)
             {
-                existingItems = items;
+                itemsHere = items;
             }
             else
             {
-                existingItems.AddRange(items);
+                itemsHere.AddRange(items);
+            }
+         
+        }
+
+        public void PlaceItem(Vector2 pos, int item)
+        {
+            if (IsOutOfBounds(pos))
+            {
+                Log.Warning("Trying to remove item out of bounds! " + pos);
+                Log.Data(Systems.DescriptionSystem.GetDebugInfoEntity(item));
+                return;
+            }
+
+            var itemsHere = items[(int)pos.X, (int)pos.Y];
+
+            if (itemsHere == null)
+            {
+                itemsHere = new List<int>() { item };
+            }
+            else
+            {
+                itemsHere.Add(item);
             }
         }
 
