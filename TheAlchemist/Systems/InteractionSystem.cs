@@ -14,13 +14,16 @@ namespace TheAlchemist.Systems
     class InteractionSystem
     {
         public bool HandleInteraction(int actor, int other)
-        {
-            Log.Message("Interaction between " + actor + "," + DescriptionSystem.GetName(actor) + " and " + other);
+        {          
 
             var door = EntityManager.GetComponentOfEntity<DoorComponent>(other);
 
             if(door != null)
             {
+                if(door.Open)
+                {
+                    return false;
+                }
                 //Log.Message("Its a door!");
 
                 door.Open = true;
@@ -32,7 +35,7 @@ namespace TheAlchemist.Systems
                 EntityManager.GetComponentOfEntity<RenderableSpriteComponent>(other).Texture = door.TextureOpen;
             }
 
-            Log.Data(DescriptionSystem.GetDebugInfoEntity(other));
+            Log.Message("Interaction between " + DescriptionSystem.GetNameWithID(actor) + " and " + DescriptionSystem.GetNameWithID(other));
 
             Util.TurnOver(actor);
             return true;

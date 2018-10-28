@@ -92,6 +92,8 @@ namespace TheAlchemist
 
             characters[(int)playerPos.X, (int)playerPos.Y] = Util.PlayerID = CreatePlayer(playerPos);
 
+            items[(int)playerPos.X - 1, (int)playerPos.Y] = new List<int>() { CreateGold(playerPos + new Vector2(-1, 0), 100) };
+
             int testEnemy = EntityManager.CreateEntity();
             int testArmor = EntityManager.CreateEntity();
             int testWeapon = EntityManager.CreateEntity();
@@ -350,7 +352,7 @@ namespace TheAlchemist
             return characters[(int)pos.X, (int)pos.Y];
         }
 
-        public int[] GetItems(Vector2 pos)
+        public IEnumerable<int> GetItems(Vector2 pos)
         {
             if (IsOutOfBounds(pos))
             {
@@ -361,7 +363,7 @@ namespace TheAlchemist
             {
                 return new int[0];
             }
-            return itemList.ToArray();
+            return itemList;
         }
 
         public void SetTerrain(Vector2 pos, int terrain)
@@ -502,6 +504,17 @@ namespace TheAlchemist
 
             return wall;
         } 
+
+        public int CreateGold(Vector2 pos, int amount)
+        {
+            return EntityManager.CreateEntity(new List<IComponent>()
+            {
+                new TransformComponent() { Position = pos },
+                new DescriptionComponent() { Name = "Gold", Description = "Ohhh, shiny!" },
+                new ItemComponent() { MaxCount = 999, Count = amount, Value = 1, Weight = 0.1f },
+                new RenderableSpriteComponent() { Texture = "player" }
+            });
+        }
 
         public int CreateDoor(Vector2 pos)
         {

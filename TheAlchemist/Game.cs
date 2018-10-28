@@ -27,6 +27,7 @@ namespace TheAlchemist
         CombatSystem combatSystem;
         NPCBehaviourSystem npcBehaviourSystem;
         InteractionSystem interactionSystem;
+        ItemSystem itemSystem;
 
         public static Random Random { get; } = new Random();
 
@@ -83,16 +84,21 @@ namespace TheAlchemist
             combatSystem = new CombatSystem();
             npcBehaviourSystem = new NPCBehaviourSystem();
             interactionSystem = new InteractionSystem();
+            itemSystem = new ItemSystem();
 
             // hook up all events with their handlers
             inputSystem.MovementEvent += movementSystem.HandleMovementEvent;
+            inputSystem.InteractionEvent += interactionSystem.HandleInteraction;
+            inputSystem.PickupItemEvent += itemSystem.PickUpItem;
 
             npcBehaviourSystem.EnemyMovedEvent += movementSystem.HandleMovementEvent;
 
             movementSystem.CollisionEvent += collisionSystem.HandleCollision;
             movementSystem.BasicAttackEvent += combatSystem.HandleBasicAttack;
             movementSystem.InteractionEvent += interactionSystem.HandleInteraction;
+
             Util.TurnOverEvent += healthSystem.RegenerateEntity;
+
             combatSystem.HealthLostEvent += healthSystem.HandleLostHealth;
 
 

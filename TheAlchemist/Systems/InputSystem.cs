@@ -13,6 +13,9 @@ namespace TheAlchemist.Systems
     class InputSystem
     {
         public event MovementEventHandler MovementEvent;
+        public event InteractionHandler InteractionEvent;
+        public event ItemPickupHandler PickupItemEvent;
+
         Keys lastInput;
         int player = 0; // 0 is an invalid entity ID
 
@@ -59,6 +62,11 @@ namespace TheAlchemist.Systems
                 lastInput = Keys.Left;
                 RaiseMovementEvent(player, Direction.West);
             }
+            else if(keysPressed.Contains(Keys.Space))
+            {
+                HandlePlayerInteraction();
+                lastInput = Keys.Space;
+            }
             else if(keysPressed.Any(item => item == Keys.D1))
             {
                 Util.FOV = FOV.Permissive;
@@ -79,6 +87,37 @@ namespace TheAlchemist.Systems
         private void RaiseMovementEvent(int entity, Direction dir)
         {
             MovementEvent?.Invoke(entity, dir);
+        }
+
+        // first tries to interact with terrain under player
+        // then tries to pick up Item
+        private void HandlePlayerInteraction()
+        {
+            int player = Util.PlayerID;
+            var playerPos = EntityManager.GetComponentOfEntity<TransformComponent>(player).Position;
+
+            int terrain = Util.CurrentFloor.GetTerrain(playerPos);
+
+            if (terrain != 0) // is there special terrain?
+            {
+                var terrainInteraction = EntityManager.GetComponentOfEntity<InteractableComponent>(terrain);
+
+                if (terrainInteraction != null) // is it interactable?
+                {
+                    InteractionEvent?.Invoke(player, terrain);
+                    return;
+                }
+            }
+
+            bool itemsOnFloor = Util.CurrentFloor.GetItems(playerPos).Count() > 0; // are there items here?
+            
+            if(!itemsOnFloor)
+            {
+                Log.Message("No items here to be picked up!");
+                return;
+            }
+
+            PickupItemEvent?.Invoke(player, playerPos);
         }
     }
 }
