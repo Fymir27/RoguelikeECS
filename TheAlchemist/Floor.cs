@@ -585,7 +585,7 @@ namespace TheAlchemist
                 new TransformComponent() { Position = pos },
                 new DescriptionComponent() { Name = "Gold", Description = "Ohhh, shiny!" },
                 new ItemComponent() { MaxCount = 999, Count = amount, Value = 1, Weight = 0.1f },
-                new RenderableSpriteComponent() { Texture = "player" }
+                new RenderableSpriteComponent() { Texture = "gold" }
             });
         }
 

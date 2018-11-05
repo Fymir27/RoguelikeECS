@@ -118,7 +118,7 @@ namespace TheAlchemist
             // TODO: use this.Content to load your game content here
             Util.DefaultFont = Content.Load<SpriteFont>("default");
 
-            string[] textures = { "player", "enemy", "wall", "doorOpened", "doorClosed", "square" };
+            string[] textures = { "player", "enemy", "wall", "doorOpened", "doorClosed", "square", "gold" };
             TextureManager.Init(Content);
             TextureManager.LoadTextures(textures);
         }
