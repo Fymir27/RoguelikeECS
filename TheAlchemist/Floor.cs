@@ -34,6 +34,8 @@ namespace TheAlchemist
 
         public Floor(string path)
         {
+            //TODO: generate floor procedurally
+
             StreamReader file = new StreamReader(path);
 
             List<List<int>> tmpTerrain = new List<List<int>>();
