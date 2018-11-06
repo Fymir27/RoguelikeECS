@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Newtonsoft.Json;
+
 namespace TheAlchemist
 {
     using Systems;
@@ -40,6 +42,7 @@ namespace TheAlchemist
         public static int PlayerID { get; set; } = 0;
         public static Floor CurrentFloor { get; set; } = null;
         public static SpriteFont DefaultFont { get; set; } = null;
+        public static string ContentPath { get; set; } = "";
 
         public static bool PlayerTurnOver { get; set; } = false;
 
@@ -111,6 +114,23 @@ namespace TheAlchemist
 
             if (entity == PlayerID)
                 PlayerTurnOver = true;
+        }
+
+        public static string SerializeObject(object obj, bool indented = false, bool saveTypeNames = true)
+        {
+            var settings = new JsonSerializerSettings();
+            if (indented) settings.Formatting = Formatting.Indented;
+            if (saveTypeNames) settings.TypeNameHandling = TypeNameHandling.Auto;
+            return JsonConvert.SerializeObject(obj, settings);
+        }
+
+        public static T DeserializeObject<T>(string obj)
+        {
+            var settings = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto
+            };
+            return JsonConvert.DeserializeObject<T>(obj, settings);
         }
     }
 }

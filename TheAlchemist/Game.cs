@@ -18,7 +18,6 @@ namespace TheAlchemist
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        SpriteFont defaultFont;
 
         InputSystem inputSystem;
         MovementSystem movementSystem;
@@ -47,13 +46,15 @@ namespace TheAlchemist
         /// </summary>
         protected override void Initialize()
         {
+            Util.ContentPath = Content.RootDirectory;
+
             Log.Init(AppDomain.CurrentDomain.BaseDirectory + "/log.html");
 
             Log.Message("Initializing...");
 
             // TODO: Add your initialization logic here
             //Floor test = new Floor(10, 10);
-            Floor test = new Floor(AppDomain.CurrentDomain.BaseDirectory + "/map.txt");
+            Floor test = new Floor(Content.RootDirectory + "/map.txt");
             Util.CurrentFloor = test;
             test.CalculateTileVisibility();
 

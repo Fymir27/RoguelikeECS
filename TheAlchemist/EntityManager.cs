@@ -127,6 +127,14 @@ namespace TheAlchemist
             return entityID;            
         }
 
+        // creates new Entity from json template
+        // expects string that contains a list of components
+        public static int CreateEntity(string json)
+        {
+            var components = Util.DeserializeObject<List<IComponent>>(json);
+            return CreateEntity(components);
+        }
+
         // adds multiple components to an entity
         public static void AddComponentsToEntity(int entityID, List<IComponent> components)
         {

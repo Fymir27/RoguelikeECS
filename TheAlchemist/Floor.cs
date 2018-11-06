@@ -9,7 +9,9 @@ using Microsoft.Xna.Framework;
 namespace TheAlchemist
 {
     using Components;
+    using Systems;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     class Floor
     {
@@ -91,10 +93,12 @@ namespace TheAlchemist
                     terrain[x, y] = tmpTerrain[y][x];
                 }
             }
-
+          
             characters[(int)playerPos.X, (int)playerPos.Y] = Util.PlayerID = CreatePlayer(playerPos);
 
             items[(int)playerPos.X - 1, (int)playerPos.Y] = new List<int>() { CreateGold(playerPos + new Vector2(-1, 0), 100) };
+
+            /* //creation of test enemy
 
             int testEnemy = EntityManager.CreateEntity();
             int testArmor = EntityManager.CreateEntity();
@@ -115,9 +119,15 @@ namespace TheAlchemist
 
             EntityManager.AddComponentsToEntity(testEnemy, enemyComponents);
 
+            */
 
+            JObject enemies = JObject.Parse(File.ReadAllText(Util.ContentPath + "/enemies.txt"));
 
-            characters[10, 10] = testEnemy;
+            string testEnemyString = enemies["X"].ToString();
+
+            int testEnemyID = EntityManager.CreateEntity(testEnemyString);      
+
+            characters[10, 10] = testEnemyID;
         }
 
 

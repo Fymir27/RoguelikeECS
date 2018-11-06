@@ -44,6 +44,9 @@
 /processorParam:TextureFormat=Color
 /build:doorOpened.png
 
+#begin enemies.txt
+/copy:enemies.txt
+
 #begin enemy.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -67,6 +70,9 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:gold.png
+
+#begin map.txt
+/copy:map.txt
 
 #begin player.png
 /importer:TextureImporter

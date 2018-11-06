@@ -1,0 +1,28 @@
+{
+"X":
+[
+  {
+    "$type": "TheAlchemist.Components.NPCComponent, TheAlchemist",
+  },
+  {
+    "$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
+    "Amount": 20.0,
+    "Max": 20.0,
+    "RegenerationAmount": 1.0,
+    "RegenerationProgress": 0.0,
+  },
+  {
+    "$type": "TheAlchemist.Components.TransformComponent, TheAlchemist",
+    "Position": "10, 10",
+  },
+  {
+    "$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+    "Solid": false,
+  },
+  {
+    "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+    "Texture": "enemy",
+    "Visible": true
+  }
+]
+}
