@@ -25,6 +25,11 @@ namespace TheAlchemist.Components
             }
         }
 
+        public bool Full
+        {
+            get => items.Count >= Capacity;
+        }
+
         List<int> items = new List<int>();
     }
 }

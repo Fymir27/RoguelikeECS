@@ -16,10 +16,31 @@ namespace TheAlchemist.Systems
     {
         public void PickUpItem(int character, Vector2 position)
         {
+            var inventory = EntityManager.GetComponentOfEntity<InventoryComponent>(character);
+
+            if(inventory == null)
+            {
+                Log.Warning("Character does not have an inventory! -> " + DescriptionSystem.GetNameWithID(character));
+                return;
+            }
+
+            if (inventory.Full)
+            {
+                Log.Message("Invetory is full! -> " + DescriptionSystem.GetNameWithID(character));
+                return;
+            }
+        
+
             int item = Util.CurrentFloor.GetFirstItem(position);
             Log.Message(DescriptionSystem.GetNameWithID(character) + " picked up " + DescriptionSystem.GetNameWithID(item));
+
             Util.CurrentFloor.RemoveItem(position, item);
             EntityManager.GetComponentOfEntity<RenderableSpriteComponent>(item).Visible = false;
+
+            inventory.Items.Add(item);
+
+           // Log.Data(DescriptionSystem.GetDebugInfoEntity(character));
+
             Util.TurnOver(character);
         }
 

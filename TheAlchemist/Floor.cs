@@ -556,7 +556,8 @@ namespace TheAlchemist
                 new PlayerComponent(),
                 new RenderableSpriteComponent { Visible = true, Texture = "player" },
                 new ColliderComponent() { Solid = false },
-                new EquipmentComponent() { Weapon = playerWeapon, Armor = playerArmor }
+                new EquipmentComponent() { Weapon = playerWeapon, Armor = playerArmor },
+                new InventoryComponent() { Capacity = 10 }
             };
 
             EntityManager.AddComponentsToEntity(player, playerComponents);

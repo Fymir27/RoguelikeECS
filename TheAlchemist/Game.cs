@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TheAlchemist
 {
@@ -59,11 +60,26 @@ namespace TheAlchemist
             var playerHealthComponent = EntityManager.GetComponentOfEntity<HealthComponent>(Util.PlayerID);
 
             int lowerFloorBorder = Util.TileSize * test.Height;
+            int rightFloorBorder = Util.TileSize * test.Width;
+
+            // init UI entity
             int UI = EntityManager.CreateEntity(new List<IComponent>()
             {
                 new DescriptionComponent() { Name = "UI", Description = "Displays stuff you probably want to know!"},
                 new RenderableTextComponent() { Position = new Vector2(10, lowerFloorBorder + 10), Text = "Player HP: " },
-                new RenderableTextComponent() { Position = new Vector2(90, lowerFloorBorder + 10), GetTextFrom = playerHealthComponent.GetString }
+                new RenderableTextComponent() { Position = new Vector2(90, lowerFloorBorder + 10), GetTextFrom = playerHealthComponent.GetString },
+                new RenderableTextComponent() { Position = new Vector2(rightFloorBorder + 10, 10), GetTextFrom = () =>
+                    {
+                        IEnumerable<int> items = EntityManager.GetComponentOfEntity<InventoryComponent>(Util.PlayerID).Items;
+                        string itemString = "< Inventory >\n";
+                        int counter = 1;
+                        foreach(var item in items)
+                        {
+                            itemString += counter++ + ": " +  DescriptionSystem.GetName(item) + " x" + EntityManager.GetComponentOfEntity<ItemComponent>(item).Count + '\n';
+                        }
+                        return itemString;
+                    }
+                }
             });
 
             Log.Data(DescriptionSystem.GetDebugInfoEntity(Util.PlayerID));
