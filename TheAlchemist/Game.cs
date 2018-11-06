@@ -67,9 +67,9 @@ namespace TheAlchemist
             int UI = EntityManager.CreateEntity(new List<IComponent>()
             {
                 new DescriptionComponent() { Name = "UI", Description = "Displays stuff you probably want to know!"},
-                new RenderableTextComponent() { Position = new Vector2(10, lowerFloorBorder + 10), Text = "Player HP: " },
-                new RenderableTextComponent() { Position = new Vector2(90, lowerFloorBorder + 10), GetTextFrom = playerHealthComponent.GetString },
-                new RenderableTextComponent() { Position = new Vector2(rightFloorBorder + 10, 10), GetTextFrom = () =>
+                new RenderableTextComponent() { Position = new Vector2(rightFloorBorder + 10, 10), Text = "Player HP: " },
+                new RenderableTextComponent() { Position = new Vector2(rightFloorBorder + 90, 10), GetTextFrom = playerHealthComponent.GetString },
+                new RenderableTextComponent() { Position = new Vector2(rightFloorBorder + 10, 35), GetTextFrom = () =>
                     {
                         IEnumerable<int> items = EntityManager.GetComponentOfEntity<InventoryComponent>(Util.PlayerID).Items;
                         string itemString = "< Inventory >\n";
@@ -83,14 +83,13 @@ namespace TheAlchemist
                 }
             });
 
+            int textBox = EntityManager.CreateEntity(new List<IComponent>()
+            {
+                new RenderableSpriteComponent() { Position = new Vector2(0, lowerFloorBorder + 10), Texture = "box" },
+                new RenderableTextComponent() { Position = new Vector2(10, lowerFloorBorder + 85), Text = @"Welcome to <The Alchemist>!" }
+            });
+
             Log.Data(DescriptionSystem.GetDebugInfoEntity(Util.PlayerID));
-            //int entity = EntityManager.createEntity();
-            //EntityManager.addComponentToEntity(entity, new ColliderComponent() { Solid = true });
-            //EntityManager.addComponentToEntity(entity, new TransformComponent());
-
-            //System.Console.WriteLine(test);
-
-            //EntityManager.Dump();
 
             // instantiate all the systems
             inputSystem = new InputSystem();
@@ -135,7 +134,14 @@ namespace TheAlchemist
             // TODO: use this.Content to load your game content here
             Util.DefaultFont = Content.Load<SpriteFont>("default");
 
-            string[] textures = { "player", "enemy", "wall", "doorOpened", "doorClosed", "square", "gold" };
+            string[] textures = 
+            {
+                "player", "enemy", "wall",
+                "doorOpened", "doorClosed", "square",
+                "gold", "rat", "box",
+                "spider", "bat"
+            };
+
             TextureManager.Init(Content);
             TextureManager.LoadTextures(textures);
         }

@@ -146,7 +146,7 @@
     <Folder Include="Events\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\enemies.txt" />
+    <None Include="Content\enemies.json" />
     <Content Include="Content\map.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

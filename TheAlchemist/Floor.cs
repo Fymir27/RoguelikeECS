@@ -121,13 +121,20 @@ namespace TheAlchemist
 
             */
 
-            JObject enemies = JObject.Parse(File.ReadAllText(Util.ContentPath + "/enemies.txt"));
+            JObject enemies = JObject.Parse(File.ReadAllText(Util.ContentPath + "/enemies.json"));
 
-            string testEnemyString = enemies["X"].ToString();
+            int rat = EntityManager.CreateEntity(enemies["rat"].ToString());
+            int bat = EntityManager.CreateEntity(enemies["bat"].ToString());
+            int spider = EntityManager.CreateEntity(enemies["spider"].ToString());
 
-            int testEnemyID = EntityManager.CreateEntity(testEnemyString);      
+            Log.Data(DescriptionSystem.GetDebugInfoEntity(rat));
+            Log.Data(DescriptionSystem.GetDebugInfoEntity(bat));
+            Log.Data(DescriptionSystem.GetDebugInfoEntity(spider));
 
-            characters[10, 10] = testEnemyID;
+            characters[10, 10] = rat;
+            characters[16, 5] = bat;
+            characters[16, 1] = spider;
+
         }
 
 
@@ -558,7 +565,7 @@ namespace TheAlchemist
             int playerArmor = EntityManager.CreateEntity();
 
             EntityManager.AddComponentToEntity(playerWeapon, new WeaponComponent() { Damage = 5 });
-            EntityManager.AddComponentToEntity(playerArmor, new ArmorComponent() { PercentMitigation = 20, FlatMitigation = 3});
+            EntityManager.AddComponentToEntity(playerArmor, new ArmorComponent() { PercentMitigation = 0, FlatMitigation = 0});
 
             List<IComponent> playerComponents = new List<IComponent>()
             {
