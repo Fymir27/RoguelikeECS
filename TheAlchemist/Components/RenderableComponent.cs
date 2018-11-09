@@ -86,7 +86,7 @@ namespace TheAlchemist.Components
             get
             {
                 if (font == null)
-                    font = Util.DefaultFont;
+                    font = Util.DefaultFont;               
                 return font;
             }
             set

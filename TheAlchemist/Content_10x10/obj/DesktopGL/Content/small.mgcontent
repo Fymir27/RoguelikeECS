@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SourceFile>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/small.spritefont</SourceFile>
+  <SourceTime>2018-11-07T13:22:49.2248623+01:00</SourceTime>
+  <DestFile>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/bin/DesktopGL/Content/small.xnb</DestFile>
+  <DestTime>2018-11-07T13:22:51.4860331+01:00</DestTime>
+  <Importer>FontDescriptionImporter</Importer>
+  <ImporterTime>2018-09-23T23:55:52+02:00</ImporterTime>
+  <Processor>FontDescriptionProcessor</Processor>
+  <ProcessorTime>2018-09-23T23:55:52+02:00</ProcessorTime>
+  <Parameters>
+    <Key>PremultiplyAlpha</Key>
+    <Value>True</Value>
+  </Parameters>
+  <Parameters>
+    <Key>TextureFormat</Key>
+    <Value>Compressed</Value>
+  </Parameters>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput />
+</PipelineBuildEvent>

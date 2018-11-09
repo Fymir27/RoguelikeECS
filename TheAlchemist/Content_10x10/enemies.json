@@ -1,0 +1,129 @@
+{
+	"X": [
+		{
+			"$type": "TheAlchemist.Components.NPCComponent, TheAlchemist"
+		},
+		{
+			"$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
+			"Amount": 20.0,
+			"Max": 20.0,
+			"RegenerationAmount": 1.0,
+			"RegenerationProgress": 0.0
+		},
+		{
+			"$type": "TheAlchemist.Components.TransformComponent, TheAlchemist",
+			"Position": "10, 10"
+		},
+		{
+			"$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+			"Solid": false
+		},
+		{
+			"$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+			"Texture": "enemy",
+			"Visible": true
+		}
+	],
+	"rat": [
+		{
+			"$type": "TheAlchemist.Components.NPCComponent, TheAlchemist"
+		},
+		{
+			"$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+			"Name": "Rat",
+			"Description": "A small dirty animal."
+		},
+		{
+			"$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
+			"Amount": 10.0,
+			"Max": 10.0,
+			"RegenerationAmount": 1.0,
+			"RegenerationProgress": 0.0
+		},
+		{
+			"$type": "TheAlchemist.Components.TransformComponent, TheAlchemist",
+			"Position": "10, 10"
+		},
+		{
+			"$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+			"Solid": false
+		},
+		{
+			"$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+			"Texture": "rat",
+			"Visible": true
+		},
+		{
+			"$type": "TheAlchemist.Components.InventoryComponent, TheAlchemist",
+			"Capacity": 1
+		}
+	],
+	"bat": [
+		{
+			"$type": "TheAlchemist.Components.NPCComponent, TheAlchemist"
+		},
+		{
+			"$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+			"Name": "Bat",
+			"Description": "A small flying animal that navigates using echolocation."
+		},
+		{
+			"$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
+			"Amount": 10.0,
+			"Max": 10.0,
+			"RegenerationAmount": 1.0,
+			"RegenerationProgress": 0.0
+		},
+		{
+			"$type": "TheAlchemist.Components.TransformComponent, TheAlchemist",
+			"Position": "16, 5"
+		},
+		{
+			"$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+			"Solid": false
+		},
+		{
+			"$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+			"Texture": "bat",
+			"Visible": true
+		},
+		{
+			"$type": "TheAlchemist.Components.InventoryComponent, TheAlchemist",
+			"Capacity": 1
+		}
+	],
+	"spider": [
+		{
+			"$type": "TheAlchemist.Components.NPCComponent, TheAlchemist"
+		},
+		{
+			"$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+			"Name": "Spider",
+			"Description": "A small eight legged animal."
+		},
+		{
+			"$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
+			"Amount": 10.0,
+			"Max": 10.0,
+			"RegenerationAmount": 1.0,
+			"RegenerationProgress": 0.0
+		},
+		{
+			"$type": "TheAlchemist.Components.TransformComponent, TheAlchemist",
+			"Position": "16, 1"
+		},
+		{
+			"$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+			"Solid": false
+		},
+		{
+			"$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+			"Texture": "spider",
+			"Visible": true
+		},
+		{
+			"$type": "TheAlchemist.Components.InventoryComponent, TheAlchemist",
+			"Capacity": 1
+		}
+	]
+}

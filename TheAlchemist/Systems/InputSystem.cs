@@ -9,12 +9,15 @@ using Microsoft.Xna.Framework.Input;
 namespace TheAlchemist.Systems
 {
     using Components;
+    using Systems;
 
     class InputSystem
     {
         public event MovementEventHandler MovementEvent;
         public event InteractionHandler InteractionEvent;
         public event ItemPickupHandler PickupItemEvent;
+
+        public event InventoryToggledHandler InventoryToggledEvent;
 
         Keys lastInput;
         int player = 0; // 0 is an invalid entity ID
@@ -67,20 +70,10 @@ namespace TheAlchemist.Systems
                 HandlePlayerInteraction();
                 lastInput = Keys.Space;
             }
-            else if(keysPressed.Any(item => item == Keys.D1))
+            else if(keysPressed.Contains(Keys.I))
             {
-                Util.FOV = FOV.Permissive;
-                Util.CurrentFloor.CalculateTileVisibility();
-            }
-            else if (keysPressed.Any(item => item == Keys.D2))
-            {
-                Util.FOV = FOV.Medium;
-                Util.CurrentFloor.CalculateTileVisibility();
-            }
-            else if (keysPressed.Any(item => item == Keys.D3))
-            {
-                Util.FOV = FOV.Restricted;
-                Util.CurrentFloor.CalculateTileVisibility();
+                InventoryToggledEvent?.Invoke();
+                lastInput = Keys.I;
             }
         }
 

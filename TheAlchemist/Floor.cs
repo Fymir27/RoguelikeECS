@@ -96,7 +96,29 @@ namespace TheAlchemist
           
             characters[(int)playerPos.X, (int)playerPos.Y] = Util.PlayerID = CreatePlayer(playerPos);
 
-            items[(int)playerPos.X - 1, (int)playerPos.Y] = new List<int>() { CreateGold(playerPos + new Vector2(-1, 0), 100) };
+            items[(int)playerPos.X - 1, (int)playerPos.Y] = new List<int>()
+            {
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100),
+                CreateGold(playerPos + new Vector2(-1, 0), 100)
+            };
 
             /* //creation of test enemy
 
@@ -576,7 +598,7 @@ namespace TheAlchemist
                 new RenderableSpriteComponent { Visible = true, Texture = "player" },
                 new ColliderComponent() { Solid = false },
                 new EquipmentComponent() { Weapon = playerWeapon, Armor = playerArmor },
-                new InventoryComponent() { Capacity = 10 }
+                new InventoryComponent() { Capacity = 24 }
             };
 
             EntityManager.AddComponentsToEntity(player, playerComponents);
@@ -611,7 +633,7 @@ namespace TheAlchemist
 
         public int CreateDoor(Vector2 pos)
         {
-            var doorComponent = new DoorComponent() { Open = false, TextureClosed = "doorClosed", TextureOpen = "doorOpened" };
+            var doorComponent = new DoorComponent() { Open = false, TextureClosed = "doorClosed", TextureOpen = "doorOpen" };
             return EntityManager.CreateEntity(new List<IComponent>()
             {
                 doorComponent,

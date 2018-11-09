@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SourceFileCollection xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Profile>Reach</Profile>
+  <Platform>DesktopGL</Platform>
+  <Config />
+  <SourceFiles>
+    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/bat.png</File>
+    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/box.png</File>
+    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/default.spritefont</File>
+    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/doorClosed.png</File>
+    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/doorOpened.png</File>
+    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/enemy.png</File>
+    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/gold.png</File>
+    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/inventory.png</File>
+    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/inventoryOpen.png</File>
+    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/player.png</File>
+    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/rat.png</File>
+    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/small.spritefont</File>
+    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/spider.png</File>
+    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/square.png</File>
+    <File>C:/Users/Oliver/Documents/Visual Studio 2017/Projects/TheAlchemist/TheAlchemist/Content/wall.png</File>
+  </SourceFiles>
+  <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+  </DestFiles>
+</SourceFileCollection>

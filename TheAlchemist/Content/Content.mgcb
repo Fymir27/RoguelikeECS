@@ -56,7 +56,7 @@
 /processorParam:TextureFormat=Color
 /build:doorClosed.png
 
-#begin doorOpened.png
+#begin doorOpen.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -66,7 +66,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:doorOpened.png
+/build:doorOpen.png
 
 #begin enemies.json
 /copy:enemies.json
@@ -95,6 +95,30 @@
 /processorParam:TextureFormat=Color
 /build:gold.png
 
+#begin inventory.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:inventory.png
+
+#begin inventoryOpen.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:inventoryOpen.png
+
 #begin map.txt
 /copy:map.txt
 
@@ -121,6 +145,13 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:rat.png
+
+#begin small.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:small.spritefont
 
 #begin spider.png
 /importer:TextureImporter

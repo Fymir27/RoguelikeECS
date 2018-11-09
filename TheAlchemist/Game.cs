@@ -20,8 +20,8 @@ namespace TheAlchemist
         SpriteBatch spriteBatch;
 
         InputSystem inputSystem;
+
         MovementSystem movementSystem;
-        RenderSystem renderSystem;
         CollisionSystem collisionSystem;
         HealthSystem healthSystem;
         CombatSystem combatSystem;
@@ -29,12 +29,19 @@ namespace TheAlchemist
         InteractionSystem interactionSystem;
         ItemSystem itemSystem;
 
+        RenderSystem renderSystem;
+        UISystem uiSystem;
+
         public static Random Random { get; } = new Random();
 
                
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredBackBufferWidth = 1280;
+            graphics.PreferredBackBufferHeight = 720;
+            //graphics.IsFullScreen = true;
+
             Content.RootDirectory = "Content";
         }
 
@@ -58,36 +65,9 @@ namespace TheAlchemist
             Util.CurrentFloor = test;
             test.CalculateTileVisibility();
 
-            var playerHealthComponent = EntityManager.GetComponentOfEntity<HealthComponent>(Util.PlayerID);
+            
 
-            int lowerFloorBorder = Util.TileSize * test.Height;
-            int rightFloorBorder = Util.TileSize * test.Width;
-
-            // init UI entity
-            int UI = EntityManager.CreateEntity(new List<IComponent>()
-            {
-                new DescriptionComponent() { Name = "UI", Description = "Displays stuff you probably want to know!"},
-                new RenderableTextComponent() { Position = new Vector2(rightFloorBorder + 10, 10), Text = "Player HP: " },
-                new RenderableTextComponent() { Position = new Vector2(rightFloorBorder + 90, 10), GetTextFrom = playerHealthComponent.GetString },
-                new RenderableTextComponent() { Position = new Vector2(rightFloorBorder + 10, 35), GetTextFrom = () =>
-                    {
-                        IEnumerable<int> items = EntityManager.GetComponentOfEntity<InventoryComponent>(Util.PlayerID).Items;
-                        string itemString = "< Inventory >\n";
-                        int counter = 1;
-                        foreach(var item in items)
-                        {
-                            itemString += counter++ + ": " +  DescriptionSystem.GetName(item) + " x" + EntityManager.GetComponentOfEntity<ItemComponent>(item).Count + '\n';
-                        }
-                        return itemString;
-                    }
-                }
-            });
-
-            int textBox = EntityManager.CreateEntity(new List<IComponent>()
-            {
-                new RenderableSpriteComponent() { Position = new Vector2(0, lowerFloorBorder + 10), Texture = "box" },
-                new RenderableTextComponent() { Position = new Vector2(10, lowerFloorBorder + 85), Text = @"Welcome to <The Alchemist>!" }
-            });
+            
 
             Log.Data(DescriptionSystem.GetDebugInfoEntity(Util.PlayerID));
 
@@ -101,11 +81,13 @@ namespace TheAlchemist
             npcBehaviourSystem = new NPCBehaviourSystem();
             interactionSystem = new InteractionSystem();
             itemSystem = new ItemSystem();
+            uiSystem = new UISystem();
 
             // hook up all events with their handlers
             inputSystem.MovementEvent += movementSystem.HandleMovementEvent;
             inputSystem.InteractionEvent += interactionSystem.HandleInteraction;
             inputSystem.PickupItemEvent += itemSystem.PickUpItem;
+            inputSystem.InventoryToggledEvent += uiSystem.HandleInventoryToggled;
 
             npcBehaviourSystem.EnemyMovedEvent += movementSystem.HandleMovementEvent;
 
@@ -116,8 +98,7 @@ namespace TheAlchemist
             Util.TurnOverEvent += healthSystem.RegenerateEntity;
 
             combatSystem.HealthLostEvent += healthSystem.HandleLostHealth;
-
-
+           
 
             base.Initialize();
         }
@@ -133,17 +114,37 @@ namespace TheAlchemist
 
             // TODO: use this.Content to load your game content here
             Util.DefaultFont = Content.Load<SpriteFont>("default");
+            Util.SmallFont = Content.Load<SpriteFont>("small");
 
             string[] textures = 
             {
-                "player", "enemy", "wall",
-                "doorOpened", "doorClosed", "square",
-                "gold", "rat", "box",
-                "spider", "bat"
+                "player", "box",
+                "gold", "wall",
+                "doorOpen", "doorClosed", "square",
+                // enemies:
+                "rat", "spider",
+                "bat", "enemy",
+                // UI:
+                "inventory", "inventoryOpen"
             };
 
             TextureManager.Init(Content);
             TextureManager.LoadTextures(textures);
+
+            // try to create custom texture
+            Texture2D tex = new Texture2D(GraphicsDevice, 150, 115, false, SurfaceFormat.Color);
+            Color[] colors = new Color[150 * 115];
+            for (int i = 0; i < colors.Length; i++)
+            {
+                colors[i] = Color.Aqua;
+            }
+            tex.SetData<Color>(colors);
+
+            tex.Name = "test";
+
+            TextureManager.AddTexture(tex);
+
+            UI.Init();       
         }
 
         /// <summary>

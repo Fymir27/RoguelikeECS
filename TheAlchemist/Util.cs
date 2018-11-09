@@ -38,10 +38,11 @@ namespace TheAlchemist
     {
         public static event TurnOverHandler TurnOverEvent;
 
-        public static int TileSize { get; } = 10;
+        public static int TileSize { get; } = 20;
         public static int PlayerID { get; set; } = 0;
         public static Floor CurrentFloor { get; set; } = null;
         public static SpriteFont DefaultFont { get; set; } = null;
+        public static SpriteFont SmallFont { get; set; } = null;
         public static string ContentPath { get; set; } = "";
 
         public static bool PlayerTurnOver { get; set; } = false;
