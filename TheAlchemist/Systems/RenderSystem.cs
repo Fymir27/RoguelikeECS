@@ -41,13 +41,7 @@ namespace TheAlchemist.Systems
                 {
                     continue; // only render npcs on seen positions
                 }
-                //spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, Color.White);
-                spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), 
-                    scale: new Vector2((float)window.ClientBounds.Width / Util.OriginalWidth, 
-                                       (float)window.ClientBounds.Height / Util.OriginalHeight), 
-                    position: sprite.Position);
-                
-                
+                spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, Color.White);              
             }
          
             // mask hidden and discovered tiles
@@ -60,7 +54,7 @@ namespace TheAlchemist.Systems
                     {
                         if (Util.CurrentFloor.IsDiscovered(pos))
                         {
-                            spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), new Color(Color.Black, 0.7f));
+                            spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), new Color(Color.Black, 0.7f));                          
                         }
                         else
                         {

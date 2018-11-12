@@ -18,6 +18,7 @@ namespace TheAlchemist
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        RenderTarget2D renderTexture;
 
         InputSystem inputSystem;
 
@@ -110,7 +111,9 @@ namespace TheAlchemist
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            spriteBatch = new SpriteBatch(graphics.GraphicsDevice);
+            renderTexture = new RenderTarget2D(graphics.GraphicsDevice, Util.OriginalWidth, Util.OriginalHeight); //, false, GraphicsDevice.PresentationParameters.BackBufferFormat,
+                //DepthFormat.None, GraphicsDevice.PresentationParameters.MultiSampleCount, RenderTargetUsage.DiscardContents);            
 
             // TODO: use this.Content to load your game content here
             Util.DefaultFont = Content.Load<SpriteFont>("default");
@@ -192,14 +195,28 @@ namespace TheAlchemist
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.White);
+            
+            // first draw everything to a Texture
+            GraphicsDevice.SetRenderTarget(renderTexture);
 
-            // TODO: Add your drawing code here
             spriteBatch.Begin();
-            //spriteBatch.Draw(textureSquare, new Vector2(0, 0), Color.Red);
+            GraphicsDevice.Clear(Color.White);          
             renderSystem.Run(spriteBatch);
-            //spriteBatch.DrawString(Util.DefaultFont, "Player HP: (30|30)", new Vector2(10, Util.TileSize * 10 + 10), Color.Black);
             spriteBatch.End();
+
+            // then draw Texture to screen
+            GraphicsDevice.SetRenderTarget(null);
+
+            spriteBatch.Begin();
+            GraphicsDevice.Clear(Color.White);
+            // fit texture to screen for resizing
+            Rectangle destRect = new Rectangle(Point.Zero, new Point(Window.ClientBounds.Width, Window.ClientBounds.Height));
+            spriteBatch.Draw(renderTexture, destRect, Color.White);
+            spriteBatch.End();
+
+            
+
+            
 
             base.Draw(gameTime);
         }
