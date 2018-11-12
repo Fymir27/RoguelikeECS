@@ -18,7 +18,7 @@ namespace TheAlchemist.Systems
         {
             var inventory = EntityManager.GetComponentOfEntity<InventoryComponent>(character);
 
-            if(inventory == null)
+            if (inventory == null)
             {
                 Log.Warning("Character does not have an inventory! -> " + DescriptionSystem.GetNameWithID(character));
                 return;

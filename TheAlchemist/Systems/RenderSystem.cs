@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,15 @@ namespace TheAlchemist.Systems
 
     class RenderSystem
     {
+        GraphicsDeviceManager graphics;
+        GameWindow window;
+
+        public RenderSystem(GraphicsDeviceManager graphics, GameWindow window)
+        {
+            this.graphics = graphics;
+            this.window = window;        
+        }
+
         public void Run(SpriteBatch spriteBatch)
         {
             // seen by player
@@ -31,7 +41,13 @@ namespace TheAlchemist.Systems
                 {
                     continue; // only render npcs on seen positions
                 }
-                spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, Color.White);
+                //spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, Color.White);
+                spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), 
+                    scale: new Vector2((float)window.ClientBounds.Width / Util.OriginalWidth, 
+                                       (float)window.ClientBounds.Height / Util.OriginalHeight), 
+                    position: sprite.Position);
+                
+                
             }
          
             // mask hidden and discovered tiles

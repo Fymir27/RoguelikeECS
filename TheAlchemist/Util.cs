@@ -45,6 +45,9 @@ namespace TheAlchemist
         public static SpriteFont SmallFont { get; set; } = null;
         public static string ContentPath { get; set; } = "";
 
+        public static int OriginalWidth { get; } = 1280;
+        public static int OriginalHeight { get; } = 720;
+
         public static bool PlayerTurnOver { get; set; } = false;
 
         public static FOV FOV = FOV.Medium;   

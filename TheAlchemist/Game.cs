@@ -38,8 +38,8 @@ namespace TheAlchemist
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = 1280;
-            graphics.PreferredBackBufferHeight = 720;
+            graphics.PreferredBackBufferWidth = Util.OriginalWidth;
+            graphics.PreferredBackBufferHeight = Util.OriginalHeight;
             //graphics.IsFullScreen = true;
 
             Content.RootDirectory = "Content";
@@ -74,7 +74,7 @@ namespace TheAlchemist
             // instantiate all the systems
             inputSystem = new InputSystem();
             movementSystem = new MovementSystem();
-            renderSystem = new RenderSystem();
+            renderSystem = new RenderSystem(graphics, Window);
             collisionSystem = new CollisionSystem();
             healthSystem = new HealthSystem();
             combatSystem = new CombatSystem();
@@ -144,7 +144,12 @@ namespace TheAlchemist
 
             TextureManager.AddTexture(tex);
 
-            UI.Init();       
+            UI.Init();
+
+
+            Window.AllowUserResizing = true;
+            
+            //Window.
         }
 
         /// <summary>
