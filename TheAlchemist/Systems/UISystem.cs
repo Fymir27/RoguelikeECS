@@ -14,16 +14,7 @@ namespace TheAlchemist.Systems
 
         public void HandleInventoryToggled()
         {
-            if (InventoryOpen)
-            {
-                UI.InventoryBackground.Texture = "inventory";
-            }
-            else
-            {
-                UI.InventoryBackground.Texture = "inventoryOpen";
-            }
-
-            InventoryOpen = !InventoryOpen;
+            UI.InventoryOpen = !UI.InventoryOpen;
         }
     }
 }

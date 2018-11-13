@@ -18,7 +18,8 @@ namespace TheAlchemist
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        RenderTarget2D renderTexture;
+        RenderTarget2D virtualScreen;
+        RenderTarget2D renderedWorld;
 
         InputSystem inputSystem;
 
@@ -39,9 +40,11 @@ namespace TheAlchemist
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = Util.OriginalWidth;
-            graphics.PreferredBackBufferHeight = Util.OriginalHeight;
+            graphics.PreferredBackBufferWidth = Util.ScreenWidth;
+            graphics.PreferredBackBufferHeight = Util.ScreenHeight;
             //graphics.IsFullScreen = true;
+
+            Window.AllowUserResizing = true;
 
             Content.RootDirectory = "Content";
         }
@@ -64,18 +67,14 @@ namespace TheAlchemist
             //Floor test = new Floor(10, 10);
             Floor test = new Floor(Content.RootDirectory + "/map.txt");
             Util.CurrentFloor = test;
-            test.CalculateTileVisibility();
-
-            
-
-            
+            test.CalculateTileVisibility();                    
 
             Log.Data(DescriptionSystem.GetDebugInfoEntity(Util.PlayerID));
 
             // instantiate all the systems
             inputSystem = new InputSystem();
             movementSystem = new MovementSystem();
-            renderSystem = new RenderSystem(graphics, Window);
+            renderSystem = new RenderSystem(GraphicsDevice);
             collisionSystem = new CollisionSystem();
             healthSystem = new HealthSystem();
             combatSystem = new CombatSystem();
@@ -111,13 +110,15 @@ namespace TheAlchemist
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(graphics.GraphicsDevice);
-            renderTexture = new RenderTarget2D(graphics.GraphicsDevice, Util.OriginalWidth, Util.OriginalHeight); //, false, GraphicsDevice.PresentationParameters.BackBufferFormat,
-                //DepthFormat.None, GraphicsDevice.PresentationParameters.MultiSampleCount, RenderTargetUsage.DiscardContents);            
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            virtualScreen = new RenderTarget2D(GraphicsDevice, Util.ScreenWidth, Util.ScreenHeight);
+            renderedWorld = new RenderTarget2D(GraphicsDevice, Util.WorldWidth, Util.WorldHeight);
 
             // TODO: use this.Content to load your game content here
             Util.DefaultFont = Content.Load<SpriteFont>("default");
             Util.SmallFont = Content.Load<SpriteFont>("small");
+            Util.BigFont = Content.Load<SpriteFont>("big");
 
             string[] textures = 
             {
@@ -128,7 +129,8 @@ namespace TheAlchemist
                 "rat", "spider",
                 "bat", "enemy",
                 // UI:
-                "inventory", "inventoryOpen"
+                "inventory", "inventoryOpen",
+                "messageLogBox", "tooltip"
             };
 
             TextureManager.Init(Content);
@@ -146,13 +148,6 @@ namespace TheAlchemist
             tex.Name = "test";
 
             TextureManager.AddTexture(tex);
-
-            UI.Init();
-
-
-            Window.AllowUserResizing = true;
-            
-            //Window.
         }
 
         /// <summary>
@@ -195,28 +190,32 @@ namespace TheAlchemist
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            
-            // first draw everything to a Texture
-            GraphicsDevice.SetRenderTarget(renderTexture);
+            // render world onto a texture
+            renderSystem.RenderWorld(renderedWorld);
 
-            spriteBatch.Begin();
-            GraphicsDevice.Clear(Color.White);          
-            renderSystem.Run(spriteBatch);
-            spriteBatch.End();
+            // render everything to virtual screen (also a texture)
+            GraphicsDevice.SetRenderTarget(virtualScreen);
 
-            // then draw Texture to screen
+            spriteBatch.Begin(); //:::::::::::::::::::::::::::::::::::::::::::::::::::
+            GraphicsDevice.Clear(Color.White);
+
+            spriteBatch.Draw(renderedWorld, Vector2.Zero, Color.White);
+            UI.Render(spriteBatch);
+
+            spriteBatch.End(); //:::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+            // then draw virtual screen onto actual window
             GraphicsDevice.SetRenderTarget(null);
 
-            spriteBatch.Begin();
-            GraphicsDevice.Clear(Color.White);
+            spriteBatch.Begin(); //:::::::::::::::::::::::::::::::::::::::::::::::::::
+            GraphicsDevice.Clear(Color.Black);
+
             // fit texture to screen for resizing
             Rectangle destRect = new Rectangle(Point.Zero, new Point(Window.ClientBounds.Width, Window.ClientBounds.Height));
-            spriteBatch.Draw(renderTexture, destRect, Color.White);
-            spriteBatch.End();
+            spriteBatch.Draw(virtualScreen, destRect, Color.White);
 
-            
-
-            
+            spriteBatch.End(); //:::::::::::::::::::::::::::::::::::::::::::::::::::::
 
             base.Draw(gameTime);
         }

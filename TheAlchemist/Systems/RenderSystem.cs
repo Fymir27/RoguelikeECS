@@ -14,17 +14,22 @@ namespace TheAlchemist.Systems
 
     class RenderSystem
     {
-        GraphicsDeviceManager graphics;
-        GameWindow window;
+        GraphicsDevice graphics;
+        SpriteBatch spriteBatch;
 
-        public RenderSystem(GraphicsDeviceManager graphics, GameWindow window)
+        public RenderSystem(GraphicsDevice graphics)
         {
             this.graphics = graphics;
-            this.window = window;        
+            spriteBatch = new SpriteBatch(graphics);
         }
 
-        public void Run(SpriteBatch spriteBatch)
+        public void RenderWorld(RenderTarget2D renderTarget)
         {
+            graphics.SetRenderTarget(renderTarget);           
+          
+            spriteBatch.Begin(); //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
+            graphics.Clear(Color.White);
+
             // seen by player
             var seenPositions = Util.CurrentFloor.GetSeenPositions();
 
@@ -73,6 +78,10 @@ namespace TheAlchemist.Systems
             {
                 spriteBatch.DrawString(text.Font, text.Text, text.Position, Color.Black);
             }
+
+            spriteBatch.End(); //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
+
+            graphics.SetRenderTarget(null);
         }
     }
 }

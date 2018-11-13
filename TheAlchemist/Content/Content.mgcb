@@ -25,6 +25,13 @@
 /processorParam:TextureFormat=Color
 /build:bat.png
 
+#begin big.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:big.spritefont
+
 #begin box.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -122,6 +129,18 @@
 #begin map.txt
 /copy:map.txt
 
+#begin messageLogBox.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:messageLogBox.png
+
 #begin player.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -176,6 +195,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:square.png
+
+#begin tooltip.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:tooltip.png
 
 #begin wall.png
 /importer:TextureImporter

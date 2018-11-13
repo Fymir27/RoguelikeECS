@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TheAlchemist
 {
@@ -14,56 +15,18 @@ namespace TheAlchemist
     // special entity for UI element access
     static class UI
     {
-        public static int UIEntityID { get; set; } = 0;
+        public static bool InventoryOpen { get; set; } = false;
 
-        public static RenderableSpriteComponent InventoryBackground { get; set; } = null;
-        public static RenderableTextComponent InventoryText { get; set; } = null;
-
-        public static RenderableSpriteComponent MessageLogBackground { get; set; } = null;
-        public static RenderableTextComponent MessageLogText { get; set; } = null;
-
-        public static RenderableTextComponent PlayerHealthText { get; set; } = null;
-
-        public static void Init()
+        public static void Render(SpriteBatch spriteBatch)
         {
-            int lowerFloorBorder = Util.TileSize * Util.CurrentFloor.Height;
-            int rightFloorBorder = Util.TileSize * Util.CurrentFloor.Width;
+            spriteBatch.Draw(TextureManager.GetTexture("messageLogBox"), new Vector2(0, Util.WorldHeight), Color.White);
+            spriteBatch.DrawString(Util.BigFont, "Message Log", new Vector2(10, Util.WorldHeight + 10), Color.Black);
 
-            InventoryBackground = new RenderableSpriteComponent() { Position = new Vector2(rightFloorBorder + 10, 0), Texture = "inventory" };
-            InventoryText = new RenderableTextComponent()
-            {
-                Position = new Vector2(rightFloorBorder + 20, 30),
-                Font = Util.SmallFont,
-                GetTextFrom = () =>
-                {
-                    IEnumerable<int> items = EntityManager.GetComponentOfEntity<InventoryComponent>(Util.PlayerID).Items;
-                    string itemString = "";
-                    int counter = 1;
-                    foreach (var item in items)
-                    {
-                        itemString += counter++ + ": " + DescriptionSystem.GetName(item) + " x" + EntityManager.GetComponentOfEntity<ItemComponent>(item).Count + '\n';
-                    }
-                    return itemString;
-                }
-            };
+            spriteBatch.Draw(TextureManager.GetTexture("tooltip"), new Vector2(Util.WorldWidth, 0), Color.White);
+            spriteBatch.DrawString(Util.BigFont, "Tooltip", new Vector2(Util.WorldWidth + 10, 10), Color.Black);
 
-            MessageLogBackground = new RenderableSpriteComponent() { Position = new Vector2(0, lowerFloorBorder + 10), Texture = "box" };
-            MessageLogText = new RenderableTextComponent() { Position = new Vector2(10, lowerFloorBorder + 85), Text = @"Welcome to <The Alchemist>!" };
-
-            PlayerHealthText = new RenderableTextComponent()
-            {
-                Position = new Vector2(rightFloorBorder + 10, 0),
-                Text = ""  //GetTextFrom = () => "Player HP: " + EntityManager.GetComponentOfEntity<HealthComponent>(Util.PlayerID).GetString()
-            };
-
-            UIEntityID = EntityManager.CreateEntity(new List<IComponent>()
-            {
-                new DescriptionComponent() { Name = "UI", Description = "Displays stuff you probably want to know!"},
-                InventoryBackground, InventoryText,
-                MessageLogBackground, MessageLogText,
-                PlayerHealthText
-            });
-            
+            spriteBatch.Draw(TextureManager.GetTexture("inventory"), new Vector2(Util.WorldWidth, 220), InventoryOpen ? Color.Aquamarine : Color.White);
+            spriteBatch.DrawString(Util.BigFont, "Inventory", new Vector2(Util.WorldWidth + 10, 220 + 10), Color.Black);
         }
     }
 }

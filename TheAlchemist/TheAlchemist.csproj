@@ -142,6 +142,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="app.manifest" />
+    <None Include="Content\big.spritefont" />
     <None Include="Content\default.spritefont" />
     <None Include="Content\small.spritefont" />
     <None Include="Meta\the_alchemist_design.md" />

@@ -37,17 +37,23 @@ namespace TheAlchemist
     static class Util
     {
         public static event TurnOverHandler TurnOverEvent;
-
-        public static int TileSize { get; } = 20;
-        public static int PlayerID { get; set; } = 0;
-        public static Floor CurrentFloor { get; set; } = null;
+ 
         public static SpriteFont DefaultFont { get; set; } = null;
         public static SpriteFont SmallFont { get; set; } = null;
+        public static SpriteFont BigFont { get; set; } = null;
         public static string ContentPath { get; set; } = "";
 
-        public static int OriginalWidth { get; } = 1280;
-        public static int OriginalHeight { get; } = 720;
+        // size of virtual screen (disregarding resizing)
+        public static int ScreenWidth { get; } = 1280;
+        public static int ScreenHeight { get; } = 720;
 
+        // virtual size of world (or rather view that is displayed)
+        public static int TileSize { get; } = 20;
+        public static int WorldWidth { get; } = 800;
+        public static int WorldHeight { get; } = 500;
+
+        public static int PlayerID { get; set; } = 0;
+        public static Floor CurrentFloor { get; set; } = null;
         public static bool PlayerTurnOver { get; set; } = false;
 
         public static FOV FOV = FOV.Medium;   
