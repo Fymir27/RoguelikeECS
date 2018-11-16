@@ -53,6 +53,7 @@ namespace TheAlchemist.Components
     class RenderableSpriteComponent : RenderableComponent<RenderableSpriteComponent>
     {
         public string Texture { get; set; } // name of texture
+        public Color Tint { get; set; } = Color.White;
     }
 
     public delegate string StringGetter();

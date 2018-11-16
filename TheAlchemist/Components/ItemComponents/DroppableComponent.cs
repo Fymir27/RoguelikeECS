@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-
 namespace TheAlchemist.Components.ItemComponents
 {
-    class ConsumableComponent : Component<ConsumableComponent>
+    class DroppableComponent : UsableComponent
     {
-        public float HealthChange { get; set; } = 0f;  // damage/heal     
+        public DroppableComponent() : base("Drop")
+        {
+
+        }
     }
 }

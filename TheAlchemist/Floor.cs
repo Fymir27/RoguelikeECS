@@ -103,6 +103,18 @@ namespace TheAlchemist
                 items[(int)playerPos.X - 1, (int)playerPos.Y].Add(CreateGold(playerPos + new Vector2(-1, 0), 100));
             }
 
+            int potion = EntityManager.CreateEntity(new List<IComponent>()
+            {
+                new TransformComponent() { Position = playerPos + new Vector2(0, -1) },
+                new ItemComponent() {},
+                new DescriptionComponent() { Name = "Potion", Description = "Quaff it!" },
+                new Components.ItemComponents.DroppableComponent(),
+                new Components.ItemComponents.ConsumableComponent(),
+                new Components.ItemComponents.ThrowableComponent(),
+                new RenderableSpriteComponent() { Texture = "potion", Tint = Color.Red }
+            });
+            PlaceItem(playerPos + new Vector2(0, -1), potion);
+
             /* //creation of test enemy
 
             int testEnemy = EntityManager.CreateEntity();
@@ -482,7 +494,7 @@ namespace TheAlchemist
         {
             if (IsOutOfBounds(pos))
             {
-                Log.Warning("Trying to remove item out of bounds! " + pos);
+                Log.Warning("Trying to place item out of bounds! " + pos);
                 Log.Data(Systems.DescriptionSystem.GetDebugInfoEntity(item));
                 return;
             }
@@ -491,7 +503,7 @@ namespace TheAlchemist
 
             if (itemsHere == null)
             {
-                itemsHere = new List<int>() { item };
+                items[(int)pos.X, (int)pos.Y] = new List<int>() { item };
             }
             else
             {

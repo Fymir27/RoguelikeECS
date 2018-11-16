@@ -46,7 +46,7 @@ namespace TheAlchemist.Systems
                 {
                     continue; // only render npcs on seen positions
                 }
-                spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, Color.White);              
+                spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, sprite.Tint);              
             }
          
             // mask hidden and discovered tiles

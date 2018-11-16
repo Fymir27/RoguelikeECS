@@ -124,12 +124,13 @@ namespace TheAlchemist
 
             string[] textures = 
             {
-                "player", "box",
-                "gold", "wall",
+                "player", "box", "wall",
                 "doorOpen", "doorClosed", "square",
                 // enemies:
                 "rat", "spider",
                 "bat", "enemy",
+                //items
+                "gold", "potion",
                 // UI:
                 "inventory", "inventoryOpen",
                 "messageLogBox", "tooltip"
@@ -180,7 +181,7 @@ namespace TheAlchemist
             }
             else
             {
-                inputSystem.Run();
+                inputSystem.Run(gameTime);
             }
 
             base.Update(gameTime);

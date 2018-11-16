@@ -53,9 +53,12 @@
     <Compile Include="Components\InteractableComponent.cs" />
     <Compile Include="Components\InventoryComponent.cs" />
     <Compile Include="Components\ItemComponent.cs" />
+    <Compile Include="Components\ItemComponents\DroppableComponent.cs" />
+    <Compile Include="Components\ItemComponents\ThrowableComponent.cs" />
+    <Compile Include="Components\ItemComponents\UsableComponent.cs" />
     <Compile Include="Components\NPCComponent.cs" />
     <Compile Include="Components\PlayerComponent.cs" />
-    <Compile Include="Components\ItemComponents\DrinkableComponent.cs" />
+    <Compile Include="Components\ItemComponents\ConsumableComponent.cs" />
     <Compile Include="Components\RenderableComponent.cs" />
     <Compile Include="Components\TransformComponent.cs" />
     <Compile Include="Components\WeaponComponent.cs" />

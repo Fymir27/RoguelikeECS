@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 namespace TheAlchemist.Systems
 {
     using Components;
+    using Components.ItemComponents;
 
     public delegate void ItemPickupHandler(int character, Vector2 position);
     public delegate void ItemUsedHandler(int character, int item);
@@ -46,8 +47,29 @@ namespace TheAlchemist.Systems
 
         public void UseItem(int character, int item)
         {
-            Console.WriteLine("ItemSystem.UseItem");
+            //Console.WriteLine("ItemSystem.UseItem");
             Log.Message(DescriptionSystem.GetNameWithID(character) + " used " + DescriptionSystem.GetNameWithID(item));
+            //Log.Data(DescriptionSystem.GetDebugInfoEntity(item));
+            IEnumerable<UsableComponent> usableComponents = EntityManager.GetAllComponentsOfEntity(item).Where(x => x.TypeID == UsableComponent.TypeID).Cast<UsableComponent>();
+            
+
+            if(!usableComponents.Any())
+            {
+                Log.Message("This item is not usable!");
+                return;
+            }
+
+            string options = "";
+
+            foreach(var component in usableComponents)
+            {
+                options += component.Action + " | ";
+            }
+
+            options = options.Substring(0, options.Length - 3);
+
+            Log.Message("Possible actions: " + options);
+
             Util.TurnOver(character);
         }
 

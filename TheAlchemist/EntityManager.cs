@@ -54,7 +54,7 @@ namespace TheAlchemist
         // running counter for entiy IDs (ID 0 is unused)
         static int entityIDCounter = 1;
 
-        // returns entities hhat have a specific type of component attached
+        // returns entities that have a specific type of component attached
         public static IEnumerable<int> GetEntitiesWithComponent<T>() where T : Component<T>
         {
             try

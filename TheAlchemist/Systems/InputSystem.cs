@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework;
 
 namespace TheAlchemist.Systems
 {
@@ -21,29 +22,40 @@ namespace TheAlchemist.Systems
         public event InventoryToggledHandler InventoryToggledEvent;
 
         Keys lastInput;
+        int sameKeyHeldFor = 0; // milliseconds for how long key has been held down
+
         int player = 0; // 0 is an invalid entity ID
+        
 
         public InputSystem()
         {
             player = EntityManager.GetEntitiesWithComponent<PlayerComponent>().FirstOrDefault();
         }
 
-        public void Run()
+        public void Run(GameTime gameTime)
         {
             KeyboardState keyboard = Keyboard.GetState();
             Keys[] keysPressed = keyboard.GetPressedKeys();
 
 
             if (keysPressed.Length == 0)
-            {
+            {                
                 lastInput = Keys.None;
                 return;
             }
 
             if(keysPressed.Any(item => item == lastInput))
             {
-                //TODO: allow holding of key if pressed for long enough
-                return;
+                sameKeyHeldFor += gameTime.ElapsedGameTime.Milliseconds;
+
+                if (sameKeyHeldFor < 800)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                sameKeyHeldFor = 0;
             }
 
             if(keysPressed.Any(item => item == Keys.Up))
@@ -69,7 +81,7 @@ namespace TheAlchemist.Systems
             else if(keysPressed.Contains(Keys.Space))
             {
                 HandleSpacePressed();
-                //lastInput = Keys.Space;
+                lastInput = Keys.Space;
             }
             else if(keysPressed.Contains(Keys.I))
             {
@@ -93,8 +105,8 @@ namespace TheAlchemist.Systems
 
             if (UI.InventoryOpen)
             {
-                Console.WriteLine("Space trigger item use!");
-                Console.WriteLine("UsedItemEvent null? " + UsedItemEvent == null);
+                //Console.WriteLine("Space trigger item use!");
+                //Console.WriteLine("UsedItemEvent null? " + UsedItemEvent == null);
                 UsedItemEvent?.Invoke(player, EntityManager.GetComponentOfEntity<InventoryComponent>(player).Items[UI.InventoryCursorPosition - 1]);
                 return;
             }
