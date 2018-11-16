@@ -96,29 +96,12 @@ namespace TheAlchemist
           
             characters[(int)playerPos.X, (int)playerPos.Y] = Util.PlayerID = CreatePlayer(playerPos);
 
-            items[(int)playerPos.X - 1, (int)playerPos.Y] = new List<int>()
+            items[(int)playerPos.X - 1, (int)playerPos.Y] = new List<int>();
+           
+            for(int i = 0; i < 50; i++)
             {
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100),
-                CreateGold(playerPos + new Vector2(-1, 0), 100)
-            };
+                items[(int)playerPos.X - 1, (int)playerPos.Y].Add(CreateGold(playerPos + new Vector2(-1, 0), 100));
+            }
 
             /* //creation of test enemy
 
@@ -283,10 +266,9 @@ namespace TheAlchemist
                                 endBlocked = true;
 
                             
-
                             if (solid)
                             {
-                                blocked = startingBlocked && endBlocked;
+                                blocked = startingBlocked && endBlocked && centreBlocked;
                             }
                             else
                             {
@@ -307,8 +289,9 @@ namespace TheAlchemist
                                         break;
                                 }
                             }
+                            
 
-                            if(blocked)
+                            if (blocked)
                             {
                                 break;
                             }
@@ -598,7 +581,7 @@ namespace TheAlchemist
                 new RenderableSpriteComponent { Visible = true, Texture = "player" },
                 new ColliderComponent() { Solid = false },
                 new EquipmentComponent() { Weapon = playerWeapon, Armor = playerArmor },
-                new InventoryComponent() { Capacity = 24 }
+                new InventoryComponent() { Capacity = 50 }
             };
 
             EntityManager.AddComponentsToEntity(player, playerComponents);
@@ -637,6 +620,7 @@ namespace TheAlchemist
             return EntityManager.CreateEntity(new List<IComponent>()
             {
                 doorComponent,
+                new DescriptionComponent() { Name = "Door", Description = "" },
                 new InteractableComponent() { },
                 new TransformComponent() { Position = pos },
                 new RenderableSpriteComponent() { Texture = doorComponent.Open ? doorComponent.TextureOpen : doorComponent.TextureClosed },

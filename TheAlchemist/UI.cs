@@ -16,6 +16,8 @@ namespace TheAlchemist
     static class UI
     {
         public static bool InventoryOpen { get; set; } = false;
+        public static int InventoryCursorPosition { get; set; } = 1;
+        public static int InventoryColumnLength { get; set; } = 25;
 
         public static void Render(SpriteBatch spriteBatch)
         {
@@ -27,6 +29,35 @@ namespace TheAlchemist
 
             spriteBatch.Draw(TextureManager.GetTexture("inventory"), new Vector2(Util.WorldWidth, 220), InventoryOpen ? Color.Aquamarine : Color.White);
             spriteBatch.DrawString(Util.BigFont, "Inventory", new Vector2(Util.WorldWidth + 10, 220 + 10), Color.Black);
+
+            var items = EntityManager.GetComponentOfEntity<InventoryComponent>(Util.PlayerID).Items;
+
+            int counter = 1;
+
+            var itemsFirstHalf = items.Take(InventoryColumnLength);
+            var itemsSecondHalf = items.Skip(InventoryColumnLength);
+
+            string itemStringLeftCol = "";
+            foreach(var item in itemsFirstHalf)
+            {
+                if (counter == InventoryCursorPosition)
+                    itemStringLeftCol += "# ";
+                itemStringLeftCol += counter++ + ": " + DescriptionSystem.GetName(item) + " x" + EntityManager.GetComponentOfEntity<ItemComponent>(item).Count + '\n';
+            }
+
+            spriteBatch.DrawString(Util.DefaultFont, itemStringLeftCol, new Vector2(Util.WorldWidth + 20, 220 + 40), Color.Black);
+
+            string itemStringRightCol = "";
+            foreach (var item in itemsSecondHalf)
+            {
+                if (counter == InventoryCursorPosition)
+                    itemStringRightCol += "# ";
+                itemStringRightCol += counter++ + ": " + DescriptionSystem.GetName(item) + " x" + EntityManager.GetComponentOfEntity<ItemComponent>(item).Count + '\n';
+            }
+
+            spriteBatch.DrawString(Util.DefaultFont, itemStringRightCol, new Vector2(Util.WorldWidth + 20 + 240, 220 + 40), Color.Black);
         }
+
+        
     }
 }

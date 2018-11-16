@@ -6,15 +6,72 @@ using System.Threading.Tasks;
 
 namespace TheAlchemist.Systems
 {
+    using Components;
+    using Systems;
+
     public delegate void InventoryToggledHandler();
 
     class UISystem
     {
-        public bool InventoryOpen { get; set; } = false;
-
         public void HandleInventoryToggled()
         {
             UI.InventoryOpen = !UI.InventoryOpen;
+        }
+
+        // MovementEventHandler
+        public void HandleInventoryCursorMoved(int character, Direction dir)
+        {
+            if (!UI.InventoryOpen)
+            {
+                return;
+            }
+
+            if (character != Util.PlayerID)
+            {
+                return;
+            }
+
+            var inventory = EntityManager.GetComponentOfEntity<InventoryComponent>(character);
+
+            if (inventory == null)
+            {
+                Log.Error("No player inventory found!");
+                throw new NullReferenceException("No player inventory found!");
+            }
+
+            //Log.Message("Inventory cursor moved " + dir);
+
+            int newCursorPosition = UI.InventoryCursorPosition;
+            int colLength = UI.InventoryColumnLength;
+
+            switch (dir)
+            {
+                case Direction.North:
+                    if (newCursorPosition > 1)
+                        newCursorPosition--;
+                    break;
+
+                case Direction.East:
+                    newCursorPosition += colLength;
+                    break;
+
+                case Direction.South:
+                    newCursorPosition++;
+                    break;
+
+                case Direction.West:
+                    newCursorPosition -= colLength;
+                    break;
+
+                default:
+                    break;
+            }
+
+            if (newCursorPosition >= 1 && newCursorPosition <= inventory.Items.Count)
+            {
+                UI.InventoryCursorPosition = newCursorPosition;
+            }
+
         }
     }
 }

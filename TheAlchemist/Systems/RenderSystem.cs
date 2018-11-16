@@ -70,6 +70,7 @@ namespace TheAlchemist.Systems
                 }
             }
 
+            /* no rendered texts at the moment!
             var renderedTexts = EntityManager
                .GetAllComponents<RenderableTextComponent>()
                .Where(text => text.Visible);
@@ -78,6 +79,7 @@ namespace TheAlchemist.Systems
             {
                 spriteBatch.DrawString(text.Font, text.Text, text.Position, Color.Black);
             }
+            */
 
             spriteBatch.End(); //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
 

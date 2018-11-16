@@ -85,6 +85,8 @@ namespace TheAlchemist
 
             // hook up all events with their handlers
             inputSystem.MovementEvent += movementSystem.HandleMovementEvent;
+            inputSystem.MovementEvent += uiSystem.HandleInventoryCursorMoved;
+            inputSystem.UsedItemEvent += itemSystem.UseItem;
             inputSystem.InteractionEvent += interactionSystem.HandleInteraction;
             inputSystem.PickupItemEvent += itemSystem.PickUpItem;
             inputSystem.InventoryToggledEvent += uiSystem.HandleInventoryToggled;

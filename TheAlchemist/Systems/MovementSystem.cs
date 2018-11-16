@@ -26,6 +26,12 @@ namespace TheAlchemist.Systems
 
         public void HandleMovementEvent(int entity, Direction dir)
         {
+            // move inventory cursor instead!
+            if(entity == Util.PlayerID && UI.InventoryOpen)
+            {
+                return;
+            }
+
             var entityTransform = EntityManager.GetComponentOfEntity<TransformComponent>(entity);
             Vector2 newPos = entityTransform.Position + Util.GetUnitVectorInDirection(dir);
             var floor = Util.CurrentFloor;

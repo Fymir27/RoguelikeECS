@@ -10,7 +10,7 @@ namespace TheAlchemist.Systems
     using Components;
 
     public delegate void ItemPickupHandler(int character, Vector2 position);
-    public delegate void ItemUseHandler(int character, int item);
+    public delegate void ItemUsedHandler(int character, int item);
 
     class ItemSystem
     {
@@ -26,7 +26,7 @@ namespace TheAlchemist.Systems
 
             if (inventory.Full)
             {
-                Log.Message("Invetory is full! -> " + DescriptionSystem.GetNameWithID(character));
+                Log.Message("Inventory is full! -> " + DescriptionSystem.GetNameWithID(character));
                 return;
             }
         
@@ -46,8 +46,11 @@ namespace TheAlchemist.Systems
 
         public void UseItem(int character, int item)
         {
+            Console.WriteLine("ItemSystem.UseItem");
             Log.Message(DescriptionSystem.GetNameWithID(character) + " used " + DescriptionSystem.GetNameWithID(item));
             Util.TurnOver(character);
         }
+
+        
     }
 }

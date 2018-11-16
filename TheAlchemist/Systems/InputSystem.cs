@@ -16,6 +16,7 @@ namespace TheAlchemist.Systems
         public event MovementEventHandler MovementEvent;
         public event InteractionHandler InteractionEvent;
         public event ItemPickupHandler PickupItemEvent;
+        public event ItemUsedHandler UsedItemEvent;
 
         public event InventoryToggledHandler InventoryToggledEvent;
 
@@ -67,8 +68,8 @@ namespace TheAlchemist.Systems
             }
             else if(keysPressed.Contains(Keys.Space))
             {
-                HandlePlayerInteraction();
-                lastInput = Keys.Space;
+                HandleSpacePressed();
+                //lastInput = Keys.Space;
             }
             else if(keysPressed.Contains(Keys.I))
             {
@@ -82,11 +83,22 @@ namespace TheAlchemist.Systems
             MovementEvent?.Invoke(entity, dir);
         }
 
-        // first tries to interact with terrain under player
-        // then tries to pick up Item
-        private void HandlePlayerInteraction()
+        // This function tries to do the following things in order:
+        // tries to use an item if inventory is open
+        // tries to interact with terrain under player
+        // tries to pick up Item
+        private void HandleSpacePressed()
         {
             int player = Util.PlayerID;
+
+            if (UI.InventoryOpen)
+            {
+                Console.WriteLine("Space trigger item use!");
+                Console.WriteLine("UsedItemEvent null? " + UsedItemEvent == null);
+                UsedItemEvent?.Invoke(player, EntityManager.GetComponentOfEntity<InventoryComponent>(player).Items[UI.InventoryCursorPosition - 1]);
+                return;
+            }
+            
             var playerPos = EntityManager.GetComponentOfEntity<TransformComponent>(player).Position;
 
             int terrain = Util.CurrentFloor.GetTerrain(playerPos);
