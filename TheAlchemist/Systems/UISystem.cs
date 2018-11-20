@@ -73,5 +73,16 @@ namespace TheAlchemist.Systems
             }
 
         }
+
+        // posts a message to the Message Log
+        public static void Message(string message)
+        {
+            for (int i = 0; i < UI.MessageLogLineCount - 1; i++)
+            {
+                UI.MessageLog[i] = UI.MessageLog[i + 1];
+            }
+
+            UI.MessageLog[UI.MessageLogLineCount - 1] = message;
+        }
     }
 }

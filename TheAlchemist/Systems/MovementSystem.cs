@@ -25,7 +25,7 @@ namespace TheAlchemist.Systems
         }
 
         public void HandleMovementEvent(int entity, Direction dir)
-        {
+        { 
             // move inventory cursor instead!
             if(entity == Util.PlayerID && UI.InventoryOpen)
             {

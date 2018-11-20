@@ -48,7 +48,7 @@ namespace TheAlchemist.Systems
             {
                 sameKeyHeldFor += gameTime.ElapsedGameTime.Milliseconds;
 
-                if (sameKeyHeldFor < 800)
+                if (sameKeyHeldFor < 500)
                 {
                     return;
                 }
@@ -130,7 +130,7 @@ namespace TheAlchemist.Systems
             
             if(!itemsOnFloor)
             {
-                Log.Message("No items here to be picked up!");
+                UISystem.Message("No items here to be picked up!");
                 return;
             }
 

@@ -27,13 +27,13 @@ namespace TheAlchemist.Systems
 
             if (inventory.Full)
             {
-                Log.Message("Inventory is full! -> " + DescriptionSystem.GetNameWithID(character));
+                UISystem.Message("Inventory is full! -> " + DescriptionSystem.GetNameWithID(character));
                 return;
             }
         
 
             int item = Util.CurrentFloor.GetFirstItem(position);
-            Log.Message(DescriptionSystem.GetNameWithID(character) + " picked up " + DescriptionSystem.GetNameWithID(item));
+            UISystem.Message(DescriptionSystem.GetNameWithID(character) + " picked up " + DescriptionSystem.GetNameWithID(item));
 
             Util.CurrentFloor.RemoveItem(position, item);
             EntityManager.GetComponentOfEntity<RenderableSpriteComponent>(item).Visible = false;
@@ -48,14 +48,15 @@ namespace TheAlchemist.Systems
         public void UseItem(int character, int item)
         {
             //Console.WriteLine("ItemSystem.UseItem");
-            Log.Message(DescriptionSystem.GetNameWithID(character) + " used " + DescriptionSystem.GetNameWithID(item));
+            //Log.Message(DescriptionSystem.GetNameWithID(character) + " used " + DescriptionSystem.GetNameWithID(item));
+            
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(item));
             IEnumerable<UsableComponent> usableComponents = EntityManager.GetAllComponentsOfEntity(item).Where(x => x.TypeID == UsableComponent.TypeID).Cast<UsableComponent>();
             
 
             if(!usableComponents.Any())
             {
-                Log.Message("This item is not usable!");
+                UISystem.Message(DescriptionSystem.GetNameWithID(item) + " is not usable!");
                 return;
             }
 
@@ -68,7 +69,7 @@ namespace TheAlchemist.Systems
 
             options = options.Substring(0, options.Length - 3);
 
-            Log.Message("Possible actions: " + options);
+            UISystem.Message(DescriptionSystem.GetNameWithID(character) + " used " + DescriptionSystem.GetNameWithID(item) + ". Options: " + options);
 
             Util.TurnOver(character);
         }

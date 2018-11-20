@@ -19,14 +19,27 @@ namespace TheAlchemist
         public static int InventoryCursorPosition { get; set; } = 1;
         public static int InventoryColumnLength { get; set; } = 25;
 
+        // TODO: save older messages
+        public static int MessageLogLineCount { get; set; } = 10;
+        public static string[] MessageLog { get; set; } = new string[MessageLogLineCount];
+
         public static void Render(SpriteBatch spriteBatch)
         {
+            // ------------------------------------------------------------------------------------------------------------------------------------------------------------
             spriteBatch.Draw(TextureManager.GetTexture("messageLogBox"), new Vector2(0, Util.WorldHeight), Color.White);
-            spriteBatch.DrawString(Util.BigFont, "Message Log", new Vector2(10, Util.WorldHeight + 10), Color.Black);
+            //spriteBatch.DrawString(Util.BigFont, "Message Log", new Vector2(10, Util.WorldHeight + 10), Color.Black);
 
+            string messageLogString = "";
+            for (int i = 0; i < MessageLogLineCount; i++)
+            {
+                messageLogString += MessageLog[i] + '\n';
+            }
+            spriteBatch.DrawString(Util.DefaultFont, messageLogString, new Vector2(10, Util.WorldHeight + 10), Color.Black);
+
+            // ------------------------------------------------------------------------------------------------------------------------------------------------------------
             spriteBatch.Draw(TextureManager.GetTexture("tooltip"), new Vector2(Util.WorldWidth, 0), Color.White);
             spriteBatch.DrawString(Util.BigFont, "Tooltip", new Vector2(Util.WorldWidth + 10, 10), Color.Black);
-
+            // ------------------------------------------------------------------------------------------------------------------------------------------------------------
             spriteBatch.Draw(TextureManager.GetTexture("inventory"), new Vector2(Util.WorldWidth, 220), InventoryOpen ? Color.Aquamarine : Color.White);
             spriteBatch.DrawString(Util.BigFont, "Inventory", new Vector2(Util.WorldWidth + 10, 220 + 10), Color.Black);
 
@@ -56,8 +69,9 @@ namespace TheAlchemist
             }
 
             spriteBatch.DrawString(Util.DefaultFont, itemStringRightCol, new Vector2(Util.WorldWidth + 20 + 240, 220 + 40), Color.Black);
+            // ------------------------------------------------------------------------------------------------------------------------------------------------------------
         }
 
-        
+
     }
 }

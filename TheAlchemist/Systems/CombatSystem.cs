@@ -18,7 +18,7 @@ namespace TheAlchemist.Systems
 
         public void HandleBasicAttack(int attacker, int defender)
         {           
-            Log.Message(attacker + " attacks " + defender);
+            UISystem.Message(DescriptionSystem.GetNameWithID(attacker) + " attacks " + DescriptionSystem.GetNameWithID(defender));
 
             float damage = unarmedDamage;
 

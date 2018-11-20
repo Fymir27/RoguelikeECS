@@ -151,6 +151,7 @@
     <None Include="Meta\the_alchemist_design.md" />
     <None Include="Meta\todo.md" />
     <None Include="packages.config" />
+    <None Include="stuff.xlsx" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Events\" />
