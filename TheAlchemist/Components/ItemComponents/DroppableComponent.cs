@@ -8,7 +8,7 @@ namespace TheAlchemist.Components.ItemComponents
 {
     class DroppableComponent : UsableComponent
     {
-        public DroppableComponent() : base("Drop")
+        public DroppableComponent() : base("Drop", Microsoft.Xna.Framework.Input.Keys.D)
         {
 
         }

@@ -8,7 +8,7 @@ namespace TheAlchemist.Components.ItemComponents
 {
     class ThrowableComponent : UsableComponent
     {
-        public ThrowableComponent() : base("Throw")
+        public ThrowableComponent() : base("Throw", Microsoft.Xna.Framework.Input.Keys.T)
         {
 
         }
