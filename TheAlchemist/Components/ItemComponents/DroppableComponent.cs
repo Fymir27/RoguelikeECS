@@ -10,7 +10,7 @@ namespace TheAlchemist.Components.ItemComponents
     {
         public DroppableComponent() : base("Drop", Microsoft.Xna.Framework.Input.Keys.D)
         {
-
+            Handler = (itemSystem, character) => itemSystem.DropItem(character, this);
         }
     }
 }

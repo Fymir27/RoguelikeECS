@@ -109,7 +109,17 @@ namespace TheAlchemist
                 new ItemComponent() {},
                 new DescriptionComponent() { Name = "Potion", Description = "Quaff it!" },
                 new Components.ItemComponents.DroppableComponent(),
-                new Components.ItemComponents.ConsumableComponent(),
+                new Components.ItemComponents.ConsumableComponent()
+                {
+                    Effects = new ItemSystem.ItemEffectDescription[] 
+                    {
+                        new ItemSystem.ItemEffectDescription()
+                        {
+                            Type = ItemSystem.ItemEffectType.RestoreHealth,
+                            Values = new float[] { 42 }
+                        }
+                    }
+                },
                 new Components.ItemComponents.ThrowableComponent(),
                 new RenderableSpriteComponent() { Texture = "potion", Tint = Color.Red }
             });

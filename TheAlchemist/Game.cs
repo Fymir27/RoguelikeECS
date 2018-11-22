@@ -92,6 +92,9 @@ namespace TheAlchemist
             inputSystem.InventoryToggledEvent += uiSystem.HandleInventoryToggled;
 
             itemSystem.PlayerPromptEvent += inputSystem.HandlePlayerPrompt;
+            itemSystem.InventoryToggledEvent += uiSystem.HandleInventoryToggled;
+            itemSystem.HealthGainedEvent += healthSystem.HandleGainedHealth;
+            itemSystem.HealthLostEvent += healthSystem.HandleLostHealth;
 
             npcBehaviourSystem.EnemyMovedEvent += movementSystem.HandleMovementEvent;
 

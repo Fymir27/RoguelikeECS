@@ -10,10 +10,11 @@ namespace TheAlchemist.Components.ItemComponents
 {
     abstract class UsableComponent : Component<UsableComponent>
     {
-        public string Action { get; set; } = "Use";
-        public Keys Key { get; set; }
+        public string Action { get; private set; } = "Use";
+        public Keys Key { get; private set; }
+        public Action<Systems.ItemSystem, int> Handler;
 
-        protected UsableComponent(string action, Keys key)
+        protected UsableComponent(string action, Keys key)//, Action<int> handler)
         {
             Action = action;
             Key = key;

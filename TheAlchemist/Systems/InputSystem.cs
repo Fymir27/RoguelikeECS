@@ -12,7 +12,8 @@ namespace TheAlchemist.Systems
     using Components;
     using Systems;
 
-    public delegate void PlayerPromptHandler(Keys[] keys, Action[] callbacks);
+    // waits for player to input one of the keys and invokes callback with the index of the key chosen
+    public delegate void PlayerPromptHandler(Keys[] keys, Action<int> callback);
 
     class InputSystem
     {
@@ -26,8 +27,8 @@ namespace TheAlchemist.Systems
 
         // keys that the player is prompted to press
         Keys[] promptKeys;
-        // corresponding callbacks if key is pressed
-        Action[] callbacks;
+        // corresponding callback if key is pressed
+        Action<int> callback;
 
         Keys lastInput;
         int sameKeyHeldFor = 0; // milliseconds for how long key has been held down
@@ -73,13 +74,13 @@ namespace TheAlchemist.Systems
                 {
                     if (keysPressed.Contains(promptKeys[i]))
                     {
-                        Action callback = callbacks[i];
                         promptKeys = null;
-                        callbacks = null;
-                        callback.Invoke();
-                        return;
+                        callback.Invoke(i);
+                        break;
                     }
                 }
+                // don't check for normal input until prompt is resolved
+                return;
             }
 
             // check for general input
@@ -162,10 +163,10 @@ namespace TheAlchemist.Systems
             PickupItemEvent?.Invoke(player, playerPos);
         }
 
-        public void HandlePlayerPrompt(Keys[] keys, Action[] callbacks)
+        public void HandlePlayerPrompt(Keys[] keys, Action<int> callback)
         {
             promptKeys = keys;
-            this.callbacks = callbacks;
+            this.callback = callback;
         }
     }
 }

@@ -35,10 +35,7 @@ namespace TheAlchemist
                 messageLogString += MessageLog[i] + '\n';
             }
             spriteBatch.DrawString(Util.DefaultFont, messageLogString, new Vector2(10, Util.WorldHeight + 10), Color.Black);
-
-            // ------------------------------------------------------------------------------------------------------------------------------------------------------------
-            spriteBatch.Draw(TextureManager.GetTexture("tooltip"), new Vector2(Util.WorldWidth, 0), Color.White);
-            spriteBatch.DrawString(Util.BigFont, "Tooltip", new Vector2(Util.WorldWidth + 10, 10), Color.Black);
+           
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
             spriteBatch.Draw(TextureManager.GetTexture("inventory"), new Vector2(Util.WorldWidth, 220), InventoryOpen ? Color.Aquamarine : Color.White);
             spriteBatch.DrawString(Util.BigFont, "Inventory", new Vector2(Util.WorldWidth + 10, 220 + 10), Color.Black);
@@ -69,6 +66,14 @@ namespace TheAlchemist
             }
 
             spriteBatch.DrawString(Util.DefaultFont, itemStringRightCol, new Vector2(Util.WorldWidth + 20 + 240, 220 + 40), Color.Black);
+
+            // ------------------------------------------------------------------------------------------------------------------------------------------------------------
+            spriteBatch.Draw(TextureManager.GetTexture("tooltip"), new Vector2(Util.WorldWidth, 0), Color.White);
+            spriteBatch.DrawString(Util.BigFont, "Tooltip", new Vector2(Util.WorldWidth + 10, 10), Color.Black);
+            if (InventoryOpen)
+            {
+                spriteBatch.DrawString(Util.BigFont, items.Count == 0 ? "" : DescriptionSystem.GetDescription(items[InventoryCursorPosition - 1]), new Vector2(Util.WorldWidth + 10, 40), Color.Black);
+            }
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
         }
 

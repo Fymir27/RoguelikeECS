@@ -10,7 +10,7 @@ namespace TheAlchemist.Components.ItemComponents
     {
         public ThrowableComponent() : base("Throw", Microsoft.Xna.Framework.Input.Keys.T)
         {
-
+            Handler = (itemSystem, character) => itemSystem.ThrowItem(character, this);
         }
     }
 }

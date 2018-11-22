@@ -18,6 +18,25 @@ namespace TheAlchemist.Systems
     class ItemSystem
     {
         public event PlayerPromptHandler PlayerPromptEvent;
+        public event InventoryToggledHandler InventoryToggledEvent;
+
+        public event HealthGainedHandler HealthGainedEvent;
+        public event HealthLostHandler HealthLostEvent;
+
+        public enum ItemEffectType
+        {
+            RestoreHealth,
+            LoseHealth
+        }
+
+        public struct ItemEffectDescription
+        {
+            public ItemEffectType Type;
+            public float[] Values;
+        }
+    
+        int itemInUse = 0;
+        IEnumerable<UsableComponent> usableComponents;
 
         public void PickUpItem(int character, Vector2 position)
         {
@@ -55,7 +74,7 @@ namespace TheAlchemist.Systems
             //Log.Message(DescriptionSystem.GetNameWithID(character) + " used " + DescriptionSystem.GetNameWithID(item));
             
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(item));
-            IEnumerable<UsableComponent> usableComponents = EntityManager.GetAllComponentsOfEntity(item).Where(x => x.TypeID == UsableComponent.TypeID).Cast<UsableComponent>();
+            usableComponents = EntityManager.GetAllComponentsOfEntity(item).Where(x => x.TypeID == UsableComponent.TypeID).Cast<UsableComponent>();
             
 
             if(!usableComponents.Any())
@@ -64,26 +83,81 @@ namespace TheAlchemist.Systems
                 return;
             }
 
+            itemInUse = item;
+
+            // choose a random use action for npcs
+            if(character != Util.PlayerID)
+            {
+                int i = Game.Random.Next(usableComponents.Count());
+                var chosenComponent = usableComponents.ElementAt(i);
+                chosenComponent.Handler.Invoke(this, character);
+                Util.TurnOver(character);
+                return;
+            }
+
+            // present the player with options of what to do with the item
             string options = "";
             List<Keys> keys = new List<Keys>();
-            List<Action> callbacks = new List<Action>();
 
             foreach(var component in usableComponents)
             {
-                options += component.Action + " | ";
+                options += component.Action + ", ";
                 keys.Add(component.Key);
-                callbacks.Add(() => UISystem.Message(component.Action));
             }
 
-            options = options.Substring(0, options.Length - 3);
+            // remove exta ", " at the end
+            options = options.Substring(0, options.Length - 2); 
 
-            UISystem.Message(DescriptionSystem.GetNameWithID(character) + " used " + DescriptionSystem.GetNameWithID(item) + ". Options: " + options);
+            UISystem.Message("How do you want to use that item? (" + options + ")");
 
-            PlayerPromptEvent?.Invoke(keys.ToArray(), callbacks.ToArray());
-
-            Util.TurnOver(character);
+            // set up callback when buttons are pressed
+            PlayerPromptEvent?.Invoke(keys.ToArray(), ChooseOption);
         }
 
-        
+        // callback that gets invoked when player 
+        // chooses what to do with the item
+        public void ChooseOption(int i)
+        {
+            var chosenComponent = usableComponents.ElementAt(i);
+            //UISystem.Message("You chose: " + chosenComponent.Action);
+
+            // invoke the specific handler of the component
+            chosenComponent.Handler.Invoke(this, Util.PlayerID);
+
+            // close inventory
+            InventoryToggledEvent?.Invoke();
+            Util.TurnOver(Util.PlayerID);
+        }
+
+        public void ConsumeItem(int character, ConsumableComponent consumable)
+        {
+            UISystem.Message(DescriptionSystem.GetNameWithID(character) + " consumes " + DescriptionSystem.GetNameWithID(consumable.EntityID));
+            foreach (var effect in consumable.Effects)
+            {
+                switch (effect.Type)
+                {
+                    case ItemEffectType.RestoreHealth:
+                        HealthGainedEvent?.Invoke(character, effect.Values[0]);
+                        break;
+
+                    case ItemEffectType.LoseHealth:
+                        HealthLostEvent?.Invoke(character, effect.Values[0]);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        public void ThrowItem(int character, ThrowableComponent throwable)
+        {
+            UISystem.Message(DescriptionSystem.GetNameWithID(character) + " throws " + DescriptionSystem.GetNameWithID(throwable.EntityID));
+        }
+
+        public void DropItem(int character, DroppableComponent droppable)
+        {
+            UISystem.Message(DescriptionSystem.GetNameWithID(character) + " drops " + DescriptionSystem.GetNameWithID(droppable.EntityID));
+        }
     }
 }
