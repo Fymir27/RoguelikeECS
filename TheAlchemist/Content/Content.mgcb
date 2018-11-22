@@ -126,6 +126,9 @@
 /processorParam:TextureFormat=Color
 /build:inventoryOpen.png
 
+#begin items.json
+/copy:items.json
+
 #begin map.txt
 /copy:map.txt
 

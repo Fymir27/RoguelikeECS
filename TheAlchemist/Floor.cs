@@ -103,6 +103,7 @@ namespace TheAlchemist
                 items[(int)playerPos.X - 1, (int)playerPos.Y].Add(CreateGold(playerPos + new Vector2(-1, 0), 100));
             }
 
+            /*
             int potion = EntityManager.CreateEntity(new List<IComponent>()
             {
                 new TransformComponent() { Position = playerPos + new Vector2(0, -1) },
@@ -123,7 +124,12 @@ namespace TheAlchemist
                 new Components.ItemComponents.ThrowableComponent(),
                 new RenderableSpriteComponent() { Texture = "potion", Tint = Color.Red }
             });
-            PlaceItem(playerPos + new Vector2(0, -1), potion);
+            */
+
+            JObject itemsFile = JObject.Parse(File.ReadAllText(Util.ContentPath + "/items.json"));
+            int healthPotion = EntityManager.CreateEntity(itemsFile["healthPotion"].ToString());
+            PlaceItem(playerPos + new Vector2(0, -1), healthPotion);
+
 
             /* //creation of test enemy
 

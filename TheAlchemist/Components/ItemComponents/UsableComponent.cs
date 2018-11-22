@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Xna.Framework.Input;
+using Newtonsoft.Json;
 
 namespace TheAlchemist.Components.ItemComponents
 {
@@ -12,6 +13,7 @@ namespace TheAlchemist.Components.ItemComponents
     {
         public string Action { get; private set; } = "Use";
         public Keys Key { get; private set; }
+        [JsonIgnore]
         public Action<Systems.ItemSystem, int> Handler;
 
         protected UsableComponent(string action, Keys key)//, Action<int> handler)

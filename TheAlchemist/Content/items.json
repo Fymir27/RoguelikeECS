@@ -1,0 +1,63 @@
+{
+  "healthPotion": [
+    {
+      "$type": "TheAlchemist.Components.TransformComponent, TheAlchemist",
+      "Position": "12, 3",
+      "EntityID": 411
+    },
+    {
+      "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
+      "Count": 1,
+      "MaxCount": 1,
+      "Value": 0,
+      "Weight": 0.0,
+      "OnGround": true,
+      "EntityID": 411
+    },
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Potion",
+      "Description": "Quaff it!",
+      "EntityID": 411
+    },
+    {
+      "$type": "TheAlchemist.Components.ItemComponents.DroppableComponent, TheAlchemist",
+      "Action": "Drop",
+      "Key": 68,
+      "EntityID": 411
+    },
+    {
+      "$type": "TheAlchemist.Components.ItemComponents.ConsumableComponent, TheAlchemist",
+      "Effects": [
+        {
+          "Type": 0,
+          "Values": [
+            42.0
+          ]
+        }
+      ],
+      "Action": "Consume",
+      "Key": 67,
+      "EntityID": 411
+    },
+    {
+      "$type": "TheAlchemist.Components.ItemComponents.ThrowableComponent, TheAlchemist",
+      "Action": "Throw",
+      "Key": 84,
+      "EntityID": 411
+    },
+    {
+      "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+      "Texture": "potion",
+      "Tint": {
+        "B": 0,
+        "G": 0,
+        "R": 255,
+        "A": 255
+      },
+      "Visible": true,
+      "Position": "240, 60",
+      "EntityID": 411
+    }
+  ]
+}
