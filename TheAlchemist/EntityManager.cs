@@ -185,10 +185,11 @@ namespace TheAlchemist
 
                         // check if entity was character/tile/item
                         if (floor.GetCharacter(pos) == entityID)
-                            floor.SetCharacter(pos, 0);
+                            floor.RemoveCharacter(pos);
                         else if (floor.GetTerrain(pos) == entityID)
-                            floor.SetTerrain(pos, 0);
-                        //TODO: remove item!
+                            floor.RemoveTerrain(pos);
+                        else if (floor.GetItems(pos).Contains(entityID))
+                            floor.RemoveItem(pos, entityID);
                     }
                     componentsOfType[component.TypeID].Remove(component);
                 }

@@ -76,8 +76,8 @@ namespace TheAlchemist.Systems
             // TODO: implement item pickup
 
             // Move entity
-            floor.SetCharacter(entityTransform.Position, 0);
-            floor.SetCharacter(newPos, entity);
+            floor.RemoveCharacter(entityTransform.Position);
+            floor.PlaceCharacter(newPos, entity);
             entityTransform.Position = newPos;
 
             Util.TurnOver(entity);

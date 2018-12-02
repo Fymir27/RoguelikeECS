@@ -55,11 +55,11 @@ namespace TheAlchemist
                     switch (tile)
                     {
                         case '#':
-                            tmpTerrain[y].Add(CreateWall(new Vector2(x, y)));
+                            tmpTerrain[y].Add(CreateWall());
                             break;
 
                         case '+':
-                            tmpTerrain[y].Add(CreateDoor(new Vector2(x, y)));
+                            tmpTerrain[y].Add(CreateDoor());
                             break;
 
                         case '@':
@@ -90,17 +90,15 @@ namespace TheAlchemist
             {
                 for (int x = 0; x < width; x++)
                 {
-                    terrain[x, y] = tmpTerrain[y][x];
+                    PlaceTerrain(new Vector2(x, y), tmpTerrain[y][x]);
                 }
             }
-          
-            characters[(int)playerPos.X, (int)playerPos.Y] = Util.PlayerID = CreatePlayer(playerPos);
 
-            items[(int)playerPos.X - 1, (int)playerPos.Y] = new List<int>();
+            PlaceCharacter(playerPos, CreatePlayer());
            
-            for(int i = 0; i < 50; i++)
+            for(int i = 0; i < 5; i++)
             {
-                items[(int)playerPos.X - 1, (int)playerPos.Y].Add(CreateGold(playerPos + new Vector2(-1, 0), 100));
+                PlaceItem(playerPos + new Vector2(-1, 0), CreateGold(100));
             }
 
             /*
@@ -163,14 +161,13 @@ namespace TheAlchemist
             int bat = EntityManager.CreateEntity(enemies["bat"].ToString());
             int spider = EntityManager.CreateEntity(enemies["spider"].ToString());
 
+            PlaceCharacter(new Vector2(10, 10), rat);
+            PlaceCharacter(new Vector2(16, 5), bat);
+            PlaceCharacter(new Vector2(16, 1), spider);
+
             Log.Data(DescriptionSystem.GetDebugInfoEntity(rat));
             Log.Data(DescriptionSystem.GetDebugInfoEntity(bat));
             Log.Data(DescriptionSystem.GetDebugInfoEntity(spider));
-
-            characters[10, 10] = rat;
-            characters[16, 5] = bat;
-            characters[16, 1] = spider;
-
         }
 
 
@@ -370,6 +367,9 @@ namespace TheAlchemist
                 Log.Warning(x + "|" + y + " is out of range! (Calculate visibilty)");
             }
         }
+ 
+        
+        ////////////////////// Getters //////////////////////////////////////
 
         public IEnumerable<Vector2> GetSeenPositions()
         {
@@ -441,12 +441,92 @@ namespace TheAlchemist
             return itemList;
         }
 
-        public void RemoveItem(Vector2 pos, int item)
+
+        //////////////////// Removal ////////////////////////////////////////
+
+        // prepares entity for removal from floor by
+        // by making the sprite invisible
+        // returns true if successful
+        private bool RemoveEntity(Vector2 pos, int entity)
+        {
+            if (IsOutOfBounds(pos))
+            {
+                // TODO: throw exception?
+                Log.Warning("Trying to remove " + DescriptionSystem.GetNameWithID(entity) + " out of bounds! " + pos);
+                return false;
+            }
+
+            EntityManager.GetComponentOfEntity<RenderableSpriteComponent>(entity).Visible = false;
+
+            return true;
+        }
+
+        public void RemoveTerrain(Vector2 pos)
+        {
+            if (IsOutOfBounds(pos))
+            {
+                Log.Warning("Can't remove terrain out of bounds! " + pos);
+                return;
+            }
+
+            int terrain = this.terrain[(int)pos.X, (int)pos.Y];
+
+            if (!RemoveEntity(pos, terrain))
+            {
+                return;
+            }
+
+            characters[(int)pos.X, (int)pos.Y] = 0;
+        }
+
+        public void RemoveCharacter(Vector2 pos)
         {
             if(IsOutOfBounds(pos))
             {
-                Log.Warning("Trying to remove item out of bounds! " + pos);
-                Log.Data(Systems.DescriptionSystem.GetDebugInfoEntity(item));
+                Log.Warning("Can't remove character out of bounds! " + pos);
+                return;
+            }
+
+            int character = characters[(int)pos.X, (int)pos.Y];
+
+            if(!RemoveEntity(pos, character))
+            {
+                return;
+            }
+
+            characters[(int)pos.X, (int)pos.Y] = 0;
+        }
+
+        public void RemoveItems(Vector2 pos)
+        {        
+           if(IsOutOfBounds(pos))
+            {
+                Log.Warning("Can't remove items out of bounds! " + pos);
+                return;
+            }
+
+            var itemsHere = items[(int)pos.X, (int)pos.Y];
+
+            if(itemsHere == null)
+            {
+                return; // nothing to remove
+            }
+
+            foreach(int item in itemsHere)
+            {
+                if(!RemoveEntity(pos, item))
+                {
+                    return;
+                }
+            }         
+
+            itemsHere = null;
+        }
+
+        public void RemoveItem(Vector2 pos, int item)
+        {
+            if(!RemoveEntity(pos, item))
+            {
                 return;
             }
 
@@ -455,52 +535,100 @@ namespace TheAlchemist
             if(itemsHere == null)
             {
                 Log.Warning("Trying to remove item that's not here! " + pos);
-                Log.Data(Systems.DescriptionSystem.GetDebugInfoEntity(item));
+                Log.Data(DescriptionSystem.GetDebugInfoEntity(item));
                 return;
             }
 
             if(itemsHere.Count == 0 || !itemsHere.Contains(item))
             {
                 Log.Warning("Trying to remove item that's not here! " + pos);
-                Log.Data(Systems.DescriptionSystem.GetDebugInfoEntity(item));
+                Log.Data(DescriptionSystem.GetDebugInfoEntity(item));
                 return;
             }
+
 
             itemsHere.Remove(item);
             if (itemsHere.Count == 0) itemsHere = null; // remove List to save space
         }
 
-        public void SetTerrain(Vector2 pos, int terrain)
+
+        ///////////////////// Placement /////////////////////////////////////////
+
+        // prepares the entity for placement as item/character/terrain by
+        // configuring/adding the the transform to the position and
+        // setting the sprite to visible
+        // returns true if successful
+        private bool PlaceEntity(Vector2 pos, int entity)
         {
-            if(IsOutOfBounds(pos))
+            if(entity == 0) // can happen during init
+            {
+                return false; 
+            }
+
+            if (IsOutOfBounds(pos))
+            {
+                Log.Warning("Trying to place " + DescriptionSystem.GetNameWithID(entity) + " out of bounds! " + pos);
+                return false;
+            }
+
+            var transform = EntityManager.GetComponentOfEntity<TransformComponent>(entity);
+
+            if (transform == null)
+            {
+                transform = new TransformComponent();
+                EntityManager.AddComponentToEntity(entity, transform);
+            }
+
+            transform.Position = pos;
+
+            var sprite = EntityManager.GetComponentOfEntity<RenderableSpriteComponent>(entity);
+
+            if (sprite == null)
+            {
+                // might be desirable in some cases
+                Log.Warning("Sprite missing for " + DescriptionSystem.GetNameWithID(entity) + "!");
+            }
+            else
+            {
+                sprite.Visible = true;
+            }
+            return true;
+        }
+
+        public void PlaceTerrain(Vector2 pos, int terrain)
+        {
+            if (!PlaceEntity(pos, terrain))
             {
                 return;
             }
             this.terrain[(int)pos.X, (int)pos.Y] = terrain;
         }
 
-        public void SetCharacter(Vector2 pos, int character)
+        public void PlaceCharacter(Vector2 pos, int character)
         {
-            if(IsOutOfBounds(pos))
+            if (!PlaceEntity(pos, character))
             {
                 return;
             }
             characters[(int)pos.X, (int)pos.Y] = character;
         }
 
-        public void AddItems(Vector2 pos, List<int> items)
+        public void PlaceItems(Vector2 pos, IEnumerable<int> items)
         {
-            if (IsOutOfBounds(pos))
+            foreach(int item in items)
             {
-                Log.Warning("Trying to add items out of bounds! " + pos);
-                return;
-            }
+                if (!PlaceEntity(pos, item))
+                {
+                    return;
+                }
+            }            
 
             var itemsHere = this.items[(int)pos.X, (int)pos.Y];
 
             if (itemsHere == null)
             {
-                itemsHere = items;
+                itemsHere = new List<int>();
+                itemsHere.AddRange(items);
             }
             else
             {
@@ -511,32 +639,10 @@ namespace TheAlchemist
 
         public void PlaceItem(Vector2 pos, int item)
         {
-            if (IsOutOfBounds(pos))
+            if(!PlaceEntity(pos, item))
             {
-                Log.Warning("Trying to place item out of bounds! " + pos);
-                Log.Data(Systems.DescriptionSystem.GetDebugInfoEntity(item));
                 return;
             }
-
-            var transform = EntityManager.GetComponentOfEntity<TransformComponent>(item);
-
-            if(transform == null)
-            {
-                transform = new TransformComponent();
-                EntityManager.AddComponentToEntity(item, transform);
-            }
-
-            transform.Position = pos;
-
-            var sprite = EntityManager.GetComponentOfEntity<RenderableSpriteComponent>(item);
-
-            if(sprite == null)
-            {
-                Log.Error("Sprite missing for " + DescriptionSystem.GetNameWithID(item) + "!");
-                return;
-            }
-
-            sprite.Visible = true;
 
             var itemsHere = items[(int)pos.X, (int)pos.Y];
 
@@ -549,6 +655,7 @@ namespace TheAlchemist
                 itemsHere.Add(item);
             }
         }
+
 
         public Floor(int width, int height)
         {
@@ -566,16 +673,16 @@ namespace TheAlchemist
                     // create sourrounding wall
                     if(y == 0 || y == height - 1)
                     {
-                        terrain[x, y] = CreateWall(new Vector2(x, y));
+                        PlaceTerrain(new Vector2(x, y), CreateWall());
                     }
                     else if(x == 0 || x == width - 1)
                     {
-                        terrain[x, y] = CreateWall(new Vector2(x, y));
+                        PlaceTerrain(new Vector2(x, y), CreateWall());
                     }                      
                 }
             }
 
-            characters[1, 1] = Util.PlayerID = CreatePlayer(new Vector2(1, 1));
+            PlaceCharacter(new Vector2(1, 1), CreatePlayer());
 
             int testEnemy = EntityManager.CreateEntity();
             int testArmor = EntityManager.CreateEntity();
@@ -614,7 +721,7 @@ namespace TheAlchemist
             return false;
         }
 
-        public int CreatePlayer(Vector2 pos)
+        public int CreatePlayer()
         {
             int player = EntityManager.CreateEntity();
             int playerWeapon = EntityManager.CreateEntity();
@@ -626,7 +733,6 @@ namespace TheAlchemist
             List<IComponent> playerComponents = new List<IComponent>()
             {
                 new DescriptionComponent() { Name = "Player", Description = "That's you!" },
-                new TransformComponent() { Position = pos },
                 new HealthComponent() { Amount = 30, Max = 30, RegenerationAmount = 0.3f },
                 new PlayerComponent(),
                 new RenderableSpriteComponent { Visible = true, Texture = "player" },
@@ -637,15 +743,16 @@ namespace TheAlchemist
 
             EntityManager.AddComponentsToEntity(player, playerComponents);
 
+            Util.PlayerID = player;
+
             return player;
         }
 
-        public int CreateWall(Vector2 pos)
+        public int CreateWall()
         {
             int wall = EntityManager.CreateEntity();
 
             List<IComponent> wallComponents = new List<IComponent>();
-            wallComponents.Add(new TransformComponent() { Position = pos });
             wallComponents.Add(new RenderableSpriteComponent() { Visible = true, Texture = "wall" });
             wallComponents.Add(new ColliderComponent() { Solid = true });
 
@@ -654,18 +761,17 @@ namespace TheAlchemist
             return wall;
         } 
 
-        public int CreateGold(Vector2 pos, int amount)
+        public int CreateGold(int amount)
         {
             return EntityManager.CreateEntity(new List<IComponent>()
             {
-                new TransformComponent() { Position = pos },
                 new DescriptionComponent() { Name = "Gold", Description = "Ohhh, shiny!" },
                 new ItemComponent() { MaxCount = 999, Count = amount, Value = 1, Weight = 0.1f },
                 new RenderableSpriteComponent() { Texture = "gold" }
             });
         }
 
-        public int CreateDoor(Vector2 pos)
+        public int CreateDoor()
         {
             var doorComponent = new DoorComponent() { Open = false, TextureClosed = "doorClosed", TextureOpen = "doorOpen" };
             return EntityManager.CreateEntity(new List<IComponent>()
@@ -673,7 +779,6 @@ namespace TheAlchemist
                 doorComponent,
                 new DescriptionComponent() { Name = "Door", Description = "" },
                 new InteractableComponent() { },
-                new TransformComponent() { Position = pos },
                 new RenderableSpriteComponent() { Texture = doorComponent.Open ? doorComponent.TextureOpen : doorComponent.TextureClosed },
                 new ColliderComponent() { Solid = true },
                 //new RenderableTextComponent() { GetTextFrom = () => doorComponent.Open.ToString() }
