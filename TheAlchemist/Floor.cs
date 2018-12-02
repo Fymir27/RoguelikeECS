@@ -130,6 +130,9 @@ namespace TheAlchemist
             int healthPotion = EntityManager.CreateEntity(itemsFile["healthPotion"].ToString());
             PlaceItem(playerPos + new Vector2(0, -1), healthPotion);
 
+            int poison = EntityManager.CreateEntity(itemsFile["poisonPotion"].ToString());
+            PlaceItem(playerPos + new Vector2(-1, -1), poison);
+
 
             /* //creation of test enemy
 
@@ -514,6 +517,26 @@ namespace TheAlchemist
                 Log.Data(Systems.DescriptionSystem.GetDebugInfoEntity(item));
                 return;
             }
+
+            var transform = EntityManager.GetComponentOfEntity<TransformComponent>(item);
+
+            if(transform == null)
+            {
+                transform = new TransformComponent();
+                EntityManager.AddComponentToEntity(item, transform);
+            }
+
+            transform.Position = pos;
+
+            var sprite = EntityManager.GetComponentOfEntity<RenderableSpriteComponent>(item);
+
+            if(sprite == null)
+            {
+                Log.Error("Sprite missing for " + DescriptionSystem.GetNameWithID(item) + "!");
+                return;
+            }
+
+            sprite.Visible = true;
 
             var itemsHere = items[(int)pos.X, (int)pos.Y];
 

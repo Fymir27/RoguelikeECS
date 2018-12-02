@@ -148,6 +148,18 @@ namespace TheAlchemist.Systems
                         break;
                 }
             }
+
+            int itemID = consumable.EntityID;
+            var itemComponent = EntityManager.GetComponentOfEntity<ItemComponent>(itemID);
+
+            if(itemComponent.Count > 1)
+            {
+                itemComponent.Count--;
+            }
+            else
+            {
+                RemoveFromInventory(itemID, character);
+            }
         }
 
         public void ThrowItem(int character, ThrowableComponent throwable)
@@ -158,6 +170,28 @@ namespace TheAlchemist.Systems
         public void DropItem(int character, DroppableComponent droppable)
         {
             UISystem.Message(DescriptionSystem.GetNameWithID(character) + " drops " + DescriptionSystem.GetNameWithID(droppable.EntityID));
+
+            int itemID = droppable.EntityID;
+
+            RemoveFromInventory(itemID, character);
+
+            var transform = EntityManager.GetComponentOfEntity<TransformComponent>(character);
+
+            Util.CurrentFloor.PlaceItem(transform.Position, itemID);          
+        }
+
+        public void RemoveFromInventory(int item, int character)
+        {
+            var inventory = EntityManager.GetComponentOfEntity<InventoryComponent>(character);
+
+            if (inventory == null)
+            {
+                Log.Error("Could not remove " + DescriptionSystem.GetNameWithID(item) + " from inventory!");
+                Log.Error(DescriptionSystem.GetNameWithID(character) + " has no inventory!");
+                return;
+            }
+
+            inventory.Items.Remove(item);
         }
     }
 }
