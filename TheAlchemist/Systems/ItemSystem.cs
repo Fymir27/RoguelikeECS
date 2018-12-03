@@ -61,9 +61,60 @@ namespace TheAlchemist.Systems
             Util.CurrentFloor.RemoveItem(position, item);
             EntityManager.GetComponentOfEntity<RenderableSpriteComponent>(item).Visible = false;
 
-            inventory.Items.Add(item);
+            bool match = false;
 
-           // Log.Data(DescriptionSystem.GetDebugInfoEntity(character));
+            foreach(var invItemID in inventory.Items)
+            {
+                var invItem = EntityManager.GetComponentOfEntity<ItemComponent>(invItemID);
+
+                // if already stacked to max, dont even check
+                if(invItem.Count == invItem.MaxCount)
+                {
+                    match = false;
+                    continue;
+                }
+
+                // start by assuming its true
+                match = true;
+
+                // check if all components of picked up item are also on current inventory item
+                // TODO: also check the other way round!
+                foreach(var component in EntityManager.GetAllComponentsOfEntity(item))
+                {
+                    if(!EntityManager.GetAllComponentsOfEntity(invItemID).Any(invItemComponent => invItemComponent.TypeID == component.TypeID))
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+
+                if(match)
+                {                  
+                    var pickedUpItem = EntityManager.GetComponentOfEntity<ItemComponent>(item);
+
+                    // cumulative count doesnt exceed max -> just increase count 
+                    // in inventory and remove picked up item
+                    if(invItem.Count + pickedUpItem.Count <= invItem.MaxCount)
+                    {
+                        invItem.Count += pickedUpItem.Count;
+                        EntityManager.RemoveEntity(item);
+                    }
+                    // cumulative count exceeds max ->
+                    // stack up to max, rest becomes new stack
+                    else
+                    {
+                        pickedUpItem.Count -= invItem.MaxCount - invItem.Count; // remove difference used to max out inventory item
+                        invItem.Count = invItem.MaxCount;
+                        inventory.Items.Add(item);
+                    }
+                    break;
+                }              
+            }
+
+            if (!match)
+            {
+                inventory.Items.Add(item);
+            }
 
             Util.TurnOver(character);
         }

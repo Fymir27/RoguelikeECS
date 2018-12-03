@@ -98,7 +98,7 @@ namespace TheAlchemist
            
             for(int i = 0; i < 5; i++)
             {
-                PlaceItem(playerPos + new Vector2(-1, 0), CreateGold(100));
+                PlaceItem(playerPos + new Vector2(-1, 0), CreateGold(666));
             }
 
             /*
