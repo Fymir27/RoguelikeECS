@@ -22,13 +22,13 @@ namespace TheAlchemist.Systems
 
             float damage = unarmedDamage;
 
-            var equipmentAttacker = EntityManager.GetComponentOfEntity<EquipmentComponent>(attacker);
-            var equipmentDefender = EntityManager.GetComponentOfEntity<EquipmentComponent>(defender);
+            var equipmentAttacker = EntityManager.GetComponent<EquipmentComponent>(attacker);
+            var equipmentDefender = EntityManager.GetComponent<EquipmentComponent>(defender);
 
             if(equipmentAttacker != null)
             {          
                 // get weapon component of item used to attack
-                var weaponComponent = EntityManager.GetComponentOfEntity<WeaponComponent>(equipmentAttacker.Weapon);
+                var weaponComponent = EntityManager.GetComponent<WeaponComponent>(equipmentAttacker.Weapon);
                 if (weaponComponent != null)
                 {
                     damage = weaponComponent.Damage;
@@ -38,7 +38,7 @@ namespace TheAlchemist.Systems
             if(equipmentDefender != null)
             {
                 // get armor component of item used to defend
-                var armorComponent = EntityManager.GetComponentOfEntity<ArmorComponent>(equipmentDefender.Armor);
+                var armorComponent = EntityManager.GetComponent<ArmorComponent>(equipmentDefender.Armor);
 
                 if (armorComponent != null)
                 {

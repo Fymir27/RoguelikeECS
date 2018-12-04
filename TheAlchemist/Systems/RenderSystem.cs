@@ -34,14 +34,14 @@ namespace TheAlchemist.Systems
             var seenPositions = Util.CurrentFloor.GetSeenPositions();
 
             var renderedSprites = EntityManager
-                .GetAllComponents<RenderableSpriteComponent>()
+                .GetAllComponentsOfType<RenderableSpriteComponent>()
                 .Where(component => component.Visible);
 
             foreach (var sprite in renderedSprites)
             {
-                var transform = EntityManager.GetComponentOfEntity<TransformComponent>(sprite.EntityID);
+                var transform = EntityManager.GetComponent<TransformComponent>(sprite.EntityID);
 
-                if (EntityManager.GetComponentOfEntity<NPCComponent>(sprite.EntityID) != null &&
+                if (EntityManager.GetComponent<NPCComponent>(sprite.EntityID) != null &&
                     !seenPositions.Any(pos => pos == transform.Position))
                 {
                     continue; // only render npcs on seen positions

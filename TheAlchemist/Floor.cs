@@ -96,10 +96,25 @@ namespace TheAlchemist
 
             PlaceCharacter(playerPos, CreatePlayer());
            
-            for(int i = 0; i < 5; i++)
+            // normal gold
+            PlaceItem(playerPos + new Vector2(-1, 0), CreateGold(666));
+
+            // switched component order gold
+            PlaceItem(playerPos + new Vector2(-1, 0), EntityManager.CreateEntity(new List<IComponent>()
             {
-                PlaceItem(playerPos + new Vector2(-1, 0), CreateGold(666));
-            }
+                new RenderableSpriteComponent() { Texture = "gold" },
+                new DescriptionComponent() { Name = "Gold", Description = "Ohhh, shiny!" },
+                new ItemComponent() { MaxCount = 999, Count = 200, Value = 1, Weight = 0.1f }              
+            }));
+
+            // additional component gold
+            PlaceItem(playerPos + new Vector2(-1, 0), EntityManager.CreateEntity(new List<IComponent>()
+            {
+                new RenderableSpriteComponent() { Texture = "gold" },
+                new DescriptionComponent() { Name = "Gold", Description = "Ohhh, shiny!" },
+                new ItemComponent() { MaxCount = 999, Count = 300, Value = 1, Weight = 0.1f },
+                new WeaponComponent() {}
+            }));
 
             /*
             int potion = EntityManager.CreateEntity(new List<IComponent>()
@@ -213,7 +228,7 @@ namespace TheAlchemist
             }
 
             int playerRange = 4;
-            Vector2 playerPos = EntityManager.GetComponentOfEntity<TransformComponent>(Util.PlayerID).Position;
+            Vector2 playerPos = EntityManager.GetComponent<TransformComponent>(Util.PlayerID).Position;
             discovered[(int)playerPos.X, (int)playerPos.Y] = true;          
             seen.Clear();
             seen.Add(playerPos);
@@ -277,7 +292,7 @@ namespace TheAlchemist
                         int curTerrain = GetTerrain(pos);
                         if (curTerrain != 0)
                         {
-                            var collider = EntityManager.GetComponentOfEntity<Components.ColliderComponent>(GetTerrain(pos));
+                            var collider = EntityManager.GetComponent<Components.ColliderComponent>(GetTerrain(pos));
                             if (collider != null && collider.Solid)
                             {
                                 solid = true;
@@ -456,7 +471,7 @@ namespace TheAlchemist
                 return false;
             }
 
-            EntityManager.GetComponentOfEntity<RenderableSpriteComponent>(entity).Visible = false;
+            EntityManager.GetComponent<RenderableSpriteComponent>(entity).Visible = false;
 
             return true;
         }
@@ -571,7 +586,7 @@ namespace TheAlchemist
                 return false;
             }
 
-            var transform = EntityManager.GetComponentOfEntity<TransformComponent>(entity);
+            var transform = EntityManager.GetComponent<TransformComponent>(entity);
 
             if (transform == null)
             {
@@ -581,7 +596,7 @@ namespace TheAlchemist
 
             transform.Position = pos;
 
-            var sprite = EntityManager.GetComponentOfEntity<RenderableSpriteComponent>(entity);
+            var sprite = EntityManager.GetComponent<RenderableSpriteComponent>(entity);
 
             if (sprite == null)
             {

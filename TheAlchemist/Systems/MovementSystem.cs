@@ -32,7 +32,7 @@ namespace TheAlchemist.Systems
                 return;
             }
 
-            var entityTransform = EntityManager.GetComponentOfEntity<TransformComponent>(entity);
+            var entityTransform = EntityManager.GetComponent<TransformComponent>(entity);
             Vector2 newPos = entityTransform.Position + Util.GetUnitVectorInDirection(dir);
             var floor = Util.CurrentFloor;
 
@@ -42,7 +42,7 @@ namespace TheAlchemist.Systems
             if (otherCharacter != 0)
             {
                 // check if collidable
-                if (EntityManager.GetComponentOfEntity<ColliderComponent>(otherCharacter) != null)
+                if (EntityManager.GetComponent<ColliderComponent>(otherCharacter) != null)
                 {
                     //TODO: talk to npcs?
                     RaiseBasicAttackEvent(entity, otherCharacter);
@@ -53,14 +53,14 @@ namespace TheAlchemist.Systems
             int terrain = floor.GetTerrain(newPos);
 
             // check if collidable with
-            if(terrain != 0 && EntityManager.GetComponentOfEntity<ColliderComponent>(terrain) != null)
+            if(terrain != 0 && EntityManager.GetComponent<ColliderComponent>(terrain) != null)
             {
                 // check if terrain is solid before possible interaction
                 // this is because solidity might be changed by interaction (e.g. door gets opened)
                 bool solid = RaiseCollisionEvent(entity, terrain);
 
                 // check if interactable
-                var interactable = EntityManager.GetComponentOfEntity<InteractableComponent>(terrain);
+                var interactable = EntityManager.GetComponent<InteractableComponent>(terrain);
                 if (interactable != null)
                 {
                     RaiseInteractionEvent(entity, terrain);

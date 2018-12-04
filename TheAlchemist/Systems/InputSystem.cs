@@ -133,17 +133,17 @@ namespace TheAlchemist.Systems
             {
                 //Console.WriteLine("Space trigger item use!");
                 //Console.WriteLine("UsedItemEvent null? " + UsedItemEvent == null);
-                UsedItemEvent?.Invoke(player, EntityManager.GetComponentOfEntity<InventoryComponent>(player).Items[UI.InventoryCursorPosition - 1]);
+                UsedItemEvent?.Invoke(player, EntityManager.GetComponent<InventoryComponent>(player).Items[UI.InventoryCursorPosition - 1]);
                 return;
             }
             
-            var playerPos = EntityManager.GetComponentOfEntity<TransformComponent>(player).Position;
+            var playerPos = EntityManager.GetComponent<TransformComponent>(player).Position;
 
             int terrain = Util.CurrentFloor.GetTerrain(playerPos);
 
             if (terrain != 0) // is there special terrain?
             {
-                var terrainInteraction = EntityManager.GetComponentOfEntity<InteractableComponent>(terrain);
+                var terrainInteraction = EntityManager.GetComponent<InteractableComponent>(terrain);
 
                 if (terrainInteraction != null) // is it interactable?
                 {

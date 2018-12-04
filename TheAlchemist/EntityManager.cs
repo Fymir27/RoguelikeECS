@@ -69,7 +69,7 @@ namespace TheAlchemist
         }
 
         // returns all components of specific type
-        public static IEnumerable<T> GetAllComponents<T>() where T : Component<T>
+        public static IEnumerable<T> GetAllComponentsOfType<T>() where T : Component<T>
         {
             try
             {
@@ -82,8 +82,8 @@ namespace TheAlchemist
             }
         }
 
-        // returns all components attached to specific a entity
-        public static IEnumerable<IComponent> GetAllComponentsOfEntity(int entityID)
+        // returns all components attached to specific entity
+        public static IEnumerable<IComponent> GetComponents(int entityID)
         {
             try
             {
@@ -96,7 +96,18 @@ namespace TheAlchemist
             }
         }
 
-        public static T GetComponentOfEntity<T>(int entityID) where T : Component<T>
+        // returns all component typeIDs of entity
+        public static IEnumerable<int> GetComponentTypeIDs(int entityID)
+        {
+            return GetComponents(entityID)
+                .Aggregate(new List<int>(), (list, item) =>
+                {
+                    list.Add(item.TypeID);
+                    return list;
+                });
+        }
+
+        public static T GetComponent<T>(int entityID) where T : Component<T>
         {                  
             try
             {

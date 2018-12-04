@@ -31,7 +31,7 @@ namespace TheAlchemist.Systems
                 return;
             }
 
-            var inventory = EntityManager.GetComponentOfEntity<InventoryComponent>(character);
+            var inventory = EntityManager.GetComponent<InventoryComponent>(character);
 
             if (inventory == null)
             {

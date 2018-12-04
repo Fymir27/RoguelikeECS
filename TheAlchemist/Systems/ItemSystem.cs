@@ -40,7 +40,7 @@ namespace TheAlchemist.Systems
 
         public void PickUpItem(int character, Vector2 position)
         {
-            var inventory = EntityManager.GetComponentOfEntity<InventoryComponent>(character);
+            var inventory = EntityManager.GetComponent<InventoryComponent>(character);
 
             if (inventory == null)
             {
@@ -52,60 +52,56 @@ namespace TheAlchemist.Systems
             {
                 UISystem.Message("Inventory is full! -> " + DescriptionSystem.GetNameWithID(character));
                 return;
-            }
-        
+            }      
 
-            int item = Util.CurrentFloor.GetFirstItem(position);
-            UISystem.Message(DescriptionSystem.GetNameWithID(character) + " picked up " + DescriptionSystem.GetNameWithID(item));
+            int pickupItemID = Util.CurrentFloor.GetFirstItem(position);
 
-            Util.CurrentFloor.RemoveItem(position, item);
-            EntityManager.GetComponentOfEntity<RenderableSpriteComponent>(item).Visible = false;
+            // post message to player
+            UISystem.Message(DescriptionSystem.GetNameWithID(character) + " picked up " + DescriptionSystem.GetNameWithID(pickupItemID));
 
-            bool match = false;
+            Util.CurrentFloor.RemoveItem(position, pickupItemID);
 
-            foreach(var invItemID in inventory.Items)
+            var pickupComponentTypeIDs = EntityManager.GetComponentTypeIDs(pickupItemID);
+
+            bool match = false; // can item can be stacked here
+
+            // start looking through every item in inventory
+            // to find out if picked up item can be stacked
+            foreach (var invItemID in inventory.Items)
             {
-                var invItem = EntityManager.GetComponentOfEntity<ItemComponent>(invItemID);
+                var invItemInfo = EntityManager.GetComponent<ItemComponent>(invItemID);
 
-                // if already stacked to max, dont even check
-                if(invItem.Count == invItem.MaxCount)
+                // if already stacked to max, jump straight to next
+                if (invItemInfo.Count == invItemInfo.MaxCount)
                 {
                     match = false;
                     continue;
                 }
 
-                // start by assuming its true
-                match = true;
+                var invItemComponentIDs = EntityManager.GetComponentTypeIDs(invItemID);
 
-                // check if all components of picked up item are also on current inventory item
-                // TODO: also check the other way round!
-                foreach(var component in EntityManager.GetAllComponentsOfEntity(item))
-                {
-                    if(!EntityManager.GetAllComponentsOfEntity(invItemID).Any(invItemComponent => invItemComponent.TypeID == component.TypeID))
-                    {
-                        match = false;
-                        break;
-                    }
-                }
+                // check if both items have the exact same components attached
+                match = invItemComponentIDs.All(pickupComponentTypeIDs.Contains) && invItemComponentIDs.Count() == pickupComponentTypeIDs.Count();             
 
                 if(match)
                 {                  
-                    var pickedUpItem = EntityManager.GetComponentOfEntity<ItemComponent>(item);
+                    var pickedUpItemInfo = EntityManager.GetComponent<ItemComponent>(pickupItemID);
 
                     // cumulative count doesnt exceed max -> just increase count 
                     // in inventory and remove picked up item
-                    if(invItem.Count + pickedUpItem.Count <= invItem.MaxCount)
+                    if(invItemInfo.Count + pickedUpItemInfo.Count <= invItemInfo.MaxCount)
                     {
-                        invItem.Count += pickedUpItem.Count;
-                        EntityManager.RemoveEntity(item);
+                        invItemInfo.Count += pickedUpItemInfo.Count;
+                        EntityManager.RemoveEntity(pickupItemID);
                     }
+
                     // cumulative count exceeds max ->
                     // stack up to max, rest becomes new stack
                     else
                     {
-                        pickedUpItem.Count -= invItem.MaxCount - invItem.Count; // remove difference used to max out inventory item
-                        invItem.Count = invItem.MaxCount;
-                        inventory.Items.Add(item);
+                        pickedUpItemInfo.Count -= invItemInfo.MaxCount - invItemInfo.Count; // remove difference used to max out inventory item
+                        invItemInfo.Count = invItemInfo.MaxCount;
+                        inventory.Items.Add(pickupItemID);
                     }
                     break;
                 }              
@@ -113,7 +109,7 @@ namespace TheAlchemist.Systems
 
             if (!match)
             {
-                inventory.Items.Add(item);
+                inventory.Items.Add(pickupItemID);
             }
 
             Util.TurnOver(character);
@@ -125,7 +121,7 @@ namespace TheAlchemist.Systems
             //Log.Message(DescriptionSystem.GetNameWithID(character) + " used " + DescriptionSystem.GetNameWithID(item));
             
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(item));
-            usableComponents = EntityManager.GetAllComponentsOfEntity(item).Where(x => x.TypeID == UsableComponent.TypeID).Cast<UsableComponent>();
+            usableComponents = EntityManager.GetComponents(item).Where(x => x.TypeID == UsableComponent.TypeID).Cast<UsableComponent>();
             
 
             if(!usableComponents.Any())
@@ -201,7 +197,7 @@ namespace TheAlchemist.Systems
             }
 
             int itemID = consumable.EntityID;
-            var itemComponent = EntityManager.GetComponentOfEntity<ItemComponent>(itemID);
+            var itemComponent = EntityManager.GetComponent<ItemComponent>(itemID);
 
             if(itemComponent.Count > 1)
             {
@@ -226,14 +222,14 @@ namespace TheAlchemist.Systems
 
             RemoveFromInventory(itemID, character);
 
-            var transform = EntityManager.GetComponentOfEntity<TransformComponent>(character);
+            var transform = EntityManager.GetComponent<TransformComponent>(character);
 
             Util.CurrentFloor.PlaceItem(transform.Position, itemID);          
         }
 
         public void RemoveFromInventory(int item, int character)
         {
-            var inventory = EntityManager.GetComponentOfEntity<InventoryComponent>(character);
+            var inventory = EntityManager.GetComponent<InventoryComponent>(character);
 
             if (inventory == null)
             {

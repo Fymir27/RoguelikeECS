@@ -20,14 +20,14 @@ namespace TheAlchemist.Systems
         {
             Log.Message("Entity " + entity + " gained " + amountGained + " health");
 
-            var healthComponent = EntityManager.GetComponentOfEntity<HealthComponent>(entity);
+            var healthComponent = EntityManager.GetComponent<HealthComponent>(entity);
 
             healthComponent.Amount += amountGained;
         }
 
         public void HandleLostHealth(int entity, float amountLost)
         {
-            var healthComponent = EntityManager.GetComponentOfEntity<HealthComponent>(entity);
+            var healthComponent = EntityManager.GetComponent<HealthComponent>(entity);
 
             healthComponent.Amount -= amountLost;
 
@@ -42,7 +42,7 @@ namespace TheAlchemist.Systems
 
         public void RegenerateEntity(int entity)
         {
-            var healthComponent = EntityManager.GetComponentOfEntity<HealthComponent>(entity);
+            var healthComponent = EntityManager.GetComponent<HealthComponent>(entity);
 
             healthComponent.RegenerationProgress += healthComponent.RegenerationAmount;
         }

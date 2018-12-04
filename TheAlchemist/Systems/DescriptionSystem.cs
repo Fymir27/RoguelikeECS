@@ -11,24 +11,24 @@ namespace TheAlchemist.Systems
     {
         public static string GetName(int entity)
         {           
-            return EntityManager.GetComponentOfEntity<Components.DescriptionComponent>(entity)?.Name;            
+            return EntityManager.GetComponent<Components.DescriptionComponent>(entity)?.Name;            
         }
 
         public static string GetNameWithID(int entity)
         {
-            return EntityManager.GetComponentOfEntity<Components.DescriptionComponent>(entity)?.Name + " (ID " + entity + ")";
+            return EntityManager.GetComponent<Components.DescriptionComponent>(entity)?.Name + " (ID " + entity + ")";
         }
 
         public static string GetDescription(int entity)
         {
-            return EntityManager.GetComponentOfEntity<Components.DescriptionComponent>(entity)?.Description;
+            return EntityManager.GetComponent<Components.DescriptionComponent>(entity)?.Description;
         }
 
         public static string GetDebugInfoEntity(int entity)
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("Entity " + entity + ", " + GetName(entity));
-            var components = EntityManager.GetAllComponentsOfEntity(entity);
+            var components = EntityManager.GetComponents(entity);
             foreach (var component in components)
             {
                 sb.AppendLine(component.GetType().ToString());
