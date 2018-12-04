@@ -56,6 +56,8 @@ namespace TheAlchemist
         public static Floor CurrentFloor { get; set; } = null;
         public static bool PlayerTurnOver { get; set; } = false;
 
+        public static int TargetIndicatorID { get; set; } = 0;
+
         public static FOV FOV = FOV.Medium;   
     
         // gets called for every new type of component/entity/...

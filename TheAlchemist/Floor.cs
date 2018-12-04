@@ -95,26 +95,19 @@ namespace TheAlchemist
             }
 
             PlaceCharacter(playerPos, CreatePlayer());
-           
+
             // normal gold
-            PlaceItem(playerPos + new Vector2(-1, 0), CreateGold(666));
-
-            // switched component order gold
-            PlaceItem(playerPos + new Vector2(-1, 0), EntityManager.CreateEntity(new List<IComponent>()
+            for (int i = 0; i < 5; i++)
             {
-                new RenderableSpriteComponent() { Texture = "gold" },
-                new DescriptionComponent() { Name = "Gold", Description = "Ohhh, shiny!" },
-                new ItemComponent() { MaxCount = 999, Count = 200, Value = 1, Weight = 0.1f }              
-            }));
+                PlaceItem(playerPos + new Vector2(-1, 0), CreateGold(666));
+            }
 
-            // additional component gold
-            PlaceItem(playerPos + new Vector2(-1, 0), EntityManager.CreateEntity(new List<IComponent>()
+            // create target indicator
+            Util.TargetIndicatorID = EntityManager.CreateEntity(new List<IComponent>()
             {
-                new RenderableSpriteComponent() { Texture = "gold" },
-                new DescriptionComponent() { Name = "Gold", Description = "Ohhh, shiny!" },
-                new ItemComponent() { MaxCount = 999, Count = 300, Value = 1, Weight = 0.1f },
-                new WeaponComponent() {}
-            }));
+                new TransformComponent() { Position = new Vector2(1, 1) },
+                new RenderableSpriteComponent() { Texture = "square", Tint = new Color(Color.Purple, 0.5f), Visible = false }
+            });
 
             /*
             int potion = EntityManager.CreateEntity(new List<IComponent>()
@@ -471,7 +464,9 @@ namespace TheAlchemist
                 return false;
             }
 
-            EntityManager.GetComponent<RenderableSpriteComponent>(entity).Visible = false;
+            var sprite = EntityManager.GetComponent<RenderableSpriteComponent>(entity);
+
+            if (sprite != null) sprite.Visible = false; 
 
             return true;
         }
@@ -510,6 +505,24 @@ namespace TheAlchemist
             }
 
             characters[(int)pos.X, (int)pos.Y] = 0;
+        }
+
+        public void MoveCharacter(Vector2 oldPos, Vector2 newPos)
+        {
+            if(IsOutOfBounds(oldPos) || IsOutOfBounds(newPos))
+            {
+                Log.Error("Movement from " + oldPos + " to " + newPos + " not possible; out of bounds!");
+                return;
+            }
+
+            if (characters[(int)newPos.X, (int)newPos.Y] != 0)
+            {
+                Log.Error("Can't move there; occupied! " + newPos);
+                return;
+            }
+
+            characters[(int)newPos.X, (int)newPos.Y] = characters[(int)oldPos.X, (int)oldPos.Y];
+            characters[(int)oldPos.X, (int)oldPos.Y] = 0;
         }
 
         public void RemoveItems(Vector2 pos)

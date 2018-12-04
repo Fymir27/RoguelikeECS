@@ -25,20 +25,20 @@ namespace TheAlchemist.Systems
 
         public event InventoryToggledHandler InventoryToggledEvent;
 
+        int controlledEntity = 0;
+        bool targetModeOn = false;
+
         // keys that the player is prompted to press
         Keys[] promptKeys;
         // corresponding callback if key is pressed
         Action<int> callback;
 
         Keys lastInput;
-        int sameKeyHeldFor = 0; // milliseconds for how long key has been held down
-
-        int player = 0; // 0 is an invalid entity ID
-        
+        int sameKeyHeldFor = 0; // milliseconds for how long key has been held down       
 
         public InputSystem()
         {
-            player = EntityManager.GetEntitiesWithComponent<PlayerComponent>().FirstOrDefault();
+            controlledEntity = Util.PlayerID;
         }
 
         public void Run(GameTime gameTime)
@@ -87,22 +87,22 @@ namespace TheAlchemist.Systems
             if(keysPressed.Any(item => item == Keys.Up))
             {
                 lastInput = Keys.Up;
-                RaiseMovementEvent(player, Direction.North);
+                RaiseMovementEvent(controlledEntity, Direction.North);
             }
             else if (keysPressed.Any(item => item == Keys.Right))
             {
                 lastInput = Keys.Right;
-                RaiseMovementEvent(player, Direction.East);
+                RaiseMovementEvent(controlledEntity, Direction.East);
             }
             else if (keysPressed.Any(item => item == Keys.Down))
             {
                 lastInput = Keys.Down;
-                RaiseMovementEvent(player, Direction.South);
+                RaiseMovementEvent(controlledEntity, Direction.South);
             }
             else if (keysPressed.Any(item => item == Keys.Left))
             {
                 lastInput = Keys.Left;
-                RaiseMovementEvent(player, Direction.West);
+                RaiseMovementEvent(controlledEntity, Direction.West);
             }
             else if(keysPressed.Contains(Keys.Space))
             {
@@ -113,6 +113,11 @@ namespace TheAlchemist.Systems
             {
                 InventoryToggledEvent?.Invoke();
                 lastInput = Keys.I;
+            }
+            else if(keysPressed.Contains(Keys.V))
+            {
+                ToggleTargetMode();
+                lastInput = Keys.V;
             }
         }
 
@@ -127,17 +132,15 @@ namespace TheAlchemist.Systems
         // tries to pick up Item
         private void HandleSpacePressed()
         {
-            int player = Util.PlayerID;
-
             if (UI.InventoryOpen)
             {
                 //Console.WriteLine("Space trigger item use!");
                 //Console.WriteLine("UsedItemEvent null? " + UsedItemEvent == null);
-                UsedItemEvent?.Invoke(player, EntityManager.GetComponent<InventoryComponent>(player).Items[UI.InventoryCursorPosition - 1]);
+                UsedItemEvent?.Invoke(Util.PlayerID, EntityManager.GetComponent<InventoryComponent>(Util.PlayerID).Items[UI.InventoryCursorPosition - 1]);
                 return;
             }
             
-            var playerPos = EntityManager.GetComponent<TransformComponent>(player).Position;
+            var playerPos = EntityManager.GetComponent<TransformComponent>(Util.PlayerID).Position;
 
             int terrain = Util.CurrentFloor.GetTerrain(playerPos);
 
@@ -147,7 +150,7 @@ namespace TheAlchemist.Systems
 
                 if (terrainInteraction != null) // is it interactable?
                 {
-                    InteractionEvent?.Invoke(player, terrain);
+                    InteractionEvent?.Invoke(Util.PlayerID, terrain);
                     return;
                 }
             }
@@ -160,13 +163,33 @@ namespace TheAlchemist.Systems
                 return;
             }
 
-            PickupItemEvent?.Invoke(player, playerPos);
+            PickupItemEvent?.Invoke(Util.PlayerID, playerPos);
         }
 
         public void HandlePlayerPrompt(Keys[] keys, Action<int> callback)
         {
             promptKeys = keys;
             this.callback = callback;
+        }
+
+        public void ToggleTargetMode()
+        {
+            var targetIndicatorSprite = EntityManager.GetComponent<RenderableSpriteComponent>(Util.TargetIndicatorID);       
+
+            if(targetModeOn)
+            {
+                controlledEntity = Util.PlayerID;
+                targetIndicatorSprite.Visible = false;
+                targetModeOn = false;
+            }
+            else
+            {
+                var playerPos = EntityManager.GetComponent<TransformComponent>(Util.PlayerID).Position;
+                EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position = playerPos;
+                controlledEntity = Util.TargetIndicatorID;
+                targetIndicatorSprite.Visible = true;
+                targetModeOn = true;
+            }          
         }
     }
 }

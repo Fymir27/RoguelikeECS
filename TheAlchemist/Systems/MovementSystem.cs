@@ -36,6 +36,17 @@ namespace TheAlchemist.Systems
             Vector2 newPos = entityTransform.Position + Util.GetUnitVectorInDirection(dir);
             var floor = Util.CurrentFloor;
 
+            // target indicator does not need collision etc...
+            // just move position if its not oob
+            if(entity == Util.TargetIndicatorID)
+            {
+                if(!floor.IsOutOfBounds(newPos))
+                { 
+                    entityTransform.Position = newPos;
+                }
+                return;
+            }
+
             int otherCharacter = floor.GetCharacter(newPos);
 
             //check if someone's already there
@@ -78,7 +89,6 @@ namespace TheAlchemist.Systems
             // Move entity
             floor.RemoveCharacter(entityTransform.Position);
             floor.PlaceCharacter(newPos, entity);
-            entityTransform.Position = newPos;
 
             Util.TurnOver(entity);
         }

@@ -59,6 +59,7 @@
     <Compile Include="Components\NPCComponent.cs" />
     <Compile Include="Components\PlayerComponent.cs" />
     <Compile Include="Components\ItemComponents\ConsumableComponent.cs" />
+    <Compile Include="Components\PotionComponent.cs" />
     <Compile Include="Components\RenderableComponent.cs" />
     <Compile Include="Components\TransformComponent.cs" />
     <Compile Include="Components\WeaponComponent.cs" />
