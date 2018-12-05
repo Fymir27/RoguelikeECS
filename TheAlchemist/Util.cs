@@ -32,6 +32,42 @@ namespace TheAlchemist
         Restricted = 3
     }
 
+    public struct Vector2i
+    {
+        public int X;
+        public int Y;
+
+        public Vector2i(int x, int y) { X = x; Y = y; }
+        public Vector2i(Vector2i other) { X = other.X; Y = other.Y; }
+
+        public static implicit operator Vector2i(Vector2 other) { return new Vector2i((int)other.X, (int)other.Y); }
+
+        public static Vector2i operator +(Vector2i first, Vector2i second)
+        {
+            return new Vector2i(first.X + second.X, first.Y + second.Y);
+        }
+
+        public static Vector2i operator -(Vector2i first, Vector2i second)
+        {
+            return new Vector2i(first.X - second.X, first.Y - second.Y);
+        }
+
+        public static bool operator ==(Vector2i first, Vector2i second)
+        {
+            return first.X == second.X && first.Y == second.Y;
+        }
+
+        public static bool operator !=(Vector2i first, Vector2i second)
+        {
+            return first.X != second.X || first.Y != second.Y;
+        }
+
+        public override string ToString()
+        {
+            return "(" + X + "|" + Y + ")";
+        }
+    }
+
     public delegate void TurnOverHandler(int entity);
 
     static class Util

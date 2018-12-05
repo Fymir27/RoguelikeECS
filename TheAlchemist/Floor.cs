@@ -749,6 +749,63 @@ namespace TheAlchemist
             return false;
         }
 
+        // returns shortest path
+        public List<Vector2> GetPath(Vector2 from, Vector2 to)
+        {
+            return null;
+        }
+
+        // returns "straight" line (Bresenham)
+        public List<Vector2i> GetLine(Vector2i from, Vector2i to)
+        {
+            List<Vector2i> result = new List<Vector2i>();
+
+            int dx = to.X - from.X;
+            int dy = to.Y - from.Y;
+
+            int sx = (dx > 0) ? 1 : -1;
+            int sy = (dy > 0) ? 1 : -1;           
+
+            Vector2i diagonalStep = new Vector2i(sx, sy);
+
+            int dfast, dslow;
+            Vector2i parallelStep;
+
+            if (Math.Abs(dx) > Math.Abs(dy))
+            {
+                dfast = Math.Abs(dx);
+                dslow = Math.Abs(dy);
+                parallelStep = new Vector2i(sx, 0);
+            }
+            else
+            {
+                dfast = Math.Abs(dy);
+                dslow = Math.Abs(dx);
+                parallelStep = new Vector2i(0, sy);
+            }
+
+            Vector2i curPos = new Vector2i(from);
+            int error = dfast / 2;
+            result.Add(from);
+
+            while (curPos != to)
+            {
+                error -= dslow;
+
+                if(error < 0)
+                {
+                    error += dfast;
+                    curPos += diagonalStep;
+                }
+                else
+                {
+                    curPos += parallelStep;
+                }
+                result.Add(curPos);
+            } 
+            return result;
+        }
+
         public int CreatePlayer()
         {
             int player = EntityManager.CreateEntity();

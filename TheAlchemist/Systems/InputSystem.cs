@@ -114,10 +114,10 @@ namespace TheAlchemist.Systems
                 InventoryToggledEvent?.Invoke();
                 lastInput = Keys.I;
             }
-            else if(keysPressed.Contains(Keys.V))
+            else if(keysPressed.Contains(Keys.X))
             {
                 ToggleTargetMode();
-                lastInput = Keys.V;
+                lastInput = Keys.X;
             }
         }
 
@@ -181,6 +181,33 @@ namespace TheAlchemist.Systems
                 controlledEntity = Util.PlayerID;
                 targetIndicatorSprite.Visible = false;
                 targetModeOn = false;
+
+
+                /*
+                var line = Util.CurrentFloor.GetLine(
+                    EntityManager.GetComponent<TransformComponent>(Util.PlayerID).Position, 
+                    EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position);
+
+                var pos = EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position;
+
+                EntityManager.RemoveEntity(Util.TargetIndicatorID);
+                Util.TargetIndicatorID = EntityManager.CreateEntity(new List<IComponent>()
+                {
+                    new TransformComponent() { Position = pos }
+                });
+
+                line.ForEach((item) => EntityManager.AddComponentToEntity(
+                    Util.TargetIndicatorID,
+                    new RenderableSpriteComponent()
+                    {
+                        Texture = "square", Tint = new Color(Color.Purple, 0.5f), Position = Util.WorldToScreenPosition(new Vector2(item.X, item.Y))
+                    }
+                ));
+
+                string lineString = "";
+                line.ForEach((item) => lineString += item.ToString() + '\n');
+                Log.Data(lineString);
+                */
             }
             else
             {
