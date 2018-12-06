@@ -107,62 +107,17 @@ namespace TheAlchemist
             {
                 new TransformComponent() { Position = new Vector2(1, 1) },
                 new RenderableSpriteComponent() { Texture = "square", Tint = new Color(Color.Purple, 0.5f), Visible = false }
-            });
+            });        
 
-            /*
-            int potion = EntityManager.CreateEntity(new List<IComponent>()
-            {
-                new TransformComponent() { Position = playerPos + new Vector2(0, -1) },
-                new ItemComponent() {},
-                new DescriptionComponent() { Name = "Potion", Description = "Quaff it!" },
-                new Components.ItemComponents.DroppableComponent(),
-                new Components.ItemComponents.ConsumableComponent()
-                {
-                    Effects = new ItemSystem.ItemEffectDescription[] 
-                    {
-                        new ItemSystem.ItemEffectDescription()
-                        {
-                            Type = ItemSystem.ItemEffectType.RestoreHealth,
-                            Values = new float[] { 42 }
-                        }
-                    }
-                },
-                new Components.ItemComponents.ThrowableComponent(),
-                new RenderableSpriteComponent() { Texture = "potion", Tint = Color.Red }
-            });
-            */
-
+            // load items ////////////
             JObject itemsFile = JObject.Parse(File.ReadAllText(Util.ContentPath + "/items.json"));
             int healthPotion = EntityManager.CreateEntity(itemsFile["healthPotion"].ToString());
-            PlaceItem(playerPos + new Vector2(0, -1), healthPotion);
+            PlaceItem(playerPos + new Vector2(-1, 0), healthPotion);
 
             int poison = EntityManager.CreateEntity(itemsFile["poisonPotion"].ToString());
-            PlaceItem(playerPos + new Vector2(-1, -1), poison);
-
-
-            /* //creation of test enemy
-
-            int testEnemy = EntityManager.CreateEntity();
-            int testArmor = EntityManager.CreateEntity();
-            int testWeapon = EntityManager.CreateEntity();
-
-            EntityManager.AddComponentToEntity(testArmor, new ArmorComponent() { FlatMitigation = 2 });
-            EntityManager.AddComponentToEntity(testWeapon, new WeaponComponent() { Damage = 5 });
-
-            List<IComponent> enemyComponents = new List<IComponent>()
-            {
-                new NPCComponent(),
-                new HealthComponent() { Amount = 20, Max = 20, RegenerationAmount = 1 },
-                new EquipmentComponent() { Weapon = testWeapon , Armor = testArmor },
-                new TransformComponent() { Position = new Vector2(10, 10) },
-                new ColliderComponent() { Solid = false },
-                new RenderableSpriteComponent() { Visible = true, Texture = "enemy" }
-            };
-
-            EntityManager.AddComponentsToEntity(testEnemy, enemyComponents);
-
-            */
-
+            PlaceItem(playerPos + new Vector2(-1, 0), poison);
+           
+            // load enemies //////////
             JObject enemies = JObject.Parse(File.ReadAllText(Util.ContentPath + "/enemies.json"));
 
             int rat = EntityManager.CreateEntity(enemies["rat"].ToString());
@@ -432,7 +387,7 @@ namespace TheAlchemist
                 return 0;
             }
 
-            return itemsHere.First();
+            return itemsHere.Last();
         }
 
         public IEnumerable<int> GetItems(Vector2 pos)
