@@ -604,7 +604,7 @@ namespace TheAlchemist
             if (transform == null)
             {
                 transform = new TransformComponent();
-                EntityManager.AddComponentToEntity(entity, transform);
+                EntityManager.AddComponent(entity, transform);
             }
 
             transform.Position = pos;
@@ -716,8 +716,8 @@ namespace TheAlchemist
             int testArmor = EntityManager.CreateEntity();
             int testWeapon = EntityManager.CreateEntity();
 
-            EntityManager.AddComponentToEntity(testArmor, new ArmorComponent() { FlatMitigation = 2 });
-            EntityManager.AddComponentToEntity(testWeapon, new WeaponComponent() { Damage = 5 });
+            EntityManager.AddComponent(testArmor, new ArmorComponent() { FlatMitigation = 2 });
+            EntityManager.AddComponent(testWeapon, new WeaponComponent() { Damage = 5 });
 
             List<IComponent> enemyComponents = new List<IComponent>()
             {
@@ -729,7 +729,7 @@ namespace TheAlchemist
                 new RenderableSpriteComponent() { Visible = true, Texture = "enemy" }
             };
 
-            EntityManager.AddComponentsToEntity(testEnemy, enemyComponents);
+            EntityManager.AddComponents(testEnemy, enemyComponents);
 
 
 
@@ -756,12 +756,19 @@ namespace TheAlchemist
         }
 
         // returns "straight" line (Bresenham)
-        public List<Vector2i> GetLine(Vector2i from, Vector2i to)
+        public List<Vector2> GetLine(Vector2 from, Vector2 to, bool stopAtSolid = true)
         {
+            if(IsOutOfBounds(from) || IsOutOfBounds(to))
+            {
+                Log.Error("Can't get Line between " + from + to + " - Out of bounds!");
+                return null;
+            }
+
+            // integer vector makes more sense here
             List<Vector2i> result = new List<Vector2i>();
 
-            int dx = to.X - from.X;
-            int dy = to.Y - from.Y;
+            int dx = (int)to.X - (int)from.X;
+            int dy = (int)to.Y - (int)from.Y;
 
             int sx = (dx > 0) ? 1 : -1;
             int sy = (dy > 0) ? 1 : -1;           
@@ -801,9 +808,28 @@ namespace TheAlchemist
                 {
                     curPos += parallelStep;
                 }
+
                 result.Add(curPos);
+
+                if (!stopAtSolid)
+                    continue;
+
+                int terrainID = terrain[curPos.X, curPos.Y];
+
+                if (terrainID == 0)
+                    continue;
+
+                var terrainCollider = EntityManager.GetComponent<ColliderComponent>(terrainID);
+
+                if (terrainCollider == null)
+                    continue;
+
+                if (terrainCollider.Solid)
+                    break;
+
+
             } 
-            return result;
+            return result.ConvertAll(pos => new Vector2(pos.X, pos.Y));
         }
 
         public int CreatePlayer()
@@ -812,8 +838,8 @@ namespace TheAlchemist
             int playerWeapon = EntityManager.CreateEntity();
             int playerArmor = EntityManager.CreateEntity();
 
-            EntityManager.AddComponentToEntity(playerWeapon, new WeaponComponent() { Damage = 5 });
-            EntityManager.AddComponentToEntity(playerArmor, new ArmorComponent() { PercentMitigation = 0, FlatMitigation = 0});
+            EntityManager.AddComponent(playerWeapon, new WeaponComponent() { Damage = 5 });
+            EntityManager.AddComponent(playerArmor, new ArmorComponent() { PercentMitigation = 0, FlatMitigation = 0});
 
             List<IComponent> playerComponents = new List<IComponent>()
             {
@@ -826,7 +852,7 @@ namespace TheAlchemist
                 new InventoryComponent() { Capacity = 50 }
             };
 
-            EntityManager.AddComponentsToEntity(player, playerComponents);
+            EntityManager.AddComponents(player, playerComponents);
 
             Util.PlayerID = player;
 
@@ -841,7 +867,7 @@ namespace TheAlchemist
             wallComponents.Add(new RenderableSpriteComponent() { Visible = true, Texture = "wall" });
             wallComponents.Add(new ColliderComponent() { Solid = true });
 
-            EntityManager.AddComponentsToEntity(wall, wallComponents);
+            EntityManager.AddComponents(wall, wallComponents);
 
             return wall;
         } 

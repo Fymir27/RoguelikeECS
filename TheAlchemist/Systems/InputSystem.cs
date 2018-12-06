@@ -20,6 +20,8 @@ namespace TheAlchemist.Systems
         public event MovementEventHandler MovementEvent;
         public event InteractionHandler InteractionEvent;
 
+        public event UpdateTargetLineHandler UpdateTargetLineEvent;
+
         public event ItemPickupHandler PickupItemEvent;
         public event ItemUsedHandler UsedItemEvent;
 
@@ -173,48 +175,19 @@ namespace TheAlchemist.Systems
         }
 
         public void ToggleTargetMode()
-        {
-            var targetIndicatorSprite = EntityManager.GetComponent<RenderableSpriteComponent>(Util.TargetIndicatorID);       
-
+        {     
             if(targetModeOn)
             {
                 controlledEntity = Util.PlayerID;
-                targetIndicatorSprite.Visible = false;
-                targetModeOn = false;
-
-
-                /*
-                var line = Util.CurrentFloor.GetLine(
-                    EntityManager.GetComponent<TransformComponent>(Util.PlayerID).Position, 
-                    EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position);
-
-                var pos = EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position;
-
-                EntityManager.RemoveEntity(Util.TargetIndicatorID);
-                Util.TargetIndicatorID = EntityManager.CreateEntity(new List<IComponent>()
-                {
-                    new TransformComponent() { Position = pos }
-                });
-
-                line.ForEach((item) => EntityManager.AddComponentToEntity(
-                    Util.TargetIndicatorID,
-                    new RenderableSpriteComponent()
-                    {
-                        Texture = "square", Tint = new Color(Color.Purple, 0.5f), Position = Util.WorldToScreenPosition(new Vector2(item.X, item.Y))
-                    }
-                ));
-
-                string lineString = "";
-                line.ForEach((item) => lineString += item.ToString() + '\n');
-                Log.Data(lineString);
-                */
+                EntityManager.RemoveAllComponentsOfType(Util.TargetIndicatorID, RenderableSpriteComponent.TypeID);
+                targetModeOn = false;               
             }
             else
             {
                 var playerPos = EntityManager.GetComponent<TransformComponent>(Util.PlayerID).Position;
                 EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position = playerPos;
                 controlledEntity = Util.TargetIndicatorID;
-                targetIndicatorSprite.Visible = true;
+                UpdateTargetLineEvent?.Invoke();
                 targetModeOn = true;
             }          
         }

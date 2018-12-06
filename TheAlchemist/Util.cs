@@ -69,6 +69,7 @@ namespace TheAlchemist
     }
 
     public delegate void TurnOverHandler(int entity);
+    public delegate void UpdateTargetLineHandler();
 
     static class Util
     {
@@ -179,6 +180,46 @@ namespace TheAlchemist
                 TypeNameHandling = TypeNameHandling.Auto
             };
             return JsonConvert.DeserializeObject<T>(obj, settings);
+        }
+
+        public static void UpdateTargetLine()
+        {
+            var targetPos = EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position;
+            // calculate line to target indicator
+            var line = CurrentFloor.GetLine(
+                EntityManager.GetComponent<TransformComponent>(Util.PlayerID).Position,
+                targetPos);
+
+            if(line.Count > 1)
+            {
+                line.RemoveAt(0); // don't draw square on player unless targeting self
+            }
+
+            // remove any old sprites
+            EntityManager.RemoveAllComponentsOfType(Util.TargetIndicatorID, RenderableSpriteComponent.TypeID);
+
+            List<IComponent> updatedSprites = new List<IComponent>();
+
+            foreach(var pos in line)
+            {
+                updatedSprites.Add(new RenderableSpriteComponent()
+                {
+                    Texture = "square",
+                    Tint = new Color(Color.Gold, 0.7f),
+                    Position = Util.WorldToScreenPosition(pos)
+                });
+            }
+
+            // add "crosshair"
+            updatedSprites.Add(new RenderableSpriteComponent()
+            {
+                Texture = "targetIndicator",
+                Position = Util.WorldToScreenPosition(targetPos)
+            });
+
+            // add updated sprites to entity
+            EntityManager.AddComponents(Util.TargetIndicatorID, updatedSprites);
+         
         }
     }
 }

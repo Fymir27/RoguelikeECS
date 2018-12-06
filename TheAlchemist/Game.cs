@@ -90,6 +90,7 @@ namespace TheAlchemist
             inputSystem.InteractionEvent += interactionSystem.HandleInteraction;
             inputSystem.PickupItemEvent += itemSystem.PickUpItem;
             inputSystem.InventoryToggledEvent += uiSystem.HandleInventoryToggled;
+            inputSystem.UpdateTargetLineEvent += Util.UpdateTargetLine;
 
             itemSystem.PlayerPromptEvent += inputSystem.HandlePlayerPrompt;
             itemSystem.InventoryToggledEvent += uiSystem.HandleInventoryToggled;
@@ -101,6 +102,7 @@ namespace TheAlchemist
             movementSystem.CollisionEvent += collisionSystem.HandleCollision;
             movementSystem.BasicAttackEvent += combatSystem.HandleBasicAttack;
             movementSystem.InteractionEvent += interactionSystem.HandleInteraction;
+            movementSystem.UpdateTargetLineEvent += Util.UpdateTargetLine;
 
             Util.TurnOverEvent += healthSystem.RegenerateEntity;
 
@@ -129,7 +131,7 @@ namespace TheAlchemist
 
             string[] textures = 
             {
-                "player", "box", "wall",
+                "player", "box", "wall", "targetIndicator",
                 "doorOpen", "doorClosed", "square",
                 // enemies:
                 "rat", "spider",

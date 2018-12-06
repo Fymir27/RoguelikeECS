@@ -134,7 +134,7 @@ namespace TheAlchemist
         public static int CreateEntity(List<IComponent> components)
         {
             int entityID = CreateEntity();
-            AddComponentsToEntity(entityID, components);
+            AddComponents(entityID, components);
             return entityID;            
         }
 
@@ -147,16 +147,16 @@ namespace TheAlchemist
         }
 
         // adds multiple components to an entity
-        public static void AddComponentsToEntity(int entityID, List<IComponent> components)
+        public static void AddComponents(int entityID, List<IComponent> components)
         {
             foreach (var component in components)
             {
-                AddComponentToEntity(entityID, component);
+                AddComponent(entityID, component);
             }
         }
 
         // adds a single component to an entity
-        public static void AddComponentToEntity(int entityID, IComponent component)
+        public static void AddComponent(int entityID, IComponent component)
         {
             component.EntityID = entityID;
             componentsOfEntity[entityID].Add(component);
@@ -174,6 +174,46 @@ namespace TheAlchemist
                 componentsOfType.Add(componentType, new List<IComponent>());
             }
             componentsOfType[componentType].Add(component);          
+        }
+
+        // removes a single specific component from entity
+        public static void RemoveComponent(int entityID, IComponent component)
+        {
+            try
+            {
+                componentsOfEntity[entityID].Remove(component);
+                componentsOfType[component.TypeID].Remove(component);
+                var componentsOfSameType = componentsOfEntity[entityID].Where(c => c.TypeID == component.TypeID);
+                if (componentsOfSameType.Count() == 0)
+                {
+                    entitiesWithComponent[component.TypeID].Remove(entityID);
+                }
+            }
+            catch (KeyNotFoundException)
+            {
+                Log.Error("Failed to remove " + component + " from entity " + entityID + "!");
+            }
+        }
+
+        // removes all components of specific type from entity
+        public static void RemoveAllComponentsOfType(int entityID, int typeID)
+        {
+            try
+            {
+                var componentsToRemove = GetComponents(entityID).Where(c => c.TypeID == typeID);
+                if(componentsToRemove.Count() == 0)
+                {
+                    Log.Warning("No components of type " + typeID + " on " + entityID);
+                    return;
+                }
+                componentsOfType[typeID].RemoveAll(componentsToRemove.Contains);
+                componentsOfEntity[entityID].RemoveAll(componentsToRemove.Contains);
+                entitiesWithComponent[typeID].Remove(entityID);
+            }
+            catch (KeyNotFoundException)
+            {
+                Log.Error("Failed to remove components of type " + typeID + " from entity " + entityID + "!");
+            }
         }
 
         // "deletes" an entity

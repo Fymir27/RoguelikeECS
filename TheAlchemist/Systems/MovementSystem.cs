@@ -18,6 +18,7 @@ namespace TheAlchemist.Systems
         public event CollisionEventHandler CollisionEvent;
         public event BasicAttackHandler BasicAttackEvent;
         public event InteractionHandler InteractionEvent;
+        public event UpdateTargetLineHandler UpdateTargetLineEvent;
 
         public MovementSystem()
         {
@@ -40,10 +41,14 @@ namespace TheAlchemist.Systems
             // just move position if its not oob
             if(entity == Util.TargetIndicatorID)
             {
-                if(!floor.IsOutOfBounds(newPos))
-                { 
-                    entityTransform.Position = newPos;
-                }
+                if (floor.IsOutOfBounds(newPos))
+                    return;
+
+                if (!floor.IsDiscovered(newPos))
+                    return;
+
+                entityTransform.Position = newPos;
+                UpdateTargetLineEvent?.Invoke();
                 return;
             }
 
