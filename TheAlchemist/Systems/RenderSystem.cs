@@ -37,7 +37,10 @@ namespace TheAlchemist.Systems
                 .GetAllComponentsOfType<RenderableSpriteComponent>()
                 .Where(component => component.Visible);
 
-            foreach (var sprite in renderedSprites)
+            // order sprite by Layer to determine what to draw first
+            var orderedSprites = renderedSprites.OrderBy(sprite => sprite.Layer);
+
+            foreach (var sprite in orderedSprites)
             {
                 var transform = EntityManager.GetComponent<TransformComponent>(sprite.EntityID);
 

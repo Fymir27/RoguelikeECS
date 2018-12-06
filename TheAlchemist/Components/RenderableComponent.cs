@@ -14,7 +14,15 @@ namespace TheAlchemist.Components
 
     class RenderableComponent<T> : Component<T> where T : Component<T>
     {
+        public class RenderLayer
+        {
+            public static readonly int Terrain = 0;
+            public static readonly int Item = 1;
+            public static readonly int Character = 2;
+        }
+
         public bool Visible { get; set; } = true;
+        public int Layer { get; set; } = 0;
 
         // screen position
         // if this property is set manually it will have that fixed value
@@ -54,6 +62,12 @@ namespace TheAlchemist.Components
     {
         public string Texture { get; set; } // name of texture
         public Color Tint { get; set; } = Color.White;
+    }
+
+    class RenderableSpriteArrayComponent : RenderableComponent<RenderableSpriteArrayComponent>
+    {
+        public string[] Textures { get; set; }
+        public Color[] Tints { get; set; }
     }
 
     public delegate string StringGetter();

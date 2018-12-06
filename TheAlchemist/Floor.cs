@@ -541,7 +541,7 @@ namespace TheAlchemist
         // configuring/adding the the transform to the position and
         // setting the sprite to visible
         // returns true if successful
-        private bool PlaceEntity(Vector2 pos, int entity)
+        private bool PlaceEntity(Vector2 pos, int entity, int renderLayer = 0)
         {
             if(entity == 0) // can happen during init
             {
@@ -574,13 +574,14 @@ namespace TheAlchemist
             else
             {
                 sprite.Visible = true;
+                sprite.Layer = renderLayer;
             }
             return true;
         }
 
         public void PlaceTerrain(Vector2 pos, int terrain)
         {
-            if (!PlaceEntity(pos, terrain))
+            if (!PlaceEntity(pos, terrain, RenderableSpriteComponent.RenderLayer.Terrain))
             {
                 return;
             }
@@ -589,7 +590,7 @@ namespace TheAlchemist
 
         public void PlaceCharacter(Vector2 pos, int character)
         {
-            if (!PlaceEntity(pos, character))
+            if (!PlaceEntity(pos, character, RenderableSpriteComponent.RenderLayer.Character))
             {
                 return;
             }
@@ -600,7 +601,7 @@ namespace TheAlchemist
         {
             foreach(int item in items)
             {
-                if (!PlaceEntity(pos, item))
+                if (!PlaceEntity(pos, item, RenderableSpriteComponent.RenderLayer.Item))
                 {
                     return;
                 }
@@ -622,7 +623,7 @@ namespace TheAlchemist
 
         public void PlaceItem(Vector2 pos, int item)
         {
-            if(!PlaceEntity(pos, item))
+            if(!PlaceEntity(pos, item, RenderableSpriteComponent.RenderLayer.Item))
             {
                 return;
             }
@@ -638,7 +639,6 @@ namespace TheAlchemist
                 itemsHere.Add(item);
             }
         }
-
 
         public Floor(int width, int height)
         {
