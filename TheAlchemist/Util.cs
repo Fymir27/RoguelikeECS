@@ -182,7 +182,10 @@ namespace TheAlchemist
             return JsonConvert.DeserializeObject<T>(obj, settings);
         }
 
-        public static void UpdateTargetLine()
+        // set init to true if targeting mode has just been entered
+        // otherwise it will produce a warning at runtime because 
+        // this function tries to remove old sprites (which there are none of)
+        public static void UpdateTargetLine(bool init = false)
         {
             var targetPos = EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position;
             // calculate line to target indicator
@@ -196,7 +199,10 @@ namespace TheAlchemist
             }
 
             // remove any old sprites
-            EntityManager.RemoveAllComponentsOfType(Util.TargetIndicatorID, RenderableSpriteComponent.TypeID);
+            if (!init)
+            {
+                EntityManager.RemoveAllComponentsOfType(Util.TargetIndicatorID, RenderableSpriteComponent.TypeID);
+            }
 
             List<IComponent> updatedSprites = new List<IComponent>();
 

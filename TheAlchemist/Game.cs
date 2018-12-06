@@ -90,7 +90,7 @@ namespace TheAlchemist
             inputSystem.InteractionEvent += interactionSystem.HandleInteraction;
             inputSystem.PickupItemEvent += itemSystem.PickUpItem;
             inputSystem.InventoryToggledEvent += uiSystem.HandleInventoryToggled;
-            inputSystem.UpdateTargetLineEvent += Util.UpdateTargetLine;
+            inputSystem.UpdateTargetLineEvent += () => Util.UpdateTargetLine(init: true);
 
             itemSystem.PlayerPromptEvent += inputSystem.HandlePlayerPrompt;
             itemSystem.InventoryToggledEvent += uiSystem.HandleInventoryToggled;
@@ -102,7 +102,7 @@ namespace TheAlchemist
             movementSystem.CollisionEvent += collisionSystem.HandleCollision;
             movementSystem.BasicAttackEvent += combatSystem.HandleBasicAttack;
             movementSystem.InteractionEvent += interactionSystem.HandleInteraction;
-            movementSystem.UpdateTargetLineEvent += Util.UpdateTargetLine;
+            movementSystem.UpdateTargetLineEvent += () => Util.UpdateTargetLine();
 
             Util.TurnOverEvent += healthSystem.RegenerateEntity;
 
