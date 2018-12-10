@@ -19,9 +19,13 @@ namespace TheAlchemist.Systems
     {
         public event PlayerPromptHandler PlayerPromptEvent;
         public event InventoryToggledHandler InventoryToggledEvent;
+        public event TargetModeToggledHandler TargetModeToggledEvent;
+        public event WaitForConfirmationHandler WaitForConfirmationEvent;
 
         public event HealthGainedHandler HealthGainedEvent;
         public event HealthLostHandler HealthLostEvent;
+
+
 
         public enum ItemEffectType
         {
@@ -212,6 +216,28 @@ namespace TheAlchemist.Systems
         public void ThrowItem(int character, ThrowableComponent throwable)
         {
             UISystem.Message(DescriptionSystem.GetNameWithID(character) + " throws " + DescriptionSystem.GetNameWithID(throwable.EntityID));
+            
+            if(TargetModeToggledEvent == null)
+            {
+                Log.Error("TargetModeToggledEvent is null!");
+                throw new NullReferenceException("TargetModeToggledEvent is null!");
+            }
+
+            TargetModeToggledEvent.Invoke();
+            WaitForConfirmationEvent?.Invoke(() => ThrowItemConfirmed(character, throwable));
+        }
+
+        private void ThrowItemConfirmed(int character, ThrowableComponent throwable)
+        {
+            UISystem.Message(DescriptionSystem.GetNameWithID(character) + " throws " + DescriptionSystem.GetNameWithID(throwable.EntityID));
+            TargetModeToggledEvent.Invoke();
+            var pos = EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position;
+
+            int itemID = throwable.EntityID;
+
+            RemoveFromInventory(itemID, character);
+
+            Util.CurrentFloor.PlaceItem(pos, itemID);
         }
 
         public void DropItem(int character, DroppableComponent droppable)

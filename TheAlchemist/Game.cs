@@ -93,6 +93,8 @@ namespace TheAlchemist
             inputSystem.UpdateTargetLineEvent += () => Util.UpdateTargetLine(init: true);
 
             itemSystem.PlayerPromptEvent += inputSystem.HandlePlayerPrompt;
+            itemSystem.TargetModeToggledEvent += inputSystem.ToggleTargetMode;
+            itemSystem.WaitForConfirmationEvent += inputSystem.RegisterConfirmationCallback;
             itemSystem.InventoryToggledEvent += uiSystem.HandleInventoryToggled;
             itemSystem.HealthGainedEvent += healthSystem.HandleGainedHealth;
             itemSystem.HealthLostEvent += healthSystem.HandleLostHealth;

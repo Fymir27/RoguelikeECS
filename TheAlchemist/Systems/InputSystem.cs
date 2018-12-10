@@ -15,6 +15,12 @@ namespace TheAlchemist.Systems
     // waits for player to input one of the keys and invokes callback with the index of the key chosen
     public delegate void PlayerPromptHandler(Keys[] keys, Action<int> callback);
 
+    public delegate void TargetModeToggledHandler();
+
+    // wait for player to confirm (usually coupled with target mode)
+    // input system invokes callback when player confirms
+    public delegate void WaitForConfirmationHandler(Action callback);
+
     class InputSystem
     {
         public event MovementEventHandler MovementEvent;
@@ -35,12 +41,16 @@ namespace TheAlchemist.Systems
         // corresponding callback if key is pressed
         Action<int> callback;
 
+        // callbacks to call when player presses "Confirm"
+        List<Action> confirmationCallbacks;
+
         Keys lastInput;
         int sameKeyHeldFor = 0; // milliseconds for how long key has been held down       
 
         public InputSystem()
         {
             controlledEntity = Util.PlayerID;
+            confirmationCallbacks = new List<Action>();
         }
 
         public void Run(GameTime gameTime)
@@ -121,11 +131,27 @@ namespace TheAlchemist.Systems
                 ToggleTargetMode();
                 lastInput = Keys.X;
             }
+            else if (keysPressed.Contains(Keys.Enter))
+            {
+                HandlePlayerConfirmation();
+                lastInput = Keys.Enter;
+            }
         }
 
         private void RaiseMovementEvent(int entity, Direction dir)
         {
             MovementEvent?.Invoke(entity, dir);
+        }
+
+        public void RegisterConfirmationCallback(Action callback)
+        {
+            confirmationCallbacks.Add(callback);
+        }
+
+        private void HandlePlayerConfirmation()
+        {
+            confirmationCallbacks.ForEach(callback => callback.Invoke());
+            confirmationCallbacks.Clear();
         }
 
         // This function tries to do the following things in order:
