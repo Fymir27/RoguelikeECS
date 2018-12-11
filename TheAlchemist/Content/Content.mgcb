@@ -129,6 +129,9 @@
 #begin items.json
 /copy:items.json
 
+#begin keybindings.json
+/copy:keybindings.json
+
 #begin map.txt
 /copy:map.txt
 

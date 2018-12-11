@@ -128,9 +128,9 @@ namespace TheAlchemist
             PlaceCharacter(new Vector2(16, 5), bat);
             PlaceCharacter(new Vector2(16, 1), spider);
 
-            Log.Data(DescriptionSystem.GetDebugInfoEntity(rat));
-            Log.Data(DescriptionSystem.GetDebugInfoEntity(bat));
-            Log.Data(DescriptionSystem.GetDebugInfoEntity(spider));
+            //Log.Data(DescriptionSystem.GetDebugInfoEntity(rat));
+            //Log.Data(DescriptionSystem.GetDebugInfoEntity(bat));
+            //Log.Data(DescriptionSystem.GetDebugInfoEntity(spider));
         }
 
 

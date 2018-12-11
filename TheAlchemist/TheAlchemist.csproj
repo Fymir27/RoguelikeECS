@@ -66,6 +66,7 @@
     <Compile Include="EntityManager.cs" />
     <Compile Include="Floor.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="InputManager.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -149,6 +150,7 @@
     <None Include="Content\big.spritefont" />
     <None Include="Content\default.spritefont" />
     <None Include="Content\items.json" />
+    <None Include="Content\keybindings.json" />
     <None Include="Content\small.spritefont" />
     <None Include="Meta\the_alchemist_design.md" />
     <None Include="Meta\todo.md" />

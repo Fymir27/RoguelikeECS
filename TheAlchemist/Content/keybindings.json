@@ -1,0 +1,11 @@
+{
+  "Exploring": {
+    "Up": "MoveN",
+    "Right": "MoveE",
+    "Down": "MoveS",
+    "Left": "MoveW"
+  },
+  "Inventory": {
+    "I": "CloseInv"
+  }
+}

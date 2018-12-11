@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 namespace TheAlchemist
 {
@@ -61,17 +62,17 @@ namespace TheAlchemist
 
             Log.Init(AppDomain.CurrentDomain.BaseDirectory + "/log.html");
 
-            Log.Message("Initializing...");
-
             // TODO: Add your initialization logic here
-            //Floor test = new Floor(10, 10);
+            //Floor test = new Floor(10, 10);          
             Floor test = new Floor(Content.RootDirectory + "/map.txt");
             Util.CurrentFloor = test;
             test.CalculateTileVisibility();                    
 
-            Log.Data(DescriptionSystem.GetDebugInfoEntity(Util.PlayerID));
+            //Log.Data(DescriptionSystem.GetDebugInfoEntity(Util.PlayerID));
+
 
             // instantiate all the systems
+            Log.Message("Loading Systems...");
             inputSystem = new InputSystem();
             movementSystem = new MovementSystem();
             renderSystem = new RenderSystem(GraphicsDevice);
@@ -84,6 +85,7 @@ namespace TheAlchemist
             uiSystem = new UISystem();
 
             // hook up all events with their handlers
+            Log.Message("Registering Event Handlers...");
             inputSystem.MovementEvent += movementSystem.HandleMovementEvent;
             inputSystem.MovementEvent += uiSystem.HandleInventoryCursorMoved;
             inputSystem.UsedItemEvent += itemSystem.UseItem;
@@ -109,9 +111,14 @@ namespace TheAlchemist
             Util.TurnOverEvent += healthSystem.RegenerateEntity;
 
             combatSystem.HealthLostEvent += healthSystem.HandleLostHealth;
-           
+
+            Log.Message("Loading Keybindings...");
+            string keybindings = File.ReadAllText(Util.ContentPath + "/keybindings.json");
+            InputManager.LoadKeyBindings(keybindings);
+            InputManager.EnterDomain(InputManager.CommandDomain.Exploring); // start out with exploring as bottom level command domain
 
             base.Initialize();
+            Log.Message("Initialization completed successfully!");
         }
 
         /// <summary>
@@ -191,6 +198,7 @@ namespace TheAlchemist
             else
             {
                 inputSystem.Run(gameTime);
+                InputManager.CheckInput(gameTime);
             }
 
             base.Update(gameTime);
