@@ -265,6 +265,8 @@ namespace TheAlchemist.Systems
             }
 
             inventory.Items.Remove(item);
+
+            UI.InventoryCursorPosition = 0;
         }
     }
 }
