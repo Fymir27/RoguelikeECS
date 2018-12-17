@@ -66,10 +66,11 @@ namespace TheAlchemist
             //Floor test = new Floor(10, 10);          
             Floor test = new Floor(Content.RootDirectory + "/map.txt");
             Util.CurrentFloor = test;
-            test.CalculateTileVisibility();                    
+            test.CalculateTileVisibility();
 
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(Util.PlayerID));
 
+            InputManager input = InputManager.Instance;
 
             // instantiate all the systems
             Log.Message("Loading Systems...");
@@ -86,16 +87,24 @@ namespace TheAlchemist
 
             // hook up all events with their handlers
             Log.Message("Registering Event Handlers...");
-            inputSystem.MovementEvent += movementSystem.HandleMovementEvent;
-            inputSystem.MovementEvent += uiSystem.HandleInventoryCursorMoved;
-            inputSystem.UsedItemEvent += itemSystem.UseItem;
-            inputSystem.InteractionEvent += interactionSystem.HandleInteraction;
-            inputSystem.PickupItemEvent += itemSystem.PickUpItem;
-            inputSystem.InventoryToggledEvent += uiSystem.HandleInventoryToggled;
-            inputSystem.UpdateTargetLineEvent += () => Util.UpdateTargetLine(init: true);
+            //inputSystem.MovementEvent += movementSystem.HandleMovementEvent;
+            //inputSystem.MovementEvent += uiSystem.HandleInventoryCursorMoved;
+            //inputSystem.UsedItemEvent += itemSystem.UseItem;
+            //inputSystem.InteractionEvent += interactionSystem.HandleInteraction;
+            //inputSystem.PickupItemEvent += itemSystem.PickUpItem;
+            //inputSystem.InventoryToggledEvent += uiSystem.HandleInventoryToggled;
+            //inputSystem.UpdateTargetLineEvent += () => Util.UpdateTargetLine(init: true);
+
+            // new input manager
+            input.MovementEvent += movementSystem.HandleMovementEvent;
+            input.InventoryToggledEvent += uiSystem.HandleInventoryToggled;
+            input.InventoryCursorMovedEvent += uiSystem.HandleInventoryCursorMoved;
+            input.PickupItemEvent += itemSystem.PickUpItem;
+            input.ItemUsedEvent += itemSystem.UseItem;
+            input.UpdateTargetLineEvent += () => Util.UpdateTargetLine(init: true);
 
             itemSystem.PlayerPromptEvent += inputSystem.HandlePlayerPrompt;
-            itemSystem.TargetModeToggledEvent += inputSystem.ToggleTargetMode;
+            itemSystem.TargetModeToggledEvent += input.ToggleTargetMode;
             itemSystem.WaitForConfirmationEvent += inputSystem.RegisterConfirmationCallback;
             itemSystem.InventoryToggledEvent += uiSystem.HandleInventoryToggled;
             itemSystem.HealthGainedEvent += healthSystem.HandleGainedHealth;
@@ -113,12 +122,13 @@ namespace TheAlchemist
             combatSystem.HealthLostEvent += healthSystem.HandleLostHealth;
 
             Log.Message("Loading Keybindings...");
-            string keybindings = File.ReadAllText(Util.ContentPath + "/keybindings.json");
-            InputManager.LoadKeyBindings(keybindings);
-            InputManager.EnterDomain(InputManager.CommandDomain.Exploring); // start out with exploring as bottom level command domain
+            string keybindings = File.ReadAllText(Util.ContentPath + "/keybindings.json");          
+            input.LoadKeyBindings(keybindings);
+            input.EnterDomain(InputManager.CommandDomain.Exploring); // start out with exploring as bottom level command domain
+            input.ControlledEntity = Util.PlayerID;
 
             base.Initialize();
-            Log.Message("Initialization completed successfully!");
+            Log.Message("Initialization completed!");
         }
 
         /// <summary>
@@ -198,7 +208,7 @@ namespace TheAlchemist
             else
             {
                 inputSystem.Run(gameTime);
-                InputManager.CheckInput(gameTime);
+                InputManager.Instance.CheckInput(gameTime);
             }
 
             base.Update(gameTime);

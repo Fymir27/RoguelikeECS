@@ -12,9 +12,28 @@ using Newtonsoft.Json.Converters;
 namespace TheAlchemist
 {
     using Systems;
+    using Components;
 
-    static class InputManager
+    /// <summary>
+    /// used as Singleton
+    /// </summary>
+    class InputManager
     {
+        public static readonly InputManager Instance = new InputManager();
+
+        public int ControlledEntity = 0;
+
+        public event MovementEventHandler MovementEvent;
+        public event ItemPickupHandler PickupItemEvent;
+
+        public event UpdateTargetLineHandler UpdateTargetLineEvent;
+
+        public event InventoryToggledHandler InventoryToggledEvent;
+        public event InventoryCursorMovedHandler InventoryCursorMovedEvent;
+        public event ItemUsedHandler ItemUsedEvent;
+
+
+
         [JsonConverter(typeof(StringEnumConverter))]
         public enum Command
         {
@@ -30,12 +49,16 @@ namespace TheAlchemist
             MoveW,
             MoveNW,
 
+            PickupItem,
+
             // UI
-            OpenInv,
-            CloseInv,
-            EnterLineTargeting, // highlights line to target
-            EnterTileTargeting, // only highlights target
-            LeaveTargeting,
+            ToggleInv,
+            MoveInvCursorUp,
+            MoveInvCursorRight,
+            MoveInvCursorDown,
+            MoveInvCursorLeft,
+
+            ToggleTargeting,
             ConfirmTarget,
 
             // Items
@@ -56,10 +79,10 @@ namespace TheAlchemist
             Inventory
         }
 
-        static Stack<CommandDomain> domainHistory = new Stack<CommandDomain>();
+        Stack<CommandDomain> domainHistory = new Stack<CommandDomain>();
 
         // commandToExecute = KeyToCommand[ActiveDomain][PressedKey]
-        static Dictionary<CommandDomain, Dictionary<Keys, Command>> keyToCommand = new Dictionary<CommandDomain, Dictionary<Keys, Command>>();
+        Dictionary<CommandDomain, Dictionary<Keys, Command>> keyToCommand = new Dictionary<CommandDomain, Dictionary<Keys, Command>>();
         /* default key bindings:
         {            
             {
@@ -83,38 +106,38 @@ namespace TheAlchemist
 
         // -- real input related -- //
         static readonly KeyboardState noKeyPressed = new KeyboardState();
-        static          KeyboardState prevKeyState = noKeyPressed;
+        KeyboardState prevKeyState = noKeyPressed;
 
-        static readonly int keyHoldDelay = 500; // delay until key registers as beeing held down
-        static          int keyHeldDownFor = 0; // milliseconds
+        readonly int keyHoldDelay = 500; // delay until key registers as beeing held down
+        int keyHeldDownFor = 0; // milliseconds
 
         // keyboard mods active
-        static bool shift = false;
-        static bool ctrl = false;
-        static bool alt = false;       
+        bool shift = false;
+        bool ctrl = false;
+        bool alt = false;
 
-        
+
         /// <summary>
         /// Checks for user input and executes corresponding command if input is present
         /// </summary>
         /// <param name="gameTime"></param>
-        public static void CheckInput(GameTime gameTime)
+        public void CheckInput(GameTime gameTime)
         {
             KeyboardState curKeyState = Keyboard.GetState();
-        
-            if(curKeyState == prevKeyState)
+
+            if (curKeyState == prevKeyState)
             {
-                if(curKeyState == noKeyPressed)
+                if (curKeyState == noKeyPressed)
                 {
                     return;
                 }
 
                 keyHeldDownFor += gameTime.ElapsedGameTime.Milliseconds;
 
-                if(keyHeldDownFor < keyHoldDelay)
+                if (keyHeldDownFor < keyHoldDelay)
                 {
                     return;
-                }              
+                }
             }
             else
             {
@@ -135,7 +158,7 @@ namespace TheAlchemist
 
             CommandDomain curDomain = domainHistory.Peek();
 
-            if(!keyToCommand.ContainsKey(curDomain))
+            if (!keyToCommand.ContainsKey(curDomain))
             {
                 Log.Error("Command domain not present: " + curDomain);
                 return;
@@ -143,7 +166,7 @@ namespace TheAlchemist
 
             var keyBindings = keyToCommand[curDomain];
 
-            if(keyBindings == null)
+            if (keyBindings == null)
             {
                 Log.Error("Key bindings missing for " + curDomain);
                 return;
@@ -154,14 +177,14 @@ namespace TheAlchemist
             foreach (var keyPressed in curKeyState.GetPressedKeys())
             {
                 // TODO: implement modifiers 
-                if(keyBindings.ContainsKey(keyPressed))
+                if (keyBindings.ContainsKey(keyPressed))
                 {
                     command = keyBindings[keyPressed];
                     break;
                 }
             }
 
-            if(command == Command.None)
+            if (command == Command.None)
             {
                 // TODO: remove
                 UISystem.Message("What?");
@@ -171,26 +194,88 @@ namespace TheAlchemist
             ExecuteCommand(command);
         }
 
-        static void ExecuteCommand(Command command)
+        public void ExecuteCommand(Command command)
         {
-            switch(command)
+            switch (command)
             {
+                case Command.None:
+                    Log.Error("Command \"None\" cannot be executed!");
+                    break;
+
+                // Movement -----------------------
+                case Command.MoveN:
+                    MoveEntity(Direction.North);
+                    break;
+                case Command.MoveNE:
+                    break;
+                case Command.MoveE:
+                    MoveEntity(Direction.East);
+                    break;
+                case Command.MoveSE:
+                    break;
+                case Command.MoveS:
+                    MoveEntity(Direction.South);
+                    break;
+                case Command.MoveSW:
+                    break;
+                case Command.MoveW:
+                    MoveEntity(Direction.West);
+                    break;
+                case Command.MoveNW:
+                    break;
+                // -------------------------------
+
+                case Command.PickupItem:
+                    PickUpItem();
+                    break;
+
+                case Command.ToggleInv:
+                    ToggleInventory();
+                    break;
+                case Command.MoveInvCursorUp:
+                    MoveInventoryCursor(Direction.North);
+                    break;
+                case Command.MoveInvCursorRight:
+                    MoveInventoryCursor(Direction.East);
+                    break;
+                case Command.MoveInvCursorDown:
+                    MoveInventoryCursor(Direction.South);
+                    break;
+                case Command.MoveInvCursorLeft:
+                    MoveInventoryCursor(Direction.West);
+                    break;
+
+                case Command.ToggleTargeting:
+                    ToggleTargetMode();
+                    break;
+                case Command.ConfirmTarget:
+                    break;
+                case Command.UseItem:
+                    UseItem();
+                    break;
+                case Command.ConsumeItem:
+                    break;
+                case Command.DropItem:
+                    break;
+                case Command.ThrowItem:
+                    break;
+
                 default:
                     Log.Error("Command not implemented! " + command);
                     break;
             }
         }
 
-        public static void BindKey(CommandDomain domain, Keys key, Command command)
+        public void BindKey(CommandDomain domain, Keys key, Command command)
         {
-            if(!keyToCommand.ContainsKey(domain))
+            if (!keyToCommand.ContainsKey(domain))
             {
                 keyToCommand.Add(domain, new Dictionary<Keys, Command>());
             }
 
             var keyBinding = keyToCommand[domain];
 
-            if(keyBinding.ContainsKey(key))
+            if (keyBinding.ContainsKey(key))
             {
                 Log.Message("Rebinding: " + key + " from " + keyBinding[key] + " to " + command);
                 keyBinding.Remove(key);
@@ -199,21 +284,22 @@ namespace TheAlchemist
             keyBinding.Add(key, command);
         }
 
-        public static void EnterDomain(CommandDomain domain)
+        public void EnterDomain(CommandDomain domain)
         {
-            if(domainHistory.Count > 0)
+            if (domainHistory.Count > 0)
             {
-                if(domainHistory.Peek() == domain)
+                if (domainHistory.Peek() == domain)
                 {
+                    Log.Warning("Trying to enter same command domain again!");
                     return; // never enter the same domain we are in!
                 }
             }
             domainHistory.Push(domain);
         }
 
-        public static void LeaveCurrentDomain()
+        public void LeaveCurrentDomain()
         {
-            if(domainHistory.Count > 1)
+            if (domainHistory.Count > 1)
             {
                 domainHistory.Pop();
             }
@@ -223,14 +309,83 @@ namespace TheAlchemist
             }
         }
 
-        public static string GetSerializedKeyBindings()
+        public string GetSerializedKeyBindings()
         {
             return Util.SerializeObject(keyToCommand, true);
         }
 
-        public static void LoadKeyBindings(string Json)
+        public void LoadKeyBindings(string Json)
         {
-            keyToCommand = Util.DeserializeObject <Dictionary<CommandDomain, Dictionary<Keys, Command>>> (Json);
+            keyToCommand = Util.DeserializeObject<Dictionary<CommandDomain, Dictionary<Keys, Command>>>(Json);
+
+            if (keyToCommand == null)
+            {
+                Log.Error("Failed to load keybindings!");
+                keyToCommand = new Dictionary<CommandDomain, Dictionary<Keys, Command>>();
+            }
+        }
+
+        /// <summary>
+        /// Sends movement event with ControlledEntity
+        /// </summary>
+        /// <param name="dir">Direction of movement</param>
+        private void MoveEntity(Direction dir)
+        {
+            MovementEvent?.Invoke(ControlledEntity, dir);
+        }
+
+        /// <summary>
+        /// opens/closes Inventory
+        /// </summary>
+        private void ToggleInventory()
+        {
+            InventoryToggledEvent?.Invoke();
+
+            if (UI.InventoryOpen)
+            {
+                EnterDomain(CommandDomain.Inventory);
+            }
+            else
+            {
+                LeaveCurrentDomain();
+            }
+        }
+
+        private void MoveInventoryCursor(Direction dir)
+        {
+            InventoryCursorMovedEvent?.Invoke(dir);
+        }
+
+        private void PickUpItem()
+        {
+            PickupItemEvent?.Invoke(ControlledEntity);
+        }
+
+        private void UseItem()
+        {
+            int cursorPos = UI.InventoryCursorPosition;
+            var item = EntityManager.GetComponent<InventoryComponent>(ControlledEntity).Items[cursorPos - 1];
+            ItemUsedEvent?.Invoke(ControlledEntity, item);
+            // TODO: ToggleInventory();
+            LeaveCurrentDomain();
+        }
+
+        public void ToggleTargetMode()
+        {
+            if (domainHistory.Peek() == CommandDomain.Targeting)
+            {               
+                ControlledEntity = Util.PlayerID;
+                EntityManager.RemoveAllComponentsOfType(Util.TargetIndicatorID, RenderableSpriteComponent.TypeID);
+                LeaveCurrentDomain();
+            }
+            else
+            {
+                ControlledEntity = Util.TargetIndicatorID;
+                var playerPos = EntityManager.GetComponent<TransformComponent>(Util.PlayerID).Position;
+                EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position = playerPos;
+                UpdateTargetLineEvent?.Invoke();
+                EnterDomain(CommandDomain.Targeting);
+            }
         }
     }
 }

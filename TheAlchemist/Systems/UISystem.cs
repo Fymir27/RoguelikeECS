@@ -10,6 +10,7 @@ namespace TheAlchemist.Systems
     using Systems;
 
     public delegate void InventoryToggledHandler();
+    public delegate void InventoryCursorMovedHandler(Direction dir);
 
     class UISystem
     {
@@ -19,19 +20,14 @@ namespace TheAlchemist.Systems
         }
 
         // MovementEventHandler
-        public void HandleInventoryCursorMoved(int character, Direction dir)
+        public void HandleInventoryCursorMoved(Direction dir)
         {
             if (!UI.InventoryOpen)
             {
                 return;
             }
 
-            if (character != Util.PlayerID)
-            {
-                return;
-            }
-
-            var inventory = EntityManager.GetComponent<InventoryComponent>(character);
+            var inventory = EntityManager.GetComponent<InventoryComponent>(Util.PlayerID);
 
             if (inventory == null)
             {

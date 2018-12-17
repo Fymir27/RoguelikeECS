@@ -191,7 +191,7 @@ namespace TheAlchemist.Systems
                 return;
             }
 
-            PickupItemEvent?.Invoke(Util.PlayerID, playerPos);
+            PickupItemEvent?.Invoke(Util.PlayerID);
         }
 
         public void HandlePlayerPrompt(Keys[] keys, Action<int> callback)

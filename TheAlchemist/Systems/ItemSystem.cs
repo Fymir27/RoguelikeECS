@@ -12,7 +12,7 @@ namespace TheAlchemist.Systems
     using Components;
     using Components.ItemComponents;
 
-    public delegate void ItemPickupHandler(int character, Vector2 position);
+    public delegate void ItemPickupHandler(int character);
     public delegate void ItemUsedHandler(int character, int item);
 
     class ItemSystem
@@ -42,8 +42,17 @@ namespace TheAlchemist.Systems
         int itemInUse = 0;
         IEnumerable<UsableComponent> usableComponents;
 
-        public void PickUpItem(int character, Vector2 position)
+        public void PickUpItem(int character)
         {
+            Vector2 position = EntityManager.GetComponent<TransformComponent>(character).Position;
+            int pickupItemID = Util.CurrentFloor.GetFirstItem(position);
+
+            if(pickupItemID == 0)
+            {
+                UISystem.Message("Nothing here to be picked up!");
+                return;
+            }
+
             var inventory = EntityManager.GetComponent<InventoryComponent>(character);
 
             if (inventory == null)
@@ -56,9 +65,7 @@ namespace TheAlchemist.Systems
             {
                 UISystem.Message("Inventory is full! -> " + DescriptionSystem.GetNameWithID(character));
                 return;
-            }      
-
-            int pickupItemID = Util.CurrentFloor.GetFirstItem(position);
+            }                
 
             // post message to player
             UISystem.Message(DescriptionSystem.GetNameWithID(character) + " picked up " + DescriptionSystem.GetNameWithID(pickupItemID));
@@ -266,7 +273,7 @@ namespace TheAlchemist.Systems
 
             inventory.Items.Remove(item);
 
-            UI.InventoryCursorPosition = 0;
+            UI.InventoryCursorPosition = 1;
         }
     }
 }

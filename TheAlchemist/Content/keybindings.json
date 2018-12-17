@@ -3,9 +3,28 @@
     "Up": "MoveN",
     "Right": "MoveE",
     "Down": "MoveS",
-    "Left": "MoveW"
+    "Left": "MoveW",
+    "I": "ToggleInv",
+    "Space": "PickupItem",
+    "X": "ToggleTargeting"
   },
+
   "Inventory": {
-    "I": "CloseInv"
+    "I": "ToggleInv",
+    "Escape": "ToggleInv",
+    "Space": "UseItem",
+    "Up": "MoveInvCursorUp",
+    "Right": "MoveInvCursorRight",
+    "Down": "MoveInvCursorDown",
+    "Left": "MoveInvCursorLeft"
+  },
+
+  "Targeting": {
+    "Up": "MoveN",
+    "Right": "MoveE",
+    "Down": "MoveS",
+    "Left": "MoveW",
+    "X": "ToggleTargeting",
+    "Escape": "ToggleTargeting"
   }
 }

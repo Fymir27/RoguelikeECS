@@ -174,12 +174,21 @@ namespace TheAlchemist
         }
 
         public static T DeserializeObject<T>(string obj)
-        {
+        {           
             var settings = new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto
             };
-            return JsonConvert.DeserializeObject<T>(obj, settings);
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(obj, settings);
+            }
+            catch(JsonException e)
+            {
+                Log.Error("Deserialization went wrong! " + typeof(T));
+                Log.Error(e.Message);
+                return default(T);
+            }
         }
 
         // set init to true if targeting mode has just been entered
