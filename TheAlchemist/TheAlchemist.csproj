@@ -54,6 +54,7 @@
     <Compile Include="Components\InventoryComponent.cs" />
     <Compile Include="Components\ItemComponent.cs" />
     <Compile Include="Components\ItemComponents\DroppableComponent.cs" />
+    <Compile Include="Components\ItemComponents\ItemEffectComponent.cs" />
     <Compile Include="Components\ItemComponents\ThrowableComponent.cs" />
     <Compile Include="Components\ItemComponents\UsableComponent.cs" />
     <Compile Include="Components\NPCComponent.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="Components\ItemComponents\ConsumableComponent.cs" />
     <Compile Include="Components\PotionComponent.cs" />
     <Compile Include="Components\RenderableComponent.cs" />
+    <Compile Include="Components\StatComponent.cs" />
     <Compile Include="Components\TransformComponent.cs" />
     <Compile Include="Components\WeaponComponent.cs" />
     <Compile Include="EntityManager.cs" />

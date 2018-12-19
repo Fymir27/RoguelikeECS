@@ -821,6 +821,7 @@ namespace TheAlchemist
             List<IComponent> wallComponents = new List<IComponent>();
             wallComponents.Add(new RenderableSpriteComponent() { Visible = true, Texture = "wall" });
             wallComponents.Add(new ColliderComponent() { Solid = true });
+            wallComponents.Add(new DescriptionComponent() { Name = "Wall", Description = "A solid wall" });
 
             EntityManager.AddComponents(wall, wallComponents);
 
@@ -843,7 +844,7 @@ namespace TheAlchemist
             return EntityManager.CreateEntity(new List<IComponent>()
             {
                 doorComponent,
-                new DescriptionComponent() { Name = "Door", Description = "" },
+                new DescriptionComponent() { Name = "Door", Description = "What may be behind this one?" },
                 new InteractableComponent() { },
                 new RenderableSpriteComponent() { Texture = doorComponent.Open ? doorComponent.TextureOpen : doorComponent.TextureClosed },
                 new ColliderComponent() { Solid = true },

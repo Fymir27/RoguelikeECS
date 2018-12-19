@@ -69,11 +69,87 @@ namespace TheAlchemist
 
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
             spriteBatch.Draw(TextureManager.GetTexture("tooltip"), new Vector2(Util.WorldWidth, 0), Color.White);
-            spriteBatch.DrawString(Util.BigFont, "Tooltip", new Vector2(Util.WorldWidth + 10, 10), Color.Black);
-            if (InventoryOpen)
+            
+
+            InputManager.CommandDomain curDomain = InputManager.Instance.GetCurrentDomain();
+
+            string name = "";
+            string description = "";
+
+            if(curDomain == InputManager.CommandDomain.Exploring)
             {
-                spriteBatch.DrawString(Util.BigFont, items.Count == 0 ? "" : DescriptionSystem.GetDescription(items[InventoryCursorPosition - 1]), new Vector2(Util.WorldWidth + 10, 40), Color.Black);
+                name = "Player";
+                description = "HP: " + EntityManager.GetComponent<HealthComponent>(Util.PlayerID).GetString();
             }
+            else if (curDomain == InputManager.CommandDomain.Inventory)
+            {
+                if(items.Count == 0)
+                {
+                    name = "Your inventory is empty!";
+                    description = "";
+                }
+                else
+                {
+                    var descriptionC = EntityManager.GetComponent<DescriptionComponent>(items[InventoryCursorPosition -1]);
+                    if(descriptionC == null)
+                    {
+                        name = "???";
+                        description = "???";
+                    }
+                    else
+                    {
+                        name = descriptionC.Name;
+                        description = descriptionC.Description;
+                    }
+                }
+            }
+            else if(curDomain == InputManager.CommandDomain.Targeting)
+            {
+                var pos = EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position;
+                int character = Util.CurrentFloor.GetCharacter(pos);
+                int item = Util.CurrentFloor.GetFirstItem(pos);
+                int terrain = Util.CurrentFloor.GetTerrain(pos);
+
+                int descrEntity = 0;
+
+                if(character != 0)
+                {
+                    descrEntity = character;
+                }
+                else if(item != 0)
+                {
+                    descrEntity = item;
+                }
+                else if(terrain != 0)
+                {
+                    descrEntity = terrain;
+                }
+
+                if(descrEntity == 0)
+                {
+                    name = "Floor";
+                    description = "There's nothing there!";
+                }
+                else
+                {
+                    var descriptionC = EntityManager.GetComponent<DescriptionComponent>(descrEntity);
+                    if(descriptionC == null)
+                    {
+                        name = "???";
+                        description = "???";
+                    }
+                    else
+                    {
+                        name = descriptionC.Name;
+                        description = descriptionC.Description;
+                    }
+                }
+            }
+
+            // draw Tooltip
+            spriteBatch.DrawString(Util.BigFont, name, new Vector2(Util.WorldWidth + 10, 10), Color.Black);
+            // TODO: multiline Tooltip
+            spriteBatch.DrawString(Util.BigFont, description, new Vector2(Util.WorldWidth + 10, 40), Color.Black);
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
         }
 

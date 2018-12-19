@@ -284,6 +284,11 @@ namespace TheAlchemist
             keyBinding.Add(key, command);
         }
 
+        public CommandDomain GetCurrentDomain()
+        {
+            return domainHistory.Peek();
+        }
+
         public void EnterDomain(CommandDomain domain)
         {
             if (domainHistory.Count > 0)
