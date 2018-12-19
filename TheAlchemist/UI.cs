@@ -146,9 +146,18 @@ namespace TheAlchemist
                 }
             }
 
-            // draw Tooltip
+            // draw name
             spriteBatch.DrawString(Util.BigFont, name, new Vector2(Util.WorldWidth + 10, 10), Color.Black);
-            // TODO: multiline Tooltip
+
+            // split description into multiple lines
+            int rowLength = 40;
+            for(int i = rowLength; i < description.Length - 1; i += rowLength)
+            {
+                int newlPos = description.Substring(0, i).LastIndexOf(' ');
+                description = description.Insert(newlPos + 1, "\n");
+            }
+
+            // draw description text
             spriteBatch.DrawString(Util.BigFont, description, new Vector2(Util.WorldWidth + 10, 40), Color.Black);
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
         }
