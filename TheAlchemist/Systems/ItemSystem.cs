@@ -5,13 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace TheAlchemist.Systems
 {
     using Components;
     using Components.ItemComponents;
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ItemUsage
     {
         Consume,
@@ -149,6 +151,28 @@ namespace TheAlchemist.Systems
             }
 
             UISystem.Message(DescriptionSystem.GetNameWithID(character) + " uses " + DescriptionSystem.GetNameWithID(item) + " -> " + usage);
+
+            switch (usage)
+            {
+                case ItemUsage.Consume:
+                    UISystem.Message("Consuming items is not yet implemented!");
+                    break;
+
+                case ItemUsage.Throw:
+                    UISystem.Message("Throwing items is not yet implemented");
+                    break;
+            }
+
+            var itemComponent = EntityManager.GetComponent<ItemComponent>(item);
+
+            if (itemComponent.Count > 1)
+            {
+                itemComponent.Count--;
+            }
+            else
+            {
+                RemoveFromInventory(item, character);
+            }
 
             Util.TurnOver(character);
 

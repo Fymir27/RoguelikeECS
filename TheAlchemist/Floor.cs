@@ -111,23 +111,11 @@ namespace TheAlchemist
 
             // load items ////////////
             JObject itemsFile = JObject.Parse(File.ReadAllText(Util.ContentPath + "/items.json"));
+
             int healthPotion = EntityManager.CreateEntity(itemsFile["healthPotion"].ToString());
-            EntityManager.AddComponent(healthPotion, new UsableItemComponent()
-            {
-                Effects = new List<UsableItemComponent.ItemEffect>()
-                {
-                    new UsableItemComponent.ItemEffect()
-                    {
-                        Type = UsableItemComponent.EffectType.Health,
-                        Potency = 50,
-                        Harmful = false
-                    }
-                },
-                Usages = new List<ItemUsage>() { ItemUsage.Consume, ItemUsage.Throw }                
-            });
             PlaceItem(playerPos + new Vector2(-1, 0), healthPotion);
 
-            int poison = EntityManager.CreateEntity(itemsFile["poisonPotion"].ToString());
+            int poison = EntityManager.CreateEntity(itemsFile["poisonPotion"].ToString());          
             PlaceItem(playerPos + new Vector2(-1, 0), poison);
            
             // load enemies //////////
