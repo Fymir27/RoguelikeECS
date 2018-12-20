@@ -164,7 +164,7 @@ namespace TheAlchemist.Systems
             {
                 //Console.WriteLine("Space trigger item use!");
                 //Console.WriteLine("UsedItemEvent null? " + UsedItemEvent == null);
-                UsedItemEvent?.Invoke(Util.PlayerID, EntityManager.GetComponent<InventoryComponent>(Util.PlayerID).Items[UI.InventoryCursorPosition - 1]);
+                UsedItemEvent?.Invoke(Util.PlayerID, EntityManager.GetComponent<InventoryComponent>(Util.PlayerID).Items[UI.InventoryCursorPosition - 1], ItemUsage.Consume);
                 return;
             }
             

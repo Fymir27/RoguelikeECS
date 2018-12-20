@@ -14,7 +14,7 @@ namespace TheAlchemist.Systems
     {
         public event HealthLostHandler HealthLostEvent;
 
-        private float unarmedDamage = 1f;
+        private float unarmedDamage = 5f;
 
         public void HandleBasicAttack(int attacker, int defender)
         {           

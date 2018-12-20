@@ -12,8 +12,14 @@ namespace TheAlchemist.Systems
     using Components;
     using Components.ItemComponents;
 
+    public enum ItemUsage
+    {
+        Consume,
+        Throw
+    }
+
     public delegate void ItemPickupHandler(int character);
-    public delegate void ItemUsedHandler(int character, int item);
+    public delegate void ItemUsedHandler(int character, int item, ItemUsage usage);
 
     class ItemSystem
     {
@@ -24,8 +30,6 @@ namespace TheAlchemist.Systems
 
         public event HealthGainedHandler HealthGainedEvent;
         public event HealthLostHandler HealthLostEvent;
-
-
 
         public enum ItemEffectType
         {
@@ -38,7 +42,7 @@ namespace TheAlchemist.Systems
             public ItemEffectType Type;
             public float[] Values;
         }
-    
+
         int itemInUse = 0;
         IEnumerable<UsableComponent> usableComponents;
 
@@ -72,6 +76,7 @@ namespace TheAlchemist.Systems
 
             Util.CurrentFloor.RemoveItem(position, pickupItemID);
 
+            #region ItemStacking
             var pickupComponentTypeIDs = EntityManager.GetComponentTypeIDs(pickupItemID);
 
             bool match = false; // can item can be stacked here
@@ -122,11 +127,61 @@ namespace TheAlchemist.Systems
             {
                 inventory.Items.Add(pickupItemID);
             }
+            #endregion
 
             Util.TurnOver(character);
         }
 
-        public void UseItem(int character, int item)
+        public void UseItem(int character, int item, ItemUsage usage)
+        {
+            var usableItem = EntityManager.GetComponent<UsableItemComponent>(item);
+
+            if(usableItem == null)
+            {
+                UISystem.Message("You can't use that!");
+                return;
+            }
+
+            if(!usableItem.Usages.Contains(usage))
+            {
+                UISystem.Message("You can't use that like that!");
+                return;
+            }
+
+            UISystem.Message(DescriptionSystem.GetNameWithID(character) + " uses " + DescriptionSystem.GetNameWithID(item) + " -> " + usage);
+
+            Util.TurnOver(character);
+
+            /*
+            var usableItem = EntityManager.GetComponent<UsableItemComponent>(item);
+
+            if(usableItem == null)
+            {
+                UISystem.Message("Can't use that!");
+                return;
+            }
+
+            UISystem.Message("What do you want to do with this item?");
+            
+            foreach(var action in usableItem.Usages)
+            {
+                Keys key = Keys.None;
+                switch(action)
+                {
+                    case ItemUsage.Consume:
+                        key = InputManager.Instance.GetKeybinding(InputManager.Command.ConsumeItem, InputManager.CommandDomain.Inventory);
+                        break;
+
+                    case ItemUsage.Throw:
+                        key = InputManager.Instance.GetKeybinding(InputManager.Command.ThrowItem, InputManager.CommandDomain.Inventory);
+                        break;
+                }
+                UISystem.Message(key + " -> " + action);
+            }
+            */
+        }
+
+        /* public void UseItem(int character, int item)
         {
             //Console.WriteLine("ItemSystem.UseItem");
             //Log.Message(DescriptionSystem.GetNameWithID(character) + " used " + DescriptionSystem.GetNameWithID(item));
@@ -171,6 +226,7 @@ namespace TheAlchemist.Systems
             // set up callback when buttons are pressed
             PlayerPromptEvent?.Invoke(keys.ToArray(), ChooseOption);
         }
+        */
 
         // callback that gets invoked when player 
         // chooses what to do with the item

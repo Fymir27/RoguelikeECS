@@ -117,6 +117,16 @@ namespace TheAlchemist
             }
         }
 
+        public static string GetStringFromEnumerable<T>(IEnumerable<T> list)
+        {
+            string result = "[";
+            foreach(var elem in list)
+            {
+                result += elem.ToString() + ",";
+            }
+            return result.Substring(0, result.Length - 1) + "]";
+        }
+
         // transforms world position to screen position based on tile size
         public static Vector2 WorldToScreenPosition(Vector2 worldPos)
         {
@@ -124,7 +134,7 @@ namespace TheAlchemist
         }
 
         // returns Direction 180 degrees from param direction
-        public static Direction getOppositeDirection(Direction direction)
+        public static Direction GetOppositeDirection(Direction direction)
         {
             int nrDirections = 8;
             return (Direction)(((int)direction + nrDirections / 2) % nrDirections);

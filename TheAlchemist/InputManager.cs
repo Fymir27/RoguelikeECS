@@ -48,6 +48,7 @@ namespace TheAlchemist
             MoveSW,
             MoveW,
             MoveNW,
+            Wait,
 
             PickupItem,
 
@@ -62,7 +63,7 @@ namespace TheAlchemist
             ConfirmTarget,
 
             // Items
-            UseItem, // general usage
+            UseItem, // general usage -> just prints specific item usage, unless there is only one usage Type
             ConsumeItem,
             DropItem,
             ThrowItem
@@ -187,7 +188,7 @@ namespace TheAlchemist
             if (command == Command.None)
             {
                 // TODO: remove
-                UISystem.Message("What?");
+                UISystem.Message("No command for " + Util.GetStringFromEnumerable(curKeyState.GetPressedKeys()));
                 return;
             }
 
@@ -223,6 +224,12 @@ namespace TheAlchemist
                     break;
                 case Command.MoveNW:
                     break;
+                case Command.Wait:
+                    if(!Util.PlayerTurnOver)
+                    {
+                        Util.TurnOver(Util.PlayerID);
+                    }
+                    break;
                 // -------------------------------
 
                 case Command.PickupItem:
@@ -251,13 +258,15 @@ namespace TheAlchemist
                 case Command.ConfirmTarget:
                     break;
                 case Command.UseItem:
-                    UseItem();
+                    TryUseItem();
                     break;
                 case Command.ConsumeItem:
+                    UseItem(ItemUsage.Consume);
                     break;
                 case Command.DropItem:
                     break;
                 case Command.ThrowItem:
+                    UseItem(ItemUsage.Throw);
                     break;
 
                 default:
@@ -314,6 +323,33 @@ namespace TheAlchemist
             }
         }
 
+        /// <summary>
+        /// Returns the key for a specific command (first one found)
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="domain"></param>
+        /// <returns></returns>
+        public Keys GetKeybinding(Command command, CommandDomain domain)
+        {
+            Dictionary<Keys, Command> keybindings;
+            keyToCommand.TryGetValue(domain, out keybindings);
+            if(keybindings == null)
+            {
+                Log.Warning("Domain empty! " + domain);
+                return Keys.None;
+            }
+
+            bool commandDefined = keybindings.ContainsValue(command);
+
+            if(!commandDefined)
+            {
+                Log.Warning("Command not defined! " + command);
+                return Keys.None;
+            }
+
+            return keybindings.FirstOrDefault(x => x.Value == command).Key;
+        }
+
         public string GetSerializedKeyBindings()
         {
             return Util.SerializeObject(keyToCommand, true);
@@ -326,7 +362,8 @@ namespace TheAlchemist
             if (keyToCommand == null)
             {
                 Log.Error("Failed to load keybindings!");
-                keyToCommand = new Dictionary<CommandDomain, Dictionary<Keys, Command>>();
+                UISystem.Message("Failed to load keybindings!");
+                keyToCommand = new Dictionary<CommandDomain, Dictionary<Keys, Command>>() { { CommandDomain.Exploring, new Dictionary<Keys, Command>() } };
             }
         }
 
@@ -366,13 +403,58 @@ namespace TheAlchemist
             PickupItemEvent?.Invoke(ControlledEntity);
         }
 
-        private void UseItem()
+        /// <summary>
+        /// uses item if item only has one possible usage
+        /// otherwise prints usage information
+        /// </summary>
+        private void TryUseItem()
         {
             int cursorPos = UI.InventoryCursorPosition;
             var item = EntityManager.GetComponent<InventoryComponent>(ControlledEntity).Items[cursorPos - 1];
-            ItemUsedEvent?.Invoke(ControlledEntity, item);
-            // TODO: ToggleInventory();
-            LeaveCurrentDomain();
+
+            var usableItem = EntityManager.GetComponent<UsableItemComponent>(item);
+
+            if (usableItem == null)
+            {
+                UISystem.Message("You can't use that!");
+                return;
+            }
+
+            // TODO: is this even good?
+            if(usableItem.Usages.Count == 1) // only one possible usage
+            {
+                UseItem(usableItem.Usages[0]);
+                return;
+            }
+
+            UISystem.Message("What do you want to do with this item?");
+
+            foreach (var action in usableItem.Usages)
+            {
+                Keys key = Keys.None;
+                switch (action)
+                {
+                    case ItemUsage.Consume:
+                        key = GetKeybinding(Command.ConsumeItem, CommandDomain.Inventory);
+                        break;
+
+                    case ItemUsage.Throw:
+                        key = GetKeybinding(Command.ThrowItem, CommandDomain.Inventory);
+                        break;
+                }
+                UISystem.Message(key + " -> " + action);
+            }
+        }
+
+        private void UseItem(ItemUsage usage)
+        {
+            int cursorPos = UI.InventoryCursorPosition;
+            var item = EntityManager.GetComponent<InventoryComponent>(ControlledEntity).Items[cursorPos - 1];
+
+
+
+            ItemUsedEvent?.Invoke(ControlledEntity, item, usage);
+            ToggleInventory();
         }
 
         public void ToggleTargetMode()

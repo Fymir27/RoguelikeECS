@@ -6,7 +6,8 @@
     "Left": "MoveW",
     "I": "ToggleInv",
     "Space": "PickupItem",
-    "X": "ToggleTargeting"
+    "X": "ToggleTargeting",
+    "OemPeriod": "Wait"
   },
 
   "Inventory": {
@@ -16,7 +17,9 @@
     "Up": "MoveInvCursorUp",
     "Right": "MoveInvCursorRight",
     "Down": "MoveInvCursorDown",
-    "Left": "MoveInvCursorLeft"
+    "Left": "MoveInvCursorLeft",
+    "Q": "ConsumeItem",
+    "F": "ThrowItem"
   },
 
   "Targeting": {

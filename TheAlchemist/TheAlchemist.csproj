@@ -54,7 +54,7 @@
     <Compile Include="Components\InventoryComponent.cs" />
     <Compile Include="Components\ItemComponent.cs" />
     <Compile Include="Components\ItemComponents\DroppableComponent.cs" />
-    <Compile Include="Components\ItemComponents\ItemEffectComponent.cs" />
+    <Compile Include="Components\UsableItemComponent.cs" />
     <Compile Include="Components\ItemComponents\ThrowableComponent.cs" />
     <Compile Include="Components\ItemComponents\UsableComponent.cs" />
     <Compile Include="Components\NPCComponent.cs" />
