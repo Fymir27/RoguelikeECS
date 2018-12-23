@@ -28,6 +28,8 @@
     "Down": "MoveS",
     "Left": "MoveW",
     "X": "ToggleTargeting",
-    "Escape": "ToggleTargeting"
+    "Escape": "ToggleTargeting",
+	"Enter": "ConfirmTarget",
+	"F": "ConfirmTarget"
   }
 }

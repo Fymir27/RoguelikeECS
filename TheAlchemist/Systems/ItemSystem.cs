@@ -19,7 +19,7 @@ namespace TheAlchemist.Systems
         Consume,
         Throw
     }
-
+   
     public delegate void ItemPickupHandler(int character);
     public delegate void ItemUsedHandler(int character, int item, ItemUsage usage);
 
@@ -32,6 +32,23 @@ namespace TheAlchemist.Systems
 
         public event HealthGainedHandler HealthGainedEvent;
         public event HealthLostHandler HealthLostEvent;
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public enum EffectType
+        {
+            // Ressources
+            Health,
+            Mana,
+
+            // Stats
+            Str,
+            Dex,
+            Int,
+
+            // Elemental
+            Ice,
+            Fire
+        }
 
         public enum ItemEffectType
         {
@@ -155,26 +172,14 @@ namespace TheAlchemist.Systems
             switch (usage)
             {
                 case ItemUsage.Consume:
-                    UISystem.Message("Consuming items is not yet implemented!");
+                    ConsumeItem(character, item);
                     break;
 
                 case ItemUsage.Throw:
-                    UISystem.Message("Throwing items is not yet implemented");
+                    InputManager.Instance.InitiateTargeting((pos) => ThrowItem(character, item, pos));
+                    //UISystem.Message("Throwing items is not yet implemented");
                     break;
             }
-
-            var itemComponent = EntityManager.GetComponent<ItemComponent>(item);
-
-            if (itemComponent.Count > 1)
-            {
-                itemComponent.Count--;
-            }
-            else
-            {
-                RemoveFromInventory(item, character);
-            }
-
-            Util.TurnOver(character);
 
             /*
             var usableItem = EntityManager.GetComponent<UsableItemComponent>(item);
@@ -203,6 +208,20 @@ namespace TheAlchemist.Systems
                 UISystem.Message(key + " -> " + action);
             }
             */
+        }
+
+        public void DecreaseItemCount(int character, int item)
+        {
+            var itemComponent = EntityManager.GetComponent<ItemComponent>(item);
+
+            if (itemComponent.Count > 1)
+            {
+                itemComponent.Count--;
+            }
+            else
+            {
+                RemoveFromInventory(item, character);
+            }
         }
 
         /* public void UseItem(int character, int item)
@@ -267,6 +286,91 @@ namespace TheAlchemist.Systems
             Util.TurnOver(Util.PlayerID);
         }
 
+        public void ConsumeItem(int character, int item)
+        {
+            var itemEffects = EntityManager.GetComponent<UsableItemComponent>(item).Effects;
+
+            foreach(var effect in itemEffects)
+            {
+                switch(effect.Type)
+                {
+                    case EffectType.Health:
+                        if (effect.Harmful)
+                            HealthLostEvent?.Invoke(character, effect.Potency * 0.5f);
+                        else
+                            HealthGainedEvent?.Invoke(character, effect.Potency * 0.5f);
+                        break;
+
+                    default:
+                        UISystem.Message("Consume: " + effect.Type + " not implemented!");
+                        break;
+                }
+            }
+
+            DecreaseItemCount(character, item);
+            Util.TurnOver(character);
+        }
+
+        public void ThrowItem(int character, int item, Vector2 pos)
+        {
+            //UISystem.Message(DescriptionSystem.GetNameWithID(character) + " throws " + DescriptionSystem.GetNameWithID(item) + " at " + pos);
+            UISystem.Message(DescriptionSystem.GetName(character) + " throws " + DescriptionSystem.GetName(item));
+
+            var usableComponent = EntityManager.GetComponent<UsableItemComponent>(item);
+            int targetCharacter = Util.CurrentFloor.GetCharacter(pos);
+            int targetTerrain = Util.CurrentFloor.GetTerrain(pos);
+
+            if (targetCharacter == 0)
+            {
+                if(usableComponent.BreakOnThrow)
+                {
+                    UISystem.Message("The item breaks!");
+                }
+                else
+                {
+                    bool solid = false;
+
+                    var collider = EntityManager.GetComponent<ColliderComponent>(targetTerrain);                   
+                    if(collider != null)
+                    {
+                        solid = collider.Solid;
+                    }
+
+                    if(solid)
+                    {
+                        // TODO: bounce off wall
+                        UISystem.Message("You can't throw that there!");
+                        return;
+                    }
+
+                    Util.CurrentFloor.PlaceItem(pos, item);
+                }
+            }
+            else
+            {
+                UISystem.Message("It hits " + DescriptionSystem.GetName(targetCharacter) + "!");
+                foreach (var effect in usableComponent.Effects)
+                {
+                    switch (effect.Type)
+                    {
+                        case EffectType.Health:
+                            if (effect.Harmful)
+                                HealthLostEvent?.Invoke(targetCharacter, effect.Potency * 0.2f);
+                            else
+                                HealthGainedEvent?.Invoke(targetCharacter, effect.Potency * 0.2f);
+                            break;
+
+                        default:
+                            UISystem.Message("Throw: " + effect.Type + " not implemented!");
+                            return;
+                    }
+                }
+            }
+
+            DecreaseItemCount(character, item);
+            Util.TurnOver(character);
+        }
+
         public void ConsumeItem(int character, ConsumableComponent consumable)
         {
             UISystem.Message(DescriptionSystem.GetNameWithID(character) + " consumes " + DescriptionSystem.GetNameWithID(consumable.EntityID));
@@ -299,6 +403,7 @@ namespace TheAlchemist.Systems
                 RemoveFromInventory(itemID, character);
             }
         }
+        
 
         public void ThrowItem(int character, ThrowableComponent throwable)
         {

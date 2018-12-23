@@ -61,7 +61,7 @@
 		{
 			"$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
 			"Name": "Bat",
-			"Description": "A small flying animal that navigates using echolocation."
+			"Description": "Flying animal that navigates using echolocation."
 		},
 		{
 			"$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",

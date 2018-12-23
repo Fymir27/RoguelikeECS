@@ -27,7 +27,7 @@ namespace TheAlchemist
         public event ItemPickupHandler PickupItemEvent;
 
         public event UpdateTargetLineHandler UpdateTargetLineEvent;
-
+        
         public event InventoryToggledHandler InventoryToggledEvent;
         public event InventoryCursorMovedHandler InventoryCursorMovedEvent;
         public event ItemUsedHandler ItemUsedEvent;
@@ -117,6 +117,8 @@ namespace TheAlchemist
         bool ctrl = false;
         bool alt = false;
 
+        // function that gets called when user selects target
+        Action<Vector2> targetConfirmationCallback = null;
 
         /// <summary>
         /// Checks for user input and executes corresponding command if input is present
@@ -256,6 +258,7 @@ namespace TheAlchemist
                     ToggleTargetMode();
                     break;
                 case Command.ConfirmTarget:
+                    ConfirmTarget();
                     break;
                 case Command.UseItem:
                     TryUseItem();
@@ -451,19 +454,20 @@ namespace TheAlchemist
             int cursorPos = UI.InventoryCursorPosition;
             var item = EntityManager.GetComponent<InventoryComponent>(ControlledEntity).Items[cursorPos - 1];
 
-
-
             ItemUsedEvent?.Invoke(ControlledEntity, item, usage);
-            ToggleInventory();
+            //ToggleInventory();
         }
 
+        /// <summary>
+        /// turns target mode on/off
+        /// </summary>
         public void ToggleTargetMode()
         {
             if (domainHistory.Peek() == CommandDomain.Targeting)
             {               
                 ControlledEntity = Util.PlayerID;
                 EntityManager.RemoveAllComponentsOfType(Util.TargetIndicatorID, RenderableSpriteComponent.TypeID);
-                LeaveCurrentDomain();
+                LeaveCurrentDomain();               
             }
             else
             {
@@ -473,6 +477,30 @@ namespace TheAlchemist
                 UpdateTargetLineEvent?.Invoke();
                 EnterDomain(CommandDomain.Targeting);
             }
+        }
+
+        /// <summary>
+        /// initiates target mode while registering a callback
+        /// to invoke when target has been selected
+        /// </summary>
+        /// <param name="callback">Recieves target position when confirmed</param>
+        public void InitiateTargeting(Action<Vector2> callback)
+        {
+            targetConfirmationCallback = callback;
+            ToggleTargetMode();
+        }
+
+        /// <summary>
+        /// passes target position to callback,
+        /// resets callback to null
+        /// and turns off target mode
+        /// </summary>
+        public void ConfirmTarget()
+        {
+            var targetPos = EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position;
+            targetConfirmationCallback?.Invoke(targetPos);
+            targetConfirmationCallback = null;
+            ToggleTargetMode();
         }
     }
 }

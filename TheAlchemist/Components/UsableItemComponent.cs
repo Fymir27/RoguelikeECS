@@ -8,25 +8,10 @@ using Newtonsoft.Json.Converters;
 
 namespace TheAlchemist.Components
 {
+    using static TheAlchemist.Systems.ItemSystem;
+
     class UsableItemComponent : Component<UsableItemComponent>
-    {
-        [JsonConverter(typeof(StringEnumConverter))]
-        public enum EffectType
-        {
-            // Ressources
-            Health,
-            Mana,
-
-            // Stats
-            Str,
-            Dex,
-            Int,
-
-            // Elemental
-            Ice,
-            Fire
-        }
-
+    {       
         public struct ItemEffect
         {
             public EffectType Type;
@@ -42,5 +27,7 @@ namespace TheAlchemist.Components
 
         public List<ItemEffect> Effects;
         public List<Systems.ItemUsage> Usages;
+
+        public bool BreakOnThrow = true;
     }
 }
