@@ -166,13 +166,21 @@ namespace TheAlchemist
         public static void TurnOver(int entity)
         {
             //Log.Message("Turn over for " + DescriptionSystem.GetNameWithID(entity));
+            var health = EntityManager.GetComponent<HealthComponent>(entity);
 
-            CurrentFloor.CalculateTileVisibility();
-
+            // entity dead, don't do anything
+            if(health.Amount <= 0)
+            {
+                return;
+            }
+           
             TurnOverEvent?.Invoke(entity);
 
             if (entity == PlayerID)
+            {
+                CurrentFloor.CalculateTileVisibility();
                 PlayerTurnOver = true;
+            }
         }
 
         public static string SerializeObject(object obj, bool indented = false, bool saveTypeNames = true)

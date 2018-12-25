@@ -61,9 +61,7 @@ namespace TheAlchemist
             Util.ContentPath = Content.RootDirectory;
 
             Log.Init(AppDomain.CurrentDomain.BaseDirectory + "/log.html");
-
-            // TODO: Add your initialization logic here
-            //Floor test = new Floor(10, 10);          
+        
             Floor test = new Floor(Content.RootDirectory + "/map.txt");
             Util.CurrentFloor = test;
             test.CalculateTileVisibility();
@@ -87,15 +85,7 @@ namespace TheAlchemist
 
             // hook up all events with their handlers
             Log.Message("Registering Event Handlers...");
-            //inputSystem.MovementEvent += movementSystem.HandleMovementEvent;
-            //inputSystem.MovementEvent += uiSystem.HandleInventoryCursorMoved;
-            //inputSystem.UsedItemEvent += itemSystem.UseItem;
-            //inputSystem.InteractionEvent += interactionSystem.HandleInteraction;
-            //inputSystem.PickupItemEvent += itemSystem.PickUpItem;
-            //inputSystem.InventoryToggledEvent += uiSystem.HandleInventoryToggled;
-            //inputSystem.UpdateTargetLineEvent += () => Util.UpdateTargetLine(init: true);
 
-            // new input manager
             input.MovementEvent += movementSystem.HandleMovementEvent;
             input.InventoryToggledEvent += uiSystem.HandleInventoryToggled;
             input.InventoryCursorMovedEvent += uiSystem.HandleInventoryCursorMoved;
@@ -103,10 +93,6 @@ namespace TheAlchemist
             input.ItemUsedEvent += itemSystem.UseItem;
             input.UpdateTargetLineEvent += () => Util.UpdateTargetLine(init: true);
 
-            itemSystem.PlayerPromptEvent += inputSystem.HandlePlayerPrompt;
-            itemSystem.TargetModeToggledEvent += input.ToggleTargetMode;
-            itemSystem.WaitForConfirmationEvent += inputSystem.RegisterConfirmationCallback;
-            itemSystem.InventoryToggledEvent += uiSystem.HandleInventoryToggled;
             itemSystem.HealthGainedEvent += healthSystem.HandleGainedHealth;
             itemSystem.HealthLostEvent += healthSystem.HandleLostHealth;
 
@@ -143,7 +129,6 @@ namespace TheAlchemist
             virtualScreen = new RenderTarget2D(GraphicsDevice, Util.ScreenWidth, Util.ScreenHeight);
             renderedWorld = new RenderTarget2D(GraphicsDevice, Util.WorldWidth, Util.WorldHeight);
 
-            // TODO: use this.Content to load your game content here
             Util.DefaultFont = Content.Load<SpriteFont>("default");
             Util.SmallFont = Content.Load<SpriteFont>("small");
             Util.BigFont = Content.Load<SpriteFont>("big");
@@ -163,20 +148,7 @@ namespace TheAlchemist
             };
 
             TextureManager.Init(Content);
-            TextureManager.LoadTextures(textures);
-
-            // try to create custom texture
-            Texture2D tex = new Texture2D(GraphicsDevice, 150, 115, false, SurfaceFormat.Color);
-            Color[] colors = new Color[150 * 115];
-            for (int i = 0; i < colors.Length; i++)
-            {
-                colors[i] = Color.Aqua;
-            }
-            tex.SetData<Color>(colors);
-
-            tex.Name = "test";
-
-            TextureManager.AddTexture(tex);
+            TextureManager.LoadTextures(textures);         
         }
 
         /// <summary>
@@ -196,10 +168,6 @@ namespace TheAlchemist
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            //Exit();
-
-            // TODO: Add your update logic here
             if (Util.PlayerTurnOver)
             {
                 npcBehaviourSystem.EnemyTurn();
@@ -207,12 +175,16 @@ namespace TheAlchemist
             }
             else
             {
-                inputSystem.Run(gameTime);
                 InputManager.Instance.CheckInput(gameTime);
             }
 
+            float playerHealth = EntityManager.GetComponent<HealthComponent>(Util.PlayerID).Amount;
+
             // remove all entities that died this turn
             EntityManager.CleanUpEntities();
+
+            if (playerHealth <= 0)
+                Exit(); // TODO: do something
 
             base.Update(gameTime);
         }

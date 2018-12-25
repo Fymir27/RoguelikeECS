@@ -415,7 +415,6 @@ namespace TheAlchemist
         {
             if (IsOutOfBounds(pos))
             {
-                // TODO: throw exception?
                 Log.Warning("Trying to remove " + DescriptionSystem.GetNameWithID(entity) + " out of bounds! " + pos);
                 return false;
             }

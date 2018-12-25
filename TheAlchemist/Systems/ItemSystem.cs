@@ -11,7 +11,6 @@ using Newtonsoft.Json.Converters;
 namespace TheAlchemist.Systems
 {
     using Components;
-    using Components.ItemComponents;
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum ItemUsage
@@ -25,11 +24,6 @@ namespace TheAlchemist.Systems
 
     class ItemSystem
     {
-        public event PlayerPromptHandler PlayerPromptEvent;
-        public event InventoryToggledHandler InventoryToggledEvent;
-        public event TargetModeToggledHandler TargetModeToggledEvent;
-        public event WaitForConfirmationHandler WaitForConfirmationEvent;
-
         public event HealthGainedHandler HealthGainedEvent;
         public event HealthLostHandler HealthLostEvent;
 
@@ -55,15 +49,6 @@ namespace TheAlchemist.Systems
             RestoreHealth,
             LoseHealth
         }
-
-        public struct ItemEffectDescription
-        {
-            public ItemEffectType Type;
-            public float[] Values;
-        }
-
-        int itemInUse = 0;
-        IEnumerable<UsableComponent> usableComponents;
 
         public void PickUpItem(int character)
         {
@@ -179,35 +164,7 @@ namespace TheAlchemist.Systems
                     InputManager.Instance.InitiateTargeting((pos) => ThrowItem(character, item, pos));
                     //UISystem.Message("Throwing items is not yet implemented");
                     break;
-            }
-
-            /*
-            var usableItem = EntityManager.GetComponent<UsableItemComponent>(item);
-
-            if(usableItem == null)
-            {
-                UISystem.Message("Can't use that!");
-                return;
-            }
-
-            UISystem.Message("What do you want to do with this item?");
-            
-            foreach(var action in usableItem.Usages)
-            {
-                Keys key = Keys.None;
-                switch(action)
-                {
-                    case ItemUsage.Consume:
-                        key = InputManager.Instance.GetKeybinding(InputManager.Command.ConsumeItem, InputManager.CommandDomain.Inventory);
-                        break;
-
-                    case ItemUsage.Throw:
-                        key = InputManager.Instance.GetKeybinding(InputManager.Command.ThrowItem, InputManager.CommandDomain.Inventory);
-                        break;
-                }
-                UISystem.Message(key + " -> " + action);
-            }
-            */
+            }          
         }
 
         public void DecreaseItemCount(int character, int item)
@@ -222,68 +179,6 @@ namespace TheAlchemist.Systems
             {
                 RemoveFromInventory(item, character);
             }
-        }
-
-        /* public void UseItem(int character, int item)
-        {
-            //Console.WriteLine("ItemSystem.UseItem");
-            //Log.Message(DescriptionSystem.GetNameWithID(character) + " used " + DescriptionSystem.GetNameWithID(item));
-            
-            //Log.Data(DescriptionSystem.GetDebugInfoEntity(item));
-            usableComponents = EntityManager.GetComponents(item).Where(x => x.TypeID == UsableComponent.TypeID).Cast<UsableComponent>();
-            
-
-            if(!usableComponents.Any())
-            {
-                UISystem.Message(DescriptionSystem.GetNameWithID(item) + " is not usable!");
-                return;
-            }
-
-            itemInUse = item;
-
-            // choose a random use action for npcs
-            if(character != Util.PlayerID)
-            {
-                int i = Game.Random.Next(usableComponents.Count());
-                var chosenComponent = usableComponents.ElementAt(i);
-                chosenComponent.Handler.Invoke(this, character);
-                Util.TurnOver(character);
-                return;
-            }
-
-            // present the player with options of what to do with the item
-            string options = "";
-            List<Keys> keys = new List<Keys>();
-
-            foreach(var component in usableComponents)
-            {
-                options += component.Action + ", ";
-                keys.Add(component.Key);
-            }
-
-            // remove exta ", " at the end
-            options = options.Substring(0, options.Length - 2); 
-
-            UISystem.Message("How do you want to use that item? (" + options + ")");
-
-            // set up callback when buttons are pressed
-            PlayerPromptEvent?.Invoke(keys.ToArray(), ChooseOption);
-        }
-        */
-
-        // callback that gets invoked when player 
-        // chooses what to do with the item
-        public void ChooseOption(int i)
-        {
-            var chosenComponent = usableComponents.ElementAt(i);
-            //UISystem.Message("You chose: " + chosenComponent.Action);
-
-            // invoke the specific handler of the component
-            chosenComponent.Handler.Invoke(this, Util.PlayerID);
-
-            // close inventory
-            InventoryToggledEvent?.Invoke();
-            Util.TurnOver(Util.PlayerID);
         }
 
         public void ConsumeItem(int character, int item)
@@ -369,80 +264,6 @@ namespace TheAlchemist.Systems
 
             DecreaseItemCount(character, item);
             Util.TurnOver(character);
-        }
-
-        public void ConsumeItem(int character, ConsumableComponent consumable)
-        {
-            UISystem.Message(DescriptionSystem.GetNameWithID(character) + " consumes " + DescriptionSystem.GetNameWithID(consumable.EntityID));
-            foreach (var effect in consumable.Effects)
-            {
-                switch (effect.Type)
-                {
-                    case ItemEffectType.RestoreHealth:
-                        HealthGainedEvent?.Invoke(character, effect.Values[0]);
-                        break;
-
-                    case ItemEffectType.LoseHealth:
-                        HealthLostEvent?.Invoke(character, effect.Values[0]);
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-
-            int itemID = consumable.EntityID;
-            var itemComponent = EntityManager.GetComponent<ItemComponent>(itemID);
-
-            if(itemComponent.Count > 1)
-            {
-                itemComponent.Count--;
-            }
-            else
-            {
-                RemoveFromInventory(itemID, character);
-            }
-        }
-        
-
-        public void ThrowItem(int character, ThrowableComponent throwable)
-        {
-            UISystem.Message(DescriptionSystem.GetNameWithID(character) + " throws " + DescriptionSystem.GetNameWithID(throwable.EntityID));
-            
-            if(TargetModeToggledEvent == null)
-            {
-                Log.Error("TargetModeToggledEvent is null!");
-                throw new NullReferenceException("TargetModeToggledEvent is null!");
-            }
-
-            TargetModeToggledEvent.Invoke();
-            WaitForConfirmationEvent?.Invoke(() => ThrowItemConfirmed(character, throwable));
-        }
-
-        private void ThrowItemConfirmed(int character, ThrowableComponent throwable)
-        {
-            UISystem.Message(DescriptionSystem.GetNameWithID(character) + " throws " + DescriptionSystem.GetNameWithID(throwable.EntityID));
-            TargetModeToggledEvent.Invoke();
-            var pos = EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position;
-
-            int itemID = throwable.EntityID;
-
-            RemoveFromInventory(itemID, character);
-
-            Util.CurrentFloor.PlaceItem(pos, itemID);
-        }
-
-        public void DropItem(int character, DroppableComponent droppable)
-        {
-            UISystem.Message(DescriptionSystem.GetNameWithID(character) + " drops " + DescriptionSystem.GetNameWithID(droppable.EntityID));
-
-            int itemID = droppable.EntityID;
-
-            RemoveFromInventory(itemID, character);
-
-            var transform = EntityManager.GetComponent<TransformComponent>(character);
-
-            Util.CurrentFloor.PlaceItem(transform.Position, itemID);          
         }
 
         public void RemoveFromInventory(int item, int character)

@@ -89,7 +89,7 @@ namespace TheAlchemist.Systems
                 }
             }
 
-            // TODO: implement item pickup
+            // TODO: implement automatic item pickup?
 
             // Move entity
             floor.RemoveCharacter(entityTransform.Position);
