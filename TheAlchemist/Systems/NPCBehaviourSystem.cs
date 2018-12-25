@@ -19,6 +19,15 @@ namespace TheAlchemist.Systems
 
             foreach(var npc in npcs)
             {
+                var health = EntityManager.GetComponent<HealthComponent>(npc);
+
+                if(health != null)
+                {
+                    if(health.Amount <= 0)
+                    {
+                        continue; // npc already died this turn
+                    }
+                }
                 // get random direction (for now only 4 directional)              
                 Direction dir = (Direction)(Game.Random.Next(0, 4) * 2);
                 RaiseEnemyMovedEvent(npc, dir);

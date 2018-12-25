@@ -211,6 +211,9 @@ namespace TheAlchemist
                 InputManager.Instance.CheckInput(gameTime);
             }
 
+            // remove all entities that died this turn
+            EntityManager.CleanUpEntities();
+
             base.Update(gameTime);
         }
 

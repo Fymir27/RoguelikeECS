@@ -34,7 +34,7 @@ namespace TheAlchemist.Systems
             // ded
             if (healthComponent.Amount <= 0)
             {
-                EntityManager.RemoveEntity(entity);
+                EntityManager.RemoveEntity(entity); // mark entity for deletion
             }
 
             //Log.Message("Entity " + entity + " HP: " + healthComponent.Amount + "|" + healthComponent.Max + " (-" + amountLost + ")");

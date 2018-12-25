@@ -25,6 +25,9 @@ namespace TheAlchemist
         // maps from component Type ID to list of components of that type
         static Dictionary<int, List<IComponent>> componentsOfType = new Dictionary<int, List<IComponent>>();
 
+        // List of entities to be removed when possible
+        static List<int> toBeRemoved = new List<int>();
+
         // returns serialized state of entity manager as string
         public static string ToJson()
         {
@@ -216,8 +219,28 @@ namespace TheAlchemist
             }
         }
 
-        // "deletes" an entity
+        // marks entity for later deletion
         public static void RemoveEntity(int entityID)
+        {
+            if(toBeRemoved.Contains(entityID))
+            {
+                return;
+            }
+            toBeRemoved.Add(entityID);
+        }
+
+        // deletes all entities that got previously marked for deletion and resets list
+        public static void CleanUpEntities()
+        {
+            foreach(int entity in toBeRemoved)
+            {
+                DeleteEntity(entity);
+            }
+            toBeRemoved.Clear();
+        }
+
+        // "deletes" an entity
+        static void DeleteEntity(int entityID)
         {
             try
             {
