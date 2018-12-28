@@ -79,7 +79,8 @@ namespace TheAlchemist
             if(curDomain == InputManager.CommandDomain.Exploring)
             {
                 name = "Player";
-                description = "HP: " + EntityManager.GetComponent<HealthComponent>(Util.PlayerID).GetString();
+                description = DescriptionSystem.GetCharacterTooltip(Util.PlayerID);
+                //description = "HP: " + EntityManager.GetComponent<HealthComponent>(Util.PlayerID).GetString();
             }
             else if (curDomain == InputManager.CommandDomain.Inventory)
             {
@@ -151,10 +152,35 @@ namespace TheAlchemist
 
             // split description into multiple lines
             int rowLength = 40;
-            for(int i = rowLength; i < description.Length - 1; i += rowLength)
+            int cur = 0;
+            int limit = 55;
+            while(cur + rowLength < description.Length)
             {
-                int newlPos = description.Substring(0, i).LastIndexOf(' ');
-                description = description.Insert(newlPos + 1, "\n");
+                if(limit-- == 0)
+                {
+                    return;
+                }
+                Console.WriteLine(cur + "|" + description.Length);
+                int newlPos = description.IndexOf('\n', cur, rowLength);
+                if(newlPos >= 0)
+                {
+                    cur = newlPos + 1;
+                    continue;
+                }
+
+                int insertHere = description.LastIndexOf(' ', cur + rowLength, rowLength);
+
+                if (insertHere == -1)
+                {
+                    insertHere = cur + rowLength; // no space found? just cut off the word, lol
+                }
+                else
+                {
+                    insertHere++; // insert after space
+                }
+
+                description = description.Insert(insertHere, "\n");
+                cur = insertHere + 1;
             }
 
             // draw description text

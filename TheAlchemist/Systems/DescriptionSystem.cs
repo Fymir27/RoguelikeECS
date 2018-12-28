@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace TheAlchemist.Systems
 {
+    using Components;
+
     // helper class for translating entities to strings
     class DescriptionSystem
     {
@@ -41,6 +43,42 @@ namespace TheAlchemist.Systems
                 sb.AppendLine();
             }
             return sb.ToString();
+        }
+
+        public static string GetCharacterTooltip(int entity)
+        {
+            string tooltip = "";
+
+            tooltip += "Health  ";
+
+            var hp = EntityManager.GetComponent<HealthComponent>(entity);
+                            
+            if(hp != null)
+            {
+                float relativeAmount = hp.Amount / hp.Max;
+                int maxBars = 30;
+                int curBars = (int)Math.Round(maxBars * relativeAmount);
+                tooltip += new string('#', curBars);
+            }
+            else
+            {
+                tooltip += "???";
+            }
+
+            tooltip += '\n';
+
+            // TODO: Mana
+
+            var stats = EntityManager.GetComponent<StatComponent>(entity);
+
+            if(stats != null)
+            {
+                tooltip += "Strength:     " + stats.Strength + '\n';
+                tooltip += "Dexterity:    " + stats.Dexterity + '\n';
+                tooltip += "Intelligence: " + stats.Intelligence + '\n';
+            }
+
+            return tooltip;
         }
     }
 }

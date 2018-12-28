@@ -804,7 +804,8 @@ namespace TheAlchemist
                 new RenderableSpriteComponent { Visible = true, Texture = "player" },
                 new ColliderComponent() { Solid = false },
                 new EquipmentComponent() { Weapon = playerWeapon, Armor = playerArmor },
-                new InventoryComponent() { Capacity = 50 }
+                new InventoryComponent() { Capacity = 50 },
+                new StatComponent() { Strength = 10, Dexterity = 11, Intelligence = 12}
             };
 
             EntityManager.AddComponents(player, playerComponents);

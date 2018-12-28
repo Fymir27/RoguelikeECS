@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TheAlchemist.Components
 {
-    class StatComponent
+    class StatComponent : Component<StatComponent>
     {
         public int Strength { get; set; } = 0;
         public int Intelligence { get; set; } = 0;
