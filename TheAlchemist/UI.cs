@@ -160,7 +160,7 @@ namespace TheAlchemist
                 {
                     return;
                 }
-                Console.WriteLine(cur + "|" + description.Length);
+                //Console.WriteLine(cur + "|" + description.Length);
                 int newlPos = description.IndexOf('\n', cur, rowLength);
                 if(newlPos >= 0)
                 {

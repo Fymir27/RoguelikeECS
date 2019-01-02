@@ -6,10 +6,38 @@ using System.Threading.Tasks;
 
 namespace TheAlchemist.Components
 {
+    public enum Stat
+    {
+        Strength,
+        Intelligence,
+        Dexterity
+    }
+
     class StatComponent : Component<StatComponent>
     {
-        public int Strength { get; set; } = 0;
-        public int Intelligence { get; set; } = 0;
-        public int Dexterity { get; set; } = 0;
+        public StatComponent()
+        {
+            stats = new Dictionary<Stat, int>();
+        }
+
+        public StatComponent(Dictionary<Stat, int> initStats)
+        {
+            stats = initStats;
+        }
+
+        Dictionary<Stat, int> stats;
+        public int this[Stat stat]
+        {
+            get
+            {
+                int val = 0;
+                stats.TryGetValue(stat, out val);
+                return val;
+            }
+            set
+            {
+                stats[stat] = value;
+            }
+        }
     }
 }

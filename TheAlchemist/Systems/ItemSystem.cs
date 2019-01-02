@@ -26,6 +26,7 @@ namespace TheAlchemist.Systems
     {
         public event HealthGainedHandler HealthGainedEvent;
         public event HealthLostHandler HealthLostEvent;
+        public event StatChangedHandler StatChangedEvent;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public enum EffectType
@@ -196,6 +197,15 @@ namespace TheAlchemist.Systems
                             HealthGainedEvent?.Invoke(character, effect.Potency * 0.5f);
                         break;
 
+                    case EffectType.Str:
+                    case EffectType.Dex:
+                    case EffectType.Int:
+                        int amount = (int)Math.Round(effect.Potency * 0.1f) * Util.Sign(!effect.Harmful);
+                        Stat stat = GetStatFromEffectType(effect.Type);
+                        int duration = 7 * (int)Math.Round(effect.Potency * 0.1f);
+                        StatChangedEvent?.Invoke(character, stat, amount, duration);
+                        break;
+
                     default:
                         UISystem.Message("Consume: " + effect.Type + " not implemented!");
                         break;
@@ -280,6 +290,22 @@ namespace TheAlchemist.Systems
             inventory.Items.Remove(item);
 
             UI.InventoryCursorPosition = 1;
+        }
+
+        private Stat GetStatFromEffectType(EffectType effect)
+        {
+            switch(effect)
+            {
+                case EffectType.Str: return Stat.Strength;
+
+                case EffectType.Dex: return Stat.Dexterity;
+
+                case EffectType.Int: return Stat.Intelligence;
+
+                default:
+                    Log.Error("Can't get Stat from this Item Effect Type: " + effect);
+                    return Stat.Strength;
+            }
         }
     }
 }

@@ -31,6 +31,7 @@ namespace TheAlchemist
         NPCBehaviourSystem npcBehaviourSystem;
         InteractionSystem interactionSystem;
         ItemSystem itemSystem;
+        StatSystem statSystem;
 
         RenderSystem renderSystem;
         UISystem uiSystem;
@@ -82,6 +83,7 @@ namespace TheAlchemist
             interactionSystem = new InteractionSystem();
             itemSystem = new ItemSystem();
             uiSystem = new UISystem();
+            statSystem = new StatSystem();
 
             // hook up all events with their handlers
             Log.Message("Registering Event Handlers...");
@@ -95,7 +97,8 @@ namespace TheAlchemist
 
             itemSystem.HealthGainedEvent += healthSystem.HandleGainedHealth;
             itemSystem.HealthLostEvent += healthSystem.HandleLostHealth;
-
+            itemSystem.StatChangedEvent += statSystem.ChangeStat;
+           
             npcBehaviourSystem.EnemyMovedEvent += movementSystem.HandleMovementEvent;
 
             movementSystem.CollisionEvent += collisionSystem.HandleCollision;
@@ -104,6 +107,7 @@ namespace TheAlchemist
             movementSystem.UpdateTargetLineEvent += () => Util.UpdateTargetLine();
 
             Util.TurnOverEvent += healthSystem.RegenerateEntity;
+            Util.TurnOverEvent += statSystem.TurnOver;
 
             combatSystem.HealthLostEvent += healthSystem.HandleLostHealth;
 
@@ -168,6 +172,15 @@ namespace TheAlchemist
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            if (Util.ErrorOccured)
+            {
+                if (!Util.BrutalModeOn)
+                {
+                    UISystem.Message("A CRITICAL ERROR HAS OCCURED!");
+                    Exit();
+                }
+            }
+
             if (Util.PlayerTurnOver)
             {
                 npcBehaviourSystem.EnemyTurn();

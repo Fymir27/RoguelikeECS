@@ -73,9 +73,9 @@ namespace TheAlchemist.Systems
 
             if(stats != null)
             {
-                tooltip += "Strength:     " + stats.Strength + '\n';
-                tooltip += "Dexterity:    " + stats.Dexterity + '\n';
-                tooltip += "Intelligence: " + stats.Intelligence + '\n';
+                tooltip += "Strength:     " + stats[Stat.Strength] + '\n';
+                tooltip += "Dexterity:    " + stats[Stat.Dexterity] + '\n';
+                tooltip += "Intelligence: " + stats[Stat.Intelligence] + '\n';
             }
 
             return tooltip;

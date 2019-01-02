@@ -117,7 +117,16 @@ namespace TheAlchemist
 
             int poison = EntityManager.CreateEntity(itemsFile["poisonPotion"].ToString());          
             PlaceItem(playerPos + new Vector2(-1, 0), poison);
-           
+
+            int strengthPotion = EntityManager.CreateEntity(itemsFile["strengthPotion"].ToString());
+            PlaceItem(playerPos + new Vector2(-2, 0), strengthPotion);
+
+            int dexterityPotion = EntityManager.CreateEntity(itemsFile["dexterityPotion"].ToString());
+            PlaceItem(playerPos + new Vector2(-3, 0), dexterityPotion);
+
+            int intelligencePotion = EntityManager.CreateEntity(itemsFile["intelligencePotion"].ToString());
+            PlaceItem(playerPos + new Vector2(-4, 0), intelligencePotion);
+
             // load enemies //////////
             JObject enemies = JObject.Parse(File.ReadAllText(Util.ContentPath + "/enemies.json"));
 
@@ -805,7 +814,12 @@ namespace TheAlchemist
                 new ColliderComponent() { Solid = false },
                 new EquipmentComponent() { Weapon = playerWeapon, Armor = playerArmor },
                 new InventoryComponent() { Capacity = 50 },
-                new StatComponent() { Strength = 10, Dexterity = 11, Intelligence = 12}
+                new StatComponent(new Dictionary<Stat, int>()
+                {
+                    { Stat.Strength, 10 },
+                    { Stat.Dexterity, 11 },
+                    { Stat.Intelligence, 13 }
+                })
             };
 
             EntityManager.AddComponents(player, playerComponents);

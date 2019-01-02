@@ -51,6 +51,8 @@ namespace TheAlchemist
             logFile.Write(GetHTMLString("font", new Dictionary<string, string>() { { "color", "red" } }, "[ERROR] " + message));
             Newline();
             logFile.Flush();
+
+            Util.ErrorOccured = true;
         }
 
         public static void End()

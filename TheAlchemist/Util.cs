@@ -74,6 +74,10 @@ namespace TheAlchemist
     static class Util
     {
         public static event TurnOverHandler TurnOverEvent;
+
+        public static bool ErrorOccured = false;
+        // ignores errors when on
+        public static bool BrutalModeOn = false;
  
         public static SpriteFont DefaultFont { get; set; } = null;
         public static SpriteFont SmallFont { get; set; } = null;
@@ -253,6 +257,11 @@ namespace TheAlchemist
             // add updated sprites to entity
             EntityManager.AddComponents(Util.TargetIndicatorID, updatedSprites);
          
+        }
+
+        public static int Sign(bool b)
+        {
+            return b ? 1 : -1;
         }
     }
 }

@@ -78,6 +78,7 @@
     <Compile Include="Systems\MovementSystem.cs" />
     <Compile Include="Systems\NPCBehaviourSystem.cs" />
     <Compile Include="Systems\RenderSystem.cs" />
+    <Compile Include="Systems\StatSystem.cs" />
     <Compile Include="Systems\UISystem.cs" />
     <Compile Include="TextureManager.cs" />
     <Compile Include="Tile.cs" />
