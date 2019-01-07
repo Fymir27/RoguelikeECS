@@ -17,177 +17,95 @@ namespace TheAlchemist
     {
         [JsonProperty]
         int width, height;
-        // one terrain entity per tile
-        // one character entity per tile
-        // a list of items per tile
-        [JsonProperty]
-        int[,] terrain;
-        [JsonProperty]
-        int[,] characters;
-        [JsonProperty]
-        List<int>[,] items;
 
-        // discovered by the player
-        bool[,] discovered;
+        // data of the floor
+        [JsonProperty]
+        Tile[,] tiles;
+
         // seen by player at this moment
-        List<Vector2> seen = new List<Vector2>();
+        List<Position> seen = new List<Position>();
+
         // precalculated for visibility calc.
-        float[][] angles = CalculateAngles(5);
+        static float[][] angles = CalculateAngles(5); // assuming no entity see farther than 5 tiles
 
-        public Floor(string path)
-        {
-            //TODO: generate floor procedurally
-
-            StreamReader file = new StreamReader(path);
-
-            List<List<int>> tmpTerrain = new List<List<int>>();
-
-            Vector2 playerPos = new Vector2(1, 1);
-
-            int y = 0;
-            while (!file.EndOfStream)
-            {
-                int x = 0;
-                var row = file.ReadLine();
-                tmpTerrain.Add(new List<int>());
-                foreach (var tile in row)
-                {
-                    switch (tile)
-                    {
-                        case '#':
-                            tmpTerrain[y].Add(CreateWall());
-                            break;
-
-                        case '+':
-                            tmpTerrain[y].Add(CreateDoor());
-                            break;
-
-                        case '@':
-                            playerPos = new Vector2(x, y);
-                            tmpTerrain[y].Add(0);
-                            break;
-
-                        default:
-                            tmpTerrain[y].Add(0);
-                            break;
-                    }
-                    x++;
-                }
-                if (x > 0)
-                    y++;
-            }
-
-            this.width = tmpTerrain[0].Count;
-            this.height = y;
-
-            terrain = new int[width, height];
-            characters = new int[width, height];
-            items = new List<int>[width, height]; // don't initialize each List yet to save space!
-
-            discovered = new bool[width, height];
-
-            for (y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    PlaceTerrain(new Vector2(x, y), tmpTerrain[y][x]);
-                }
-            }
-
-            PlaceCharacter(playerPos, CreatePlayer());
-
-            // normal gold
-            for (int i = 0; i < 5; i++)
-            {
-                PlaceItem(playerPos + new Vector2(-1, 0), CreateGold(666));
-            }
-
-            // create target indicator
-            Util.TargetIndicatorID = EntityManager.CreateEntity(new List<IComponent>()
-            {
-                new TransformComponent() { Position = new Vector2(1, 1) },
-                new RenderableSpriteComponent() { Texture = "square", Tint = new Color(Color.Purple, 0.5f), Visible = false }
-            });        
-
-            // load items ////////////
-            JObject itemsFile = JObject.Parse(File.ReadAllText(Util.ContentPath + "/items.json"));
-
-            int healthPotion = EntityManager.CreateEntity(itemsFile["healthPotion"].ToString());
-            PlaceItem(playerPos + new Vector2(-1, 0), healthPotion);
-
-            int poison = EntityManager.CreateEntity(itemsFile["poisonPotion"].ToString());          
-            PlaceItem(playerPos + new Vector2(-1, 0), poison);
-
-            int strengthPotion = EntityManager.CreateEntity(itemsFile["strengthPotion"].ToString());
-            PlaceItem(playerPos + new Vector2(-2, 0), strengthPotion);
-
-            int dexterityPotion = EntityManager.CreateEntity(itemsFile["dexterityPotion"].ToString());
-            PlaceItem(playerPos + new Vector2(-3, 0), dexterityPotion);
-
-            int intelligencePotion = EntityManager.CreateEntity(itemsFile["intelligencePotion"].ToString());
-            PlaceItem(playerPos + new Vector2(-4, 0), intelligencePotion);
-
-            // load enemies //////////
-            JObject enemies = JObject.Parse(File.ReadAllText(Util.ContentPath + "/enemies.json"));
-
-            int rat = EntityManager.CreateEntity(enemies["rat"].ToString());
-            int bat = EntityManager.CreateEntity(enemies["bat"].ToString());
-            int spider = EntityManager.CreateEntity(enemies["spider"].ToString());
-
-            PlaceCharacter(new Vector2(10, 10), rat);
-            PlaceCharacter(new Vector2(16, 5), bat);
-            PlaceCharacter(new Vector2(16, 1), spider);
-
-            //Log.Data(DescriptionSystem.GetDebugInfoEntity(rat));
-            //Log.Data(DescriptionSystem.GetDebugInfoEntity(bat));
-            //Log.Data(DescriptionSystem.GetDebugInfoEntity(spider));
-        }
-
-
+        // used for visibility calc
         struct Octant
         {
-            public Vector2 PosChangePerRow;
-            public Vector2 PosChangePerBlock;
+            public Position PosChangePerRow;
+            public Position PosChangePerBlock;
 
-            public Octant(Vector2 posChangePerRow, Vector2 posChangePerBlock)
+            public Octant(Position posChangePerRow, Position posChangePerBlock)
             {
                 PosChangePerRow = posChangePerRow;
                 PosChangePerBlock = posChangePerBlock;
             }
         }
-
-        Octant[] octants = new Octant[]
+        static Octant[] octants = new Octant[]
         {
-            new Octant(new Vector2(0, -1), new Vector2(1, 0)),  // 0
-            new Octant(new Vector2(1, 0), new Vector2(0, -1)),  // 1
-            new Octant(new Vector2(1, 0), new Vector2(0, 1)),   // 2
-            new Octant(new Vector2(0, 1), new Vector2(1, 0)),   // 3 
-            new Octant(new Vector2(0, 1), new Vector2(-1, 0)),  // 4
-            new Octant(new Vector2(-1, 0), new Vector2(0, -1)), // 5
-            new Octant(new Vector2(-1, 0), new Vector2(0, 1)),  // 6
-            new Octant(new Vector2(0, -1), new Vector2(-1, 0)), // 7
+            new Octant(new Position(0, -1), new Position(1, 0)),  // 0
+            new Octant(new Position(1, 0), new Position(0, -1)),  // 1
+            new Octant(new Position(1, 0), new Position(0, 1)),   // 2
+            new Octant(new Position(0, 1), new Position(1, 0)),   // 3 
+            new Octant(new Position(0, 1), new Position(-1, 0)),  // 4
+            new Octant(new Position(-1, 0), new Position(0, -1)), // 5
+            new Octant(new Position(-1, 0), new Position(0, 1)),  // 6
+            new Octant(new Position(0, -1), new Position(-1, 0)), // 7
         };
 
         public int Width { get => width; set => width = value; }
         public int Height { get => height; set => height = value; }
 
-        // determines which cells are visible to the player and updates them accordingly
-        // taken from: http://www.roguebasin.com/index.php?title=Restrictive_Precise_Angle_Shadowcasting
-        // octants:
-        // 6\7|0/1
-        // ---|---
-        // 5/4|3\2
-        //
+
+        // ------------------------------------------------
+
+        public Tile GetTile(int x, int y)
+        {
+            if(IsOutOfBounds(x, y))
+            {
+                return null;
+            }
+            return tiles[x, y];
+        }
+
+        public Tile GetTile(Position pos)
+        {
+            return GetTile(pos.X, pos.Y);
+        }
+
+        public bool IsOutOfBounds(int x, int y)
+        {
+            if (x < 0 || x >= width ||
+                y < 0 || y >= height)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool IsOutOfBounds(Position pos)
+        {
+            return IsOutOfBounds(pos.X, pos.Y);
+        }
+
+        // -------------------------------------------------
+
+        /// determines which cells are visible to the player and updates them accordingly
+        /// taken from: http://www.roguebasin.com/index.php?title=Restrictive_Precise_Angle_Shadowcasting
+        /// octants:
+        /// 6\7|0/1
+        /// ---|---
+        /// 5/4|3\2
+        ///
         public void CalculateTileVisibility()
-        { 
+        {
             bool AngleBetween(float angle, float bigger, float smaller)
             {
                 return angle >= smaller && angle <= bigger;
             }
 
-            int playerRange = 4;
-            Vector2 playerPos = EntityManager.GetComponent<TransformComponent>(Util.PlayerID).Position;
-            discovered[(int)playerPos.X, (int)playerPos.Y] = true;          
+            int playerRange = 4; // TODO: this shouldn't be here
+            Position playerPos = EntityManager.GetComponent<TransformComponent>(Util.PlayerID).Position;
+            discovered[playerPos.X, playerPos.Y] = true;
             seen.Clear();
             seen.Add(playerPos);
 
@@ -223,7 +141,7 @@ namespace TheAlchemist
                 var posOrthagonal = playerPos;
 
                 for (int row = 1; row <= playerRange; row++)
-                {                   
+                {
                     int blocksInRow = row + 1;
                     int obstaclesThisRow = 0;
 
@@ -232,12 +150,12 @@ namespace TheAlchemist
                     //var pos = new Vector2(posOrthagonal.X, posOrthagonal.Y);
                     var pos = posOrthagonal;
 
-                    for(int block = 0; block < blocksInRow; block ++)
+                    for (int block = 0; block < blocksInRow; block++)
                     {
                         int indexStartingAngle = block * 2;
                         float startingAngle = angles[row][indexStartingAngle];
-                        float centreAngle   = angles[row][indexStartingAngle + 1];
-                        float endAngle      = angles[row][indexStartingAngle + 2];
+                        float centreAngle = angles[row][indexStartingAngle + 1];
+                        float endAngle = angles[row][indexStartingAngle + 2];
 
                         // check if cell is blocked
                         bool blocked = false;
@@ -247,10 +165,10 @@ namespace TheAlchemist
 
                         // check if cell is solid
                         bool solid = false;
-                        int curTerrain = GetTerrain(pos);
+                        int curTerrain = GetTerrain(new Vector2(pos.X, pos.Y));
                         if (curTerrain != 0)
                         {
-                            var collider = EntityManager.GetComponent<Components.ColliderComponent>(GetTerrain(pos));
+                            var collider = EntityManager.GetComponent<ColliderComponent>(curTerrain);
                             if (collider != null && collider.Solid)
                             {
                                 solid = true;
@@ -266,14 +184,14 @@ namespace TheAlchemist
                             if (AngleBetween(endAngle, endAngles[i], startingAngles[i]))
                                 endBlocked = true;
 
-                            
+
                             if (solid)
                             {
                                 blocked = startingBlocked && endBlocked && centreBlocked;
                             }
                             else
                             {
-                                
+
                                 switch (Util.FOV)
                                 {
                                     // bugged! dont use!
@@ -290,7 +208,7 @@ namespace TheAlchemist
                                         break;
                                 }
                             }
-                            
+
 
                             if (blocked)
                             {
@@ -312,7 +230,7 @@ namespace TheAlchemist
 
                         if (!blocked)
                         {
-                            if(solid)
+                            if (solid)
                             {
                                 // add new blocked range and increase obstacle count
                                 startingAngles.Add(startingAngle);
@@ -332,24 +250,154 @@ namespace TheAlchemist
             int x = 0;
             int y = 0;
             try
-            {           
+            {
                 seen.ForEach(pos => discovered[x = (int)pos.X, y = (int)pos.Y] = true);
             }
-            catch(IndexOutOfRangeException)
+            catch (IndexOutOfRangeException)
             {
                 Log.Warning(x + "|" + y + " is out of range! (Calculate visibilty)");
             }
         }
+
+
+        // one terrain entity per tile
+        // one character entity per tile
+        // a list of items per tile
+        [JsonProperty]
+        int[,] terrain;
+        [JsonProperty]
+        int[,] characters;
+        [JsonProperty]
+        List<int>[,] items;
+
+        // discovered by the player
+        bool[,] discovered;      
+
+        public Floor(string path)
+        {
+            //TODO: generate floor procedurally
+
+            StreamReader file = new StreamReader(path);
+
+            
+
+            List<List<int>> tmpTerrain = new List<List<int>>();
+
+            Position playerPos = new Position(1, 1);
+
+            int y = 0;
+            while (!file.EndOfStream)
+            {
+                int x = 0;
+                var row = file.ReadLine();
+                tmpTerrain.Add(new List<int>());
+                foreach (var tile in row)
+                {
+                    switch (tile)
+                    {
+                        case '#':
+                            tmpTerrain[y].Add(CreateWall());
+                            break;
+
+                        case '+':
+                            tmpTerrain[y].Add(CreateDoor());
+                            break;
+
+                        case '@':
+                            playerPos = new Position(x, y);
+                            tmpTerrain[y].Add(0);
+                            break;
+
+                        default:
+                            tmpTerrain[y].Add(0);
+                            break;
+                    }
+                    x++;
+                }
+                if (x > 0)
+                    y++;
+            }
+
+            Width = tmpTerrain[0].Count;
+            Height = y;
+
+            terrain = new int[width, height];
+            characters = new int[width, height];
+            items = new List<int>[width, height]; // don't initialize each List yet to save space!
+            discovered = new bool[width, height];
+
+            tiles = new Tile[width, height];
+
+            // instantiate tiles and set terrain
+            // reeused y from above
+            for (y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    tiles[x, y] = new Tile();
+                    PlaceTerrain(new Position(x, y), tmpTerrain[y][x]);
+                }
+            }
+
+            PlaceCharacter(playerPos, CreatePlayer());
+
+            // normal gold
+            for (int i = 0; i < 5; i++)
+            {
+                PlaceItem(playerPos + new Position(-1, 0), CreateGold(666));
+            }
+
+            // create target indicator
+            Util.TargetIndicatorID = EntityManager.CreateEntity(new List<IComponent>()
+            {
+                new TransformComponent() { Position = new Position(1, 1) },
+            });        
+
+            // load items ////////////
+            JObject itemsFile = JObject.Parse(File.ReadAllText(Util.ContentPath + "/items.json"));
+
+            int healthPotion = EntityManager.CreateEntity(itemsFile["healthPotion"].ToString());
+            PlaceItem(playerPos + new Position(-1, 0), healthPotion);
+
+            int poison = EntityManager.CreateEntity(itemsFile["poisonPotion"].ToString());          
+            PlaceItem(playerPos + new Position(-1, 0), poison);
+
+            int strengthPotion = EntityManager.CreateEntity(itemsFile["strengthPotion"].ToString());
+            PlaceItem(playerPos + new Position(-2, 0), strengthPotion);
+
+            int dexterityPotion = EntityManager.CreateEntity(itemsFile["dexterityPotion"].ToString());
+            PlaceItem(playerPos + new Position(-3, 0), dexterityPotion);
+
+            int intelligencePotion = EntityManager.CreateEntity(itemsFile["intelligencePotion"].ToString());
+            PlaceItem(playerPos + new Position(-4, 0), intelligencePotion);
+
+            // load enemies //////////
+            JObject enemies = JObject.Parse(File.ReadAllText(Util.ContentPath + "/enemies.json"));
+
+            int rat = EntityManager.CreateEntity(enemies["rat"].ToString());
+            int bat = EntityManager.CreateEntity(enemies["bat"].ToString());
+            int spider = EntityManager.CreateEntity(enemies["spider"].ToString());
+
+            PlaceCharacter(new Position(10, 10), rat);
+            PlaceCharacter(new Position(16, 5), bat);
+            PlaceCharacter(new Position(16, 1), spider);
+
+            //Log.Data(DescriptionSystem.GetDebugInfoEntity(rat));
+            //Log.Data(DescriptionSystem.GetDebugInfoEntity(bat));
+            //Log.Data(DescriptionSystem.GetDebugInfoEntity(spider));
+        }
+
+
  
         
         ////////////////////// Getters //////////////////////////////////////
 
-        public IEnumerable<Vector2> GetSeenPositions()
+        public IEnumerable<Position> GetSeenPositions()
         {
             return seen;
         }
 
-        public bool IsDiscovered(Vector2 pos)
+        public bool IsDiscovered(Position pos)
         {
             try
             {
@@ -362,7 +410,7 @@ namespace TheAlchemist
             }
         }
 
-        public int GetTerrain(Vector2 pos)
+        public int GetTerrain(Position pos)
         {
             if(IsOutOfBounds(pos))
             {
@@ -371,7 +419,7 @@ namespace TheAlchemist
             return terrain[(int)pos.X, (int)pos.Y];
         }
 
-        public int GetCharacter(Vector2 pos)
+        public int GetCharacter(Position pos)
         {
             if(IsOutOfBounds(pos))
             {
@@ -380,7 +428,7 @@ namespace TheAlchemist
             return characters[(int)pos.X, (int)pos.Y];
         }
 
-        public int GetFirstItem(Vector2 pos)
+        public int GetFirstItem(Position pos)
         {
             if(IsOutOfBounds(pos))
             {
@@ -400,7 +448,7 @@ namespace TheAlchemist
             return itemsHere.Last();
         }
 
-        public IEnumerable<int> GetItems(Vector2 pos)
+        public IEnumerable<int> GetItems(Position pos)
         {
             if (IsOutOfBounds(pos))
             {
@@ -414,13 +462,12 @@ namespace TheAlchemist
             return itemList;
         }
 
-
         //////////////////// Removal ////////////////////////////////////////
 
         // prepares entity for removal from floor by
         // by making the sprite invisible
         // returns true if successful
-        private bool RemoveEntity(Vector2 pos, int entity)
+        private bool RemoveEntity(Position pos, int entity)
         {
             if (IsOutOfBounds(pos))
             {
@@ -435,7 +482,7 @@ namespace TheAlchemist
             return true;
         }
 
-        public void RemoveTerrain(Vector2 pos)
+        public void RemoveTerrain(Position pos)
         {
             if (IsOutOfBounds(pos))
             {
@@ -453,7 +500,7 @@ namespace TheAlchemist
             characters[(int)pos.X, (int)pos.Y] = 0;
         }
 
-        public void RemoveCharacter(Vector2 pos)
+        public void RemoveCharacter(Position pos)
         {
             if(IsOutOfBounds(pos))
             {
@@ -471,7 +518,7 @@ namespace TheAlchemist
             characters[(int)pos.X, (int)pos.Y] = 0;
         }
 
-        public void MoveCharacter(Vector2 oldPos, Vector2 newPos)
+        public void MoveCharacter(Position oldPos, Position newPos)
         {
             if(IsOutOfBounds(oldPos) || IsOutOfBounds(newPos))
             {
@@ -489,7 +536,7 @@ namespace TheAlchemist
             characters[(int)oldPos.X, (int)oldPos.Y] = 0;
         }
 
-        public void RemoveItems(Vector2 pos)
+        public void RemoveItems(Position pos)
         {        
            if(IsOutOfBounds(pos))
             {
@@ -515,7 +562,7 @@ namespace TheAlchemist
             itemsHere = null;
         }
 
-        public void RemoveItem(Vector2 pos, int item)
+        public void RemoveItem(Position pos, int item)
         {
             if(!RemoveEntity(pos, item))
             {
@@ -550,7 +597,7 @@ namespace TheAlchemist
         // configuring/adding the the transform to the position and
         // setting the sprite to visible
         // returns true if successful
-        private bool PlaceEntity(Vector2 pos, int entity, int renderLayer = 0)
+        private bool PlaceEntity(Position pos, int entity, int renderLayer = 0)
         {
             if(entity == 0) // can happen during init
             {
@@ -588,25 +635,27 @@ namespace TheAlchemist
             return true;
         }
 
-        public void PlaceTerrain(Vector2 pos, int terrain)
+        public void PlaceTerrain(Position pos, int terrain)
         {
             if (!PlaceEntity(pos, terrain, RenderableSpriteComponent.RenderLayer.Terrain))
             {
                 return;
             }
-            this.terrain[(int)pos.X, (int)pos.Y] = terrain;
+            this.terrain[pos.X, pos.Y] = terrain;
+            GetTile(pos).Terrain = terrain;
         }
 
-        public void PlaceCharacter(Vector2 pos, int character)
+        public void PlaceCharacter(Position pos, int character)
         {
             if (!PlaceEntity(pos, character, RenderableSpriteComponent.RenderLayer.Character))
             {
                 return;
             }
-            characters[(int)pos.X, (int)pos.Y] = character;
+            characters[pos.X, pos.Y] = character;
+            GetTile(pos).Character = character;
         }
 
-        public void PlaceItems(Vector2 pos, IEnumerable<int> items)
+        /* public void PlaceItems(Position pos, IEnumerable<int> items)
         {
             foreach(int item in items)
             {
@@ -629,19 +678,31 @@ namespace TheAlchemist
             }
          
         }
+        */
 
-        public void PlaceItem(Vector2 pos, int item)
+        public void PlaceItem(Position pos, int item)
         {
             if(!PlaceEntity(pos, item, RenderableSpriteComponent.RenderLayer.Item))
             {
                 return;
             }
 
+            var tile = GetTile(pos);
+
+            if(tile.Items == null)
+            {
+                tile.Items = new List<int>() { item };
+            }
+            else
+            {
+                tile.Items.Add(item);
+            }
+
             var itemsHere = items[(int)pos.X, (int)pos.Y];
 
             if (itemsHere == null)
             {
-                items[(int)pos.X, (int)pos.Y] = new List<int>() { item };
+                items[(int)pos.X, (int)pos.Y] = new List<int>() { item };                
             }
             else
             {
@@ -656,7 +717,7 @@ namespace TheAlchemist
 
             terrain = new int[width, height];
             characters = new int[width, height];
-            items = new List<int>[width, height]; // don't initialize each List yet to save space!
+            items = new List<int>[width, height]; // don't initialize each List yet to save space!     
 
             for (int y = 0; y < width; y++)
             {
@@ -700,27 +761,16 @@ namespace TheAlchemist
             characters[3, 3] = testEnemy;
         }
 
-        public bool IsOutOfBounds(Vector2 pos)
-        {
-            int x = (int)pos.X;
-            int y = (int)pos.Y;
-            if (x < 0 || x >= width ||
-                y < 0 || y >= height)
-            {
-                //Log.Warning(pos + " is out of bounds!");
-                return true;
-            }
-            return false;
-        }
+        
 
         // returns shortest path
-        public List<Vector2> GetPath(Vector2 from, Vector2 to)
+        public List<Position> GetPath(Position from, Position to)
         {
             return null;
         }
 
         // returns "straight" line (Bresenham)
-        public List<Vector2> GetLine(Vector2 from, Vector2 to, bool stopAtSolid = true)
+        public List<Position> GetLine(Position from, Position to, bool stopAtSolid = true)
         {
             if(IsOutOfBounds(from) || IsOutOfBounds(to))
             {
@@ -729,33 +779,33 @@ namespace TheAlchemist
             }
 
             // integer vector makes more sense here
-            List<Vector2i> result = new List<Vector2i>();
+            List<Position> result = new List<Position>();
 
-            int dx = (int)to.X - (int)from.X;
-            int dy = (int)to.Y - (int)from.Y;
+            int dx = to.X - from.X;
+            int dy = to.Y - from.Y;
 
             int sx = (dx > 0) ? 1 : -1;
             int sy = (dy > 0) ? 1 : -1;           
 
-            Vector2i diagonalStep = new Vector2i(sx, sy);
+            Position diagonalStep = new Position(sx, sy);
 
             int dfast, dslow;
-            Vector2i parallelStep;
+            Position parallelStep;
 
             if (Math.Abs(dx) > Math.Abs(dy))
             {
                 dfast = Math.Abs(dx);
                 dslow = Math.Abs(dy);
-                parallelStep = new Vector2i(sx, 0);
+                parallelStep = new Position(sx, 0);
             }
             else
             {
                 dfast = Math.Abs(dy);
                 dslow = Math.Abs(dx);
-                parallelStep = new Vector2i(0, sy);
+                parallelStep = new Position(0, sy);
             }
 
-            Vector2i curPos = new Vector2i(from);
+            Position curPos = new Position(from);
             int error = dfast / 2;
             result.Add(from);
 
@@ -791,9 +841,8 @@ namespace TheAlchemist
                 if (terrainCollider.Solid)
                     break;
 
-
-            } 
-            return result.ConvertAll(pos => new Vector2(pos.X, pos.Y));
+            }
+            return result;
         }
 
         public int CreatePlayer()

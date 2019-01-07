@@ -8,9 +8,18 @@ namespace TheAlchemist
 {
     class Tile
     {
-        int Character { get; set; }
-        List<int> Items { get; set; } = new List<int>();
-        int Terrain { get; set; }
+        public int Terrain;
+        public int Character;
+        public List<int> Items;
+        public bool Discovered;
+
+        public Tile(int terrain = 0, int character = 0, List<int> items = null)
+        {
+            Terrain = terrain;
+            Character = character;
+            Items = items;
+            Discovered = false;
+        }
     }
 
     /*

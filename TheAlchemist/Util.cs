@@ -32,32 +32,33 @@ namespace TheAlchemist
         Restricted = 3
     }
 
-    public struct Vector2i
+    // marks a position in the game world
+    public struct Position
     {
         public int X;
         public int Y;
 
-        public Vector2i(int x, int y) { X = x; Y = y; }
-        public Vector2i(Vector2i other) { X = other.X; Y = other.Y; }
+        public Position(int x, int y) { X = x; Y = y; }
+        public Position(Position other) { X = other.X; Y = other.Y; }
 
-        public static implicit operator Vector2i(Vector2 other) { return new Vector2i((int)other.X, (int)other.Y); }
+        public static implicit operator Position(Vector2 other) { return new Position((int)other.X, (int)other.Y); }
 
-        public static Vector2i operator +(Vector2i first, Vector2i second)
+        public static Position operator +(Position first, Position second)
         {
-            return new Vector2i(first.X + second.X, first.Y + second.Y);
+            return new Position(first.X + second.X, first.Y + second.Y);
         }
 
-        public static Vector2i operator -(Vector2i first, Vector2i second)
+        public static Position operator -(Position first, Position second)
         {
-            return new Vector2i(first.X - second.X, first.Y - second.Y);
+            return new Position(first.X - second.X, first.Y - second.Y);
         }
 
-        public static bool operator ==(Vector2i first, Vector2i second)
+        public static bool operator ==(Position first, Position second)
         {
             return first.X == second.X && first.Y == second.Y;
         }
 
-        public static bool operator !=(Vector2i first, Vector2i second)
+        public static bool operator !=(Position first, Position second)
         {
             return first.X != second.X || first.Y != second.Y;
         }
@@ -132,7 +133,7 @@ namespace TheAlchemist
         }
 
         // transforms world position to screen position based on tile size
-        public static Vector2 WorldToScreenPosition(Vector2 worldPos)
+        public static Vector2 WorldToScreenPosition(Position worldPos)
         {
             return new Vector2(worldPos.X * TileSize, worldPos.Y * TileSize);
         }
@@ -145,25 +146,25 @@ namespace TheAlchemist
         }
 
         // returns a "unit" vector in Direction dir
-        public static Vector2 GetUnitVectorInDirection(Direction dir)
+        public static Position GetUnitVectorInDirection(Direction dir)
         {
             switch(dir)
             {
                 case Direction.North:
-                    return new Vector2(0, -1);
+                    return new Position(0, -1);
 
                 case Direction.East:
-                    return new Vector2(1, 0);
+                    return new Position(1, 0);
 
                 case Direction.South:
-                    return new Vector2(0, 1);
+                    return new Position(0, 1);
 
                 case Direction.West:
-                    return new Vector2(-1, 0);
+                    return new Position(-1, 0);
 
                 default:
-                    Console.WriteLine("No vector known for " + dir);
-                    return new Vector2(0, 0);
+                    Log.Error("No vector known for " + dir);
+                    return new Position(0, 0);
             }
         }
 

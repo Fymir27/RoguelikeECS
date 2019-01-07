@@ -53,7 +53,7 @@ namespace TheAlchemist.Systems
 
         public void PickUpItem(int character)
         {
-            Vector2 position = EntityManager.GetComponent<TransformComponent>(character).Position;
+            Position position = EntityManager.GetComponent<TransformComponent>(character).Position;
             int pickupItemID = Util.CurrentFloor.GetFirstItem(position);
 
             if(pickupItemID == 0)
@@ -216,7 +216,7 @@ namespace TheAlchemist.Systems
             Util.TurnOver(character);
         }
 
-        public void ThrowItem(int character, int item, Vector2 pos)
+        public void ThrowItem(int character, int item, Position pos)
         {
             //UISystem.Message(DescriptionSystem.GetNameWithID(character) + " throws " + DescriptionSystem.GetNameWithID(item) + " at " + pos);
             UISystem.Message(DescriptionSystem.GetName(character) + " throws " + DescriptionSystem.GetName(item));

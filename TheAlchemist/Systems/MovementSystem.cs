@@ -34,7 +34,7 @@ namespace TheAlchemist.Systems
             }
 
             var entityTransform = EntityManager.GetComponent<TransformComponent>(entity);
-            Vector2 newPos = entityTransform.Position + Util.GetUnitVectorInDirection(dir);
+            Position newPos = entityTransform.Position + Util.GetUnitVectorInDirection(dir);
             var floor = Util.CurrentFloor;
 
             // target indicator does not need collision etc...

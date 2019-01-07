@@ -70,7 +70,7 @@ namespace TheAlchemist.Systems
 
             if(modsOfEntity == null)
             {
-                Console.WriteLine("No mod list for this entiy yet");
+                //Console.WriteLine("No mod list for this entiy yet");
                 modsOfEntity = new List<StatModification>() { mod };
                 modifications.Add(entity, modsOfEntity);
             }

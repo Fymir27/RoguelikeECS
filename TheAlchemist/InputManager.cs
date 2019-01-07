@@ -118,7 +118,7 @@ namespace TheAlchemist
         bool alt = false;
 
         // function that gets called when user selects target
-        Action<Vector2> targetConfirmationCallback = null;
+        Action<Position> targetConfirmationCallback = null;
 
         /// <summary>
         /// Checks for user input and executes corresponding command if input is present
@@ -484,7 +484,7 @@ namespace TheAlchemist
         /// to invoke when target has been selected
         /// </summary>
         /// <param name="callback">Recieves target position when confirmed</param>
-        public void InitiateTargeting(Action<Vector2> callback)
+        public void InitiateTargeting(Action<Position> callback)
         {
             targetConfirmationCallback = callback;
             ToggleTargetMode();

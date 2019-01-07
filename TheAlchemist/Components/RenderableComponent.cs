@@ -36,7 +36,7 @@ namespace TheAlchemist.Components
 
                 try
                 {
-                    Vector2 worldPos = EntityManager
+                    Position worldPos = EntityManager
                         .GetComponent<TransformComponent>(entityID)
                         .Position;
                     return Util.WorldToScreenPosition(worldPos);

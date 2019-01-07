@@ -10,8 +10,8 @@ namespace TheAlchemist.Components
 {
     class TransformComponent : Component<TransformComponent>
     {
-        Vector2 position; // world position (tile)
-        public Vector2 Position
+        Position position; // world position (tile)
+        public Position Position
         {
             get { return position; }
             set
