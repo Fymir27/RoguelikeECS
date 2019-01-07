@@ -105,7 +105,7 @@ namespace TheAlchemist
 
             int playerRange = 4; // TODO: this shouldn't be here
             Position playerPos = EntityManager.GetComponent<TransformComponent>(Util.PlayerID).Position;
-            discovered[playerPos.X, playerPos.Y] = true;
+            GetTile(playerPos).Discovered = true;
             seen.Clear();
             seen.Add(playerPos);
 
@@ -165,7 +165,7 @@ namespace TheAlchemist
 
                         // check if cell is solid
                         bool solid = false;
-                        int curTerrain = GetTerrain(new Vector2(pos.X, pos.Y));
+                        int curTerrain = GetTerrain(new Position(pos.X, pos.Y));
                         if (curTerrain != 0)
                         {
                             var collider = EntityManager.GetComponent<ColliderComponent>(curTerrain);
@@ -251,7 +251,7 @@ namespace TheAlchemist
             int y = 0;
             try
             {
-                seen.ForEach(pos => discovered[x = (int)pos.X, y = (int)pos.Y] = true);
+                seen.ForEach(pos => GetTile(pos).Discovered = true);
             }
             catch (IndexOutOfRangeException)
             {
@@ -263,15 +263,15 @@ namespace TheAlchemist
         // one terrain entity per tile
         // one character entity per tile
         // a list of items per tile
-        [JsonProperty]
-        int[,] terrain;
-        [JsonProperty]
-        int[,] characters;
-        [JsonProperty]
-        List<int>[,] items;
+        //[JsonProperty]
+        //int[,] terrain;
+        //[JsonProperty]
+        //int[,] characters;
+        //[JsonProperty]
+        //List<int>[,] items;
 
         // discovered by the player
-        bool[,] discovered;      
+        // bool[,] discovered;      
 
         public Floor(string path)
         {
@@ -321,10 +321,12 @@ namespace TheAlchemist
             Width = tmpTerrain[0].Count;
             Height = y;
 
+            /*
             terrain = new int[width, height];
             characters = new int[width, height];
             items = new List<int>[width, height]; // don't initialize each List yet to save space!
             discovered = new bool[width, height];
+            */
 
             tiles = new Tile[width, height];
 
@@ -401,7 +403,8 @@ namespace TheAlchemist
         {
             try
             {
-                return discovered[(int)pos.X, (int)pos.Y];
+                return GetTile(pos).Discovered;
+                //return discovered[(int)pos.X, (int)pos.Y];
             }
             catch(IndexOutOfRangeException)
             {
@@ -416,7 +419,8 @@ namespace TheAlchemist
             {
                 return 0;
             }
-            return terrain[(int)pos.X, (int)pos.Y];
+            return GetTile(pos).Terrain;
+            //return terrain[(int)pos.X, (int)pos.Y];
         }
 
         public int GetCharacter(Position pos)
@@ -425,7 +429,8 @@ namespace TheAlchemist
             {
                 return 0;
             }
-            return characters[(int)pos.X, (int)pos.Y];
+            return GetTile(pos).Character;
+            //return characters[(int)pos.X, (int)pos.Y];
         }
 
         public int GetFirstItem(Position pos)
@@ -435,7 +440,7 @@ namespace TheAlchemist
                 return 0;
             }
 
-            var itemsHere = items[(int)pos.X, (int)pos.Y];
+            var itemsHere = GetTile(pos).Items; //items[(int)pos.X, (int)pos.Y];
 
             if (itemsHere == null)
                 return 0;
@@ -454,7 +459,7 @@ namespace TheAlchemist
             {
                 return new int[0];
             }
-            var itemList = items[(int)pos.X, (int)pos.Y];
+            var itemList = GetTile(pos).Items; //items[(int)pos.X, (int)pos.Y];
             if(itemList == null)
             {
                 return new int[0];
@@ -490,14 +495,14 @@ namespace TheAlchemist
                 return;
             }
 
-            int terrain = this.terrain[(int)pos.X, (int)pos.Y];
+            int terrain = GetTile(pos).Terrain; //this.terrain[(int)pos.X, (int)pos.Y];
 
             if (!RemoveEntity(pos, terrain))
             {
                 return;
             }
 
-            characters[(int)pos.X, (int)pos.Y] = 0;
+            GetTile(pos).Terrain = 0; // this.terrain[(int)pos.X, (int)pos.Y] = 0;
         }
 
         public void RemoveCharacter(Position pos)
@@ -508,17 +513,17 @@ namespace TheAlchemist
                 return;
             }
 
-            int character = characters[(int)pos.X, (int)pos.Y];
+            int character = GetTile(pos).Character; // characters[(int)pos.X, (int)pos.Y];
 
             if(!RemoveEntity(pos, character))
             {
                 return;
             }
 
-            characters[(int)pos.X, (int)pos.Y] = 0;
+            GetTile(pos).Character = 0; // characters[(int)pos.X, (int)pos.Y] = 0;
         }
 
-        public void MoveCharacter(Position oldPos, Position newPos)
+        /* public void MoveCharacter(Position oldPos, Position newPos)
         {
             if(IsOutOfBounds(oldPos) || IsOutOfBounds(newPos))
             {
@@ -534,7 +539,7 @@ namespace TheAlchemist
 
             characters[(int)newPos.X, (int)newPos.Y] = characters[(int)oldPos.X, (int)oldPos.Y];
             characters[(int)oldPos.X, (int)oldPos.Y] = 0;
-        }
+        } */
 
         public void RemoveItems(Position pos)
         {        
@@ -544,7 +549,7 @@ namespace TheAlchemist
                 return;
             }
 
-            var itemsHere = items[(int)pos.X, (int)pos.Y];
+            var itemsHere = GetTile(pos).Items; // items[(int)pos.X, (int)pos.Y];
 
             if(itemsHere == null)
             {
@@ -569,7 +574,7 @@ namespace TheAlchemist
                 return;
             }
 
-            var itemsHere = items[(int)pos.X, (int)pos.Y];
+            var itemsHere = GetTile(pos).Items; // items[(int)pos.X, (int)pos.Y];
 
             if(itemsHere == null)
             {
@@ -584,7 +589,6 @@ namespace TheAlchemist
                 Log.Data(DescriptionSystem.GetDebugInfoEntity(item));
                 return;
             }
-
 
             itemsHere.Remove(item);
             if (itemsHere.Count == 0) itemsHere = null; // remove List to save space
@@ -641,7 +645,7 @@ namespace TheAlchemist
             {
                 return;
             }
-            this.terrain[pos.X, pos.Y] = terrain;
+            //this.terrain[pos.X, pos.Y] = terrain;
             GetTile(pos).Terrain = terrain;
         }
 
@@ -651,7 +655,7 @@ namespace TheAlchemist
             {
                 return;
             }
-            characters[pos.X, pos.Y] = character;
+            //characters[pos.X, pos.Y] = character;
             GetTile(pos).Character = character;
         }
 
@@ -697,7 +701,8 @@ namespace TheAlchemist
             {
                 tile.Items.Add(item);
             }
-
+            
+            /*
             var itemsHere = items[(int)pos.X, (int)pos.Y];
 
             if (itemsHere == null)
@@ -708,9 +713,10 @@ namespace TheAlchemist
             {
                 itemsHere.Add(item);
             }
+            */
         }
 
-        public Floor(int width, int height)
+        /* public Floor(int width, int height)
         {
             this.width = width;
             this.height = height;
@@ -759,7 +765,7 @@ namespace TheAlchemist
 
 
             characters[3, 3] = testEnemy;
-        }
+        }*/
 
         
 
@@ -828,7 +834,7 @@ namespace TheAlchemist
                 if (!stopAtSolid)
                     continue;
 
-                int terrainID = terrain[curPos.X, curPos.Y];
+                int terrainID = GetTerrain(curPos);
 
                 if (terrainID == 0)
                     continue;
