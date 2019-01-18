@@ -68,6 +68,7 @@
     <Compile Include="Log.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Room.cs" />
     <Compile Include="Systems\CollisionSystem.cs" />
     <Compile Include="Systems\CombatSystem.cs" />
     <Compile Include="Systems\DescriptionSystem.cs" />

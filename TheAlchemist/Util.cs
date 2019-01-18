@@ -53,6 +53,16 @@ namespace TheAlchemist
             return new Position(first.X - second.X, first.Y - second.Y);
         }
 
+        public static Position operator *(Position pos, int factor)
+        {
+            return new Position(pos.X * factor, pos.Y * factor);
+        }
+
+        public static Position operator *(int factor, Position pos)
+        {
+            return new Position(pos.X * factor, pos.Y * factor);
+        }
+
         public static bool operator ==(Position first, Position second)
         {
             return first.X == second.X && first.Y == second.Y;
@@ -218,7 +228,7 @@ namespace TheAlchemist
         // otherwise it will produce a warning at runtime because 
         // this function tries to remove old sprites (which there are none of)
         public static void UpdateTargetLine(bool init = false)
-        {
+        {         
             var targetPos = EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position;
             // calculate line to target indicator
             var line = CurrentFloor.GetLine(

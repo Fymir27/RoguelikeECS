@@ -463,6 +463,15 @@ namespace TheAlchemist
         /// </summary>
         public void ToggleTargetMode()
         {
+            if (Util.TargetIndicatorID == 0) // lazy init
+            {
+                // create target indicator
+                Util.TargetIndicatorID = EntityManager.CreateEntity(new List<IComponent>()
+                {
+                    new TransformComponent() { Position = new Position(1, 1) },
+                });
+            }
+
             if (domainHistory.Peek() == CommandDomain.Targeting)
             {               
                 ControlledEntity = Util.PlayerID;

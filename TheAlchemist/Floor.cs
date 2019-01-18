@@ -72,6 +72,20 @@ namespace TheAlchemist
             return GetTile(pos.X, pos.Y);
         }
 
+        public void SetTile(int x, int y, Tile tile)
+        {
+            if(IsOutOfBounds(x, y))
+            {
+                return;
+            }
+            tiles[x, y] = tile;
+        }
+
+        public void SetTile(Position pos, Tile tile)
+        {
+            SetTile(pos.X, pos.Y, tile);
+        }
+
         public bool IsOutOfBounds(int x, int y)
         {
             if (x < 0 || x >= width ||
@@ -109,6 +123,8 @@ namespace TheAlchemist
             seen.Clear();
             seen.Add(playerPos);
 
+            List<Position> solidTiles = new List<Position>();
+
             for (int octant = 0; octant < 8; octant++)
             {
                 // Octant (here: NorthNorthWest):
@@ -124,7 +140,7 @@ namespace TheAlchemist
 
                 int obstaclesFound = 0;
                 List<float> startingAngles = new List<float>();
-                List<float> endAngles = new List<float>();
+                List<float> endAngles = new List<float>();               
 
                 //Log.Message("Octant " + octant);
 
@@ -172,6 +188,7 @@ namespace TheAlchemist
                             if (collider != null && collider.Solid)
                             {
                                 solid = true;
+                                solidTiles.Add(pos);
                             }
                         }
 
@@ -187,7 +204,7 @@ namespace TheAlchemist
 
                             if (solid)
                             {
-                                blocked = startingBlocked && endBlocked && centreBlocked;
+                                blocked = centreBlocked && startingBlocked && endBlocked;
                             }
                             else
                             {
@@ -230,6 +247,7 @@ namespace TheAlchemist
 
                         if (!blocked)
                         {
+                            seen.Add(pos);
                             if (solid)
                             {
                                 // add new blocked range and increase obstacle count
@@ -238,7 +256,6 @@ namespace TheAlchemist
                                 obstaclesFound++;
                                 obstaclesThisRow++;
                             }
-                            seen.Add(pos);
                         }
 
                         // move to next block
@@ -247,15 +264,69 @@ namespace TheAlchemist
                 }
             }
 
-            int x = 0;
-            int y = 0;
+            Console.WriteLine("Seen size before: " + seen.Count);
+            Console.WriteLine("Player pos: " + playerPos);
+            // cast ray in all 45 degree diagonals to make sure diagonal walls block LOS
+            for (int i = 0; i < 8; i += 2)
+            {
+                Console.WriteLine("Octant: " + i);
+
+                bool diagonalBlocked = false; // was this diagonal ray already blocked
+
+                Position pos = playerPos; // pos of tile in diagonal
+                for (int row = 1; row <= playerRange; row++)
+                {
+                    pos += octants[i].PosChangePerRow;
+                    pos += octants[i].PosChangePerBlock;
+
+                    Console.Write(pos + " ");
+
+                    if(!seen.Contains(pos) || solidTiles.Contains(pos))
+                    {
+                        Console.WriteLine("Already hidden or solid!");
+                        break; // if current tile is already hidden, future will be as well anyways, so we stop
+                    }
+
+                    if(diagonalBlocked) // this diagonal ray has been blocked
+                    {
+                        Console.WriteLine("Blocked before; removing...");
+
+                        seen.RemoveAll(x => x == pos);
+
+                        if (seen.Contains(pos))
+                        {
+                            Console.WriteLine("WTF");
+                        }
+                        continue;
+                    }
+
+                    // n1 pos
+                    //  @ n2
+                    bool neighbour1Solid = solidTiles.Contains(pos - octants[i].PosChangePerBlock);
+                    bool neighbour2Solid = solidTiles.Contains(pos - octants[i].PosChangePerRow);
+                    
+                    if(neighbour1Solid && neighbour2Solid)
+                    {
+                        Console.WriteLine("Block found!");
+                        seen.RemoveAll(x => x == pos);
+                        diagonalBlocked = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Not Blocked!");
+                    }                  
+                }
+            }
+
+            Console.WriteLine("Seen size after: " + seen.Count);
+
             try
             {
                 seen.ForEach(pos => GetTile(pos).Discovered = true);
             }
-            catch (IndexOutOfRangeException)
+            catch(NullReferenceException)
             {
-                Log.Warning(x + "|" + y + " is out of range! (Calculate visibilty)");
+                Log.Warning("Position out of range! (Calculate visibilty)");
             }
         }
 
@@ -347,13 +418,7 @@ namespace TheAlchemist
             for (int i = 0; i < 5; i++)
             {
                 PlaceItem(playerPos + new Position(-1, 0), CreateGold(666));
-            }
-
-            // create target indicator
-            Util.TargetIndicatorID = EntityManager.CreateEntity(new List<IComponent>()
-            {
-                new TransformComponent() { Position = new Position(1, 1) },
-            });        
+            }     
 
             // load items ////////////
             JObject itemsFile = JObject.Parse(File.ReadAllText(Util.ContentPath + "/items.json"));
@@ -387,9 +452,38 @@ namespace TheAlchemist
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(rat));
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(bat));
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(spider));
+
+            Log.Message("Floor loaded: " + path + " (" + Width + "|" + Height + ")");
         }
 
+        public Floor()
+        {
+            Width = 40;
+            Height = 25;
 
+            tiles = new Tile[width, height];
+
+            int x, y;
+
+            // instantiate tiles and set terrain
+            for (y = 0; y < height; y++)
+            {
+                for (x = 0; x < width; x++)
+                {
+                    tiles[x, y] = new Tile();
+                }
+            }
+
+            var roomPos = new Position(3, 3);
+
+            var room = new Room(roomPos, 10, 5, RoomShape.Rectangle, this);          
+
+            roomPos = new Position(14, 9);
+
+            var room2 = new Room(roomPos, 7, 7, RoomShape.Diamond, this);
+
+            PlaceCharacter(roomPos + new Position(18, 13), CreatePlayer());
+        }
  
         
         ////////////////////// Getters //////////////////////////////////////
@@ -851,7 +945,7 @@ namespace TheAlchemist
             return result;
         }
 
-        public int CreatePlayer()
+        public static int CreatePlayer()
         {
             int player = EntityManager.CreateEntity();
             int playerWeapon = EntityManager.CreateEntity();
@@ -884,21 +978,19 @@ namespace TheAlchemist
             return player;
         }
 
-        public int CreateWall()
+        public static int CreateWall()
         {
-            int wall = EntityManager.CreateEntity();
+            List<IComponent> wallComponents = new List<IComponent>()
+            {
+                new RenderableSpriteComponent() { Visible = true, Texture = "wall" },
+                new ColliderComponent() { Solid = true },
+                new DescriptionComponent() { Name = "Wall", Description = "A solid wall" }
+            };
 
-            List<IComponent> wallComponents = new List<IComponent>();
-            wallComponents.Add(new RenderableSpriteComponent() { Visible = true, Texture = "wall" });
-            wallComponents.Add(new ColliderComponent() { Solid = true });
-            wallComponents.Add(new DescriptionComponent() { Name = "Wall", Description = "A solid wall" });
-
-            EntityManager.AddComponents(wall, wallComponents);
-
-            return wall;
+            return EntityManager.CreateEntity(wallComponents);
         } 
 
-        public int CreateGold(int amount)
+        public static int CreateGold(int amount)
         {
             return EntityManager.CreateEntity(new List<IComponent>()
             {

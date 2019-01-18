@@ -62,10 +62,12 @@ namespace TheAlchemist
             Util.ContentPath = Content.RootDirectory;
 
             Log.Init(AppDomain.CurrentDomain.BaseDirectory + "/log.html");
-        
+
             Floor test = new Floor(Content.RootDirectory + "/map.txt");
+            //Floor test = new Floor();
+
             Util.CurrentFloor = test;
-            test.CalculateTileVisibility();
+            Util.CurrentFloor.CalculateTileVisibility();
 
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(Util.PlayerID));
 
