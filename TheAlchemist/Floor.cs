@@ -851,7 +851,7 @@ namespace TheAlchemist
             return result;
         }
 
-        public int CreatePlayer()
+        public static int CreatePlayer()
         {
             int player = EntityManager.CreateEntity();
             int playerWeapon = EntityManager.CreateEntity();
@@ -884,7 +884,7 @@ namespace TheAlchemist
             return player;
         }
 
-        public int CreateWall()
+        public static int CreateWall()
         {
             int wall = EntityManager.CreateEntity();
 
@@ -898,7 +898,7 @@ namespace TheAlchemist
             return wall;
         } 
 
-        public int CreateGold(int amount)
+        public static int CreateGold(int amount)
         {
             return EntityManager.CreateEntity(new List<IComponent>()
             {
