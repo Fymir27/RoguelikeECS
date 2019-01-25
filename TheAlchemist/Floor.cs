@@ -13,8 +13,40 @@ namespace TheAlchemist
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
-    class Floor
+    public interface IVisionGrid
     {
+        bool IsOpaque(Position pos);
+        void SetSeen(Position pos);
+    }
+
+    class Floor : IVisionGrid
+    {     
+      
+        public bool IsOpaque(Position pos)
+        {
+            int terrain = GetTile(pos).Terrain;
+
+            if (terrain == 0)
+            {
+                return false;
+            }
+
+            var collider = EntityManager.GetComponent<ColliderComponent>(terrain);
+
+            if (collider != null)
+            {
+                return collider.Solid;
+            }
+
+            return false;
+        }
+
+        public void SetSeen(Position pos)
+        {
+            GetTile(pos).Discovered = true;
+            seen.Add(pos);
+        }
+
         [JsonProperty]
         int width, height;
 
@@ -103,6 +135,176 @@ namespace TheAlchemist
 
         // -------------------------------------------------
 
+        private int SecondaryRay(Position pos, Position offset, int power)
+        {
+            if (power <= 0)
+                return 0;
+
+            pos += offset;
+
+            SetSeen(pos);
+
+            if(IsOpaque(pos))
+            {
+                return 1;
+            }
+
+            return 1 + SecondaryRay(pos, offset, power - 1);
+        }
+
+        public void CalculateTileVisibility()
+        {
+            seen.Clear();
+
+            int playerRange = 4;
+
+            Position[] mainRays =
+            {
+                new Position(0, -1), // N
+                new Position(1, 0),  // E
+                new Position(0, 1),  // S 
+                new Position(-1, 0)  // W
+            };
+
+            Position[] secondaryRays =
+            {
+                new Position(1, 0),  // horizontal
+                new Position(0, 1)   // vertical
+            };
+
+            var playerPos = EntityManager.GetComponent<TransformComponent>(Util.PlayerID).Position;
+            seen.Add(playerPos);
+
+            // cast main rays
+            for (int i = 0; i < 4; i++)
+            {
+                Position pos = playerPos;
+                int dampening1 = 1;
+                int dampening2 = 1;
+
+                for (int power = playerRange; power > 0; power--)
+                {
+                    pos += mainRays[i]; //extend ray
+                    SetSeen(pos);
+
+                    if(IsOpaque(pos))
+                    {
+                        // this is to better light corners of a room
+                        var neighbour1 = pos + secondaryRays[i % 2];
+                        var neighbour2 = pos - secondaryRays[i % 2];
+
+                        if(IsOpaque(neighbour1))
+                        {
+                            if (power - dampening1 > 0)
+                            {
+                                SetSeen(neighbour1);
+                            }
+                        }
+
+                        if (IsOpaque(neighbour2))
+                        {
+                            if (power - dampening2 > 0)
+                            {
+                                SetSeen(neighbour2);
+                            }
+                        }
+
+                        break;
+                    }
+
+                    int maxExtention1 = SecondaryRay(pos, secondaryRays[i % 2],        power - dampening1);
+                    int maxExtention2 = SecondaryRay(pos, secondaryRays[i % 2] * (-1), power - dampening2);
+
+                    bool blocked1 = maxExtention1 < power - dampening1;
+                    bool blocked2 = maxExtention2 < power - dampening2;                
+
+                    if (blocked1)
+                    {
+                        dampening1++;
+                    }
+
+                    if(blocked2)
+                    {
+                        dampening2++;
+                    }
+
+                    
+                }   
+            }
+        }
+
+      
+
+        /* public void CalculateTileVisibility()
+         {
+             seen.Clear();
+
+             // "cirlce"
+             Position[] edgeOfVision =
+             {
+                 new Position( 0, -3),
+                 new Position( 1, -3),
+                 new Position( 2, -2),
+                 new Position( 3, -1),
+                 new Position( 3, 0),
+                 new Position( 3, 1),
+                 new Position( 2, 2),
+                 new Position( 1, 3),
+                 new Position( 0, 3),
+                 new Position(-1, 3),
+                 new Position(-2, 2),
+                 new Position(-3, 1),
+                 new Position(-3, 0),
+                 new Position(-3, -1),
+                 new Position(-2, -2),
+                 new Position(-1, -3)
+             };
+
+             //square
+             Position[] edgeOfVision2 =
+             {
+                 new Position(-3, -3),
+                 new Position(-2, -3),
+                 new Position(-1, -3),
+                 new Position(-0, -3),
+                 new Position( 1, -3),
+                 new Position( 2, -3),
+                 new Position( 3, -2),
+                 new Position( 3, -1),
+                 new Position( 3, -0),
+                 new Position( 3,  1),
+                 new Position( 3,  2),
+                 new Position( 3,  3),
+                 new Position( 2,  3),
+                 new Position( 1,  3),
+                 new Position( 0,  3),
+                 new Position(-1,  3),
+                 new Position(-2,  3),
+                 new Position(-3,  3),
+                 new Position(-3,  2),
+                 new Position(-3,  1),
+                 new Position(-3,  0),
+                 new Position(-3, -1),
+                 new Position(-3, -2),
+                 new Position(-3, -3),
+             };
+
+             var playerPos = EntityManager.GetComponent<TransformComponent>(Util.PlayerID).Position;
+
+             foreach(var offset in edgeOfVision2)
+             {              
+                 var pos = playerPos + offset;
+                 var line = GetLine(playerPos, pos);
+                 foreach(var linePos in line)
+                 {
+                     seen.Add(linePos);
+                     GetTile(linePos).Discovered = true;
+                 }               
+             }
+
+
+         }*/
+
         /// determines which cells are visible to the player and updates them accordingly
         /// taken from: http://www.roguebasin.com/index.php?title=Restrictive_Precise_Angle_Shadowcasting
         /// octants:
@@ -110,7 +312,7 @@ namespace TheAlchemist
         /// ---|---
         /// 5/4|3\2
         ///
-        public void CalculateTileVisibility()
+        /*public void CalculateTileVisibility()
         {
             bool AngleBetween(float angle, float bigger, float smaller)
             {
@@ -234,16 +436,15 @@ namespace TheAlchemist
 
                         }
 
-                        /*
-                        Log.Message("Current block's angles: " + startingAngle + ", " + centreAngle + ", " + endAngle);
-                        Log.Message("Blocked: " + startingBlocked + centreBlocked + endBlocked);
-                        string angles = "";
-                        for (int i = 0; i < startingAngles.Count; i++)
-                        {
-                            angles += startingAngles[i] + "|" + endAngles[i] + ", ";
-                        }
-                        Log.Message("Currently blocked angles: " + angles);
-                        */
+                        //Log.Message("Current block's angles: " + startingAngle + ", " + centreAngle + ", " + endAngle);
+                        //Log.Message("Blocked: " + startingBlocked + centreBlocked + endBlocked);
+                        //string angles = "";
+                        //for (int i = 0; i < startingAngles.Count; i++)
+                        //{
+                        //    angles += startingAngles[i] + "|" + endAngles[i] + ", ";
+                        //}
+                        //Log.Message("Currently blocked angles: " + angles);
+
 
                         if (!blocked)
                         {
@@ -264,61 +465,62 @@ namespace TheAlchemist
                 }
             }
 
-            Console.WriteLine("Seen size before: " + seen.Count);
-            Console.WriteLine("Player pos: " + playerPos);
-            // cast ray in all 45 degree diagonals to make sure diagonal walls block LOS
-            for (int i = 0; i < 8; i += 2)
-            {
-                Console.WriteLine("Octant: " + i);
+            //Console.WriteLine("Seen size before: " + seen.Count);
+            //Console.WriteLine("Player pos: " + playerPos);
+            
+            //// cast ray in all 45 degree diagonals to make sure diagonal walls block LOS
+            //for (int i = 0; i < 8; i += 2)
+            //{
+            //    Console.WriteLine("Octant: " + i);
 
-                bool diagonalBlocked = false; // was this diagonal ray already blocked
+            //    bool diagonalBlocked = false; // was this diagonal ray already blocked
 
-                Position pos = playerPos; // pos of tile in diagonal
-                for (int row = 1; row <= playerRange; row++)
-                {
-                    pos += octants[i].PosChangePerRow;
-                    pos += octants[i].PosChangePerBlock;
+            //    Position pos = playerPos; // pos of tile in diagonal
+            //    for (int row = 1; row <= playerRange; row++)
+            //    {
+            //        pos += octants[i].PosChangePerRow;
+            //        pos += octants[i].PosChangePerBlock;
 
-                    Console.Write(pos + " ");
+            //        Console.Write(pos + " ");
 
-                    if(!seen.Contains(pos) || solidTiles.Contains(pos))
-                    {
-                        Console.WriteLine("Already hidden or solid!");
-                        break; // if current tile is already hidden, future will be as well anyways, so we stop
-                    }
+            //        if(!seen.Contains(pos) || solidTiles.Contains(pos))
+            //        {
+            //            Console.WriteLine("Already hidden or solid!");
+            //            break; // if current tile is already hidden, future will be as well anyways, so we stop
+            //        }
 
-                    if(diagonalBlocked) // this diagonal ray has been blocked
-                    {
-                        Console.WriteLine("Blocked before; removing...");
+            //        if(diagonalBlocked) // this diagonal ray has been blocked
+            //        {
+            //            Console.WriteLine("Blocked before; removing...");
 
-                        seen.RemoveAll(x => x == pos);
+            //            seen.RemoveAll(x => x == pos);
 
-                        if (seen.Contains(pos))
-                        {
-                            Console.WriteLine("WTF");
-                        }
-                        continue;
-                    }
+            //            if (seen.Contains(pos))
+            //            {
+            //                Console.WriteLine("WTF");
+            //            }
+            //            continue;
+            //        }
 
-                    // n1 pos
-                    //  @ n2
-                    bool neighbour1Solid = solidTiles.Contains(pos - octants[i].PosChangePerBlock);
-                    bool neighbour2Solid = solidTiles.Contains(pos - octants[i].PosChangePerRow);
+            //        // n1 pos
+            //        //  @ n2
+            //        bool neighbour1Solid = solidTiles.Contains(pos - octants[i].PosChangePerBlock);
+            //        bool neighbour2Solid = solidTiles.Contains(pos - octants[i].PosChangePerRow);
                     
-                    if(neighbour1Solid && neighbour2Solid)
-                    {
-                        Console.WriteLine("Block found!");
-                        seen.RemoveAll(x => x == pos);
-                        diagonalBlocked = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Not Blocked!");
-                    }                  
-                }
-            }
+            //        if(neighbour1Solid && neighbour2Solid)
+            //        {
+            //            Console.WriteLine("Block found!");
+            //            seen.RemoveAll(x => x == pos);
+            //            diagonalBlocked = true;
+            //        }
+            //        else
+            //        {
+            //            Console.WriteLine("Not Blocked!");
+            //        }                  
+            //    }
+            //}
 
-            Console.WriteLine("Seen size after: " + seen.Count);
+            //Console.WriteLine("Seen size after: " + seen.Count);
 
             try
             {
@@ -328,7 +530,7 @@ namespace TheAlchemist
             {
                 Log.Warning("Position out of range! (Calculate visibilty)");
             }
-        }
+        }*/
 
 
         // one terrain entity per tile
@@ -874,8 +1076,8 @@ namespace TheAlchemist
         {
             if(IsOutOfBounds(from) || IsOutOfBounds(to))
             {
-                Log.Error("Can't get Line between " + from + to + " - Out of bounds!");
-                return null;
+                //Log.Error("Can't get Line between " + from + to + " - Out of bounds!");
+                //return null;
             }
 
             // integer vector makes more sense here
