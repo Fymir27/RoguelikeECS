@@ -685,7 +685,7 @@ namespace TheAlchemist
 
             Console.WriteLine("Room2:");
             roomPos = new Position(6, 9);
-            var room2 = new Room(roomPos, 10, 8, RoomShape.Diamond, this);
+            var room2 = new Room(roomPos, 10, 5, RoomShape.Diamond, this);
 
             Console.WriteLine("Room3:");
             roomPos = new Position(3, 14);
@@ -695,10 +695,10 @@ namespace TheAlchemist
             roomPos = new Position(14, 3);
             var room4 = new Room(roomPos, 5, 5, RoomShape.Diamond, this);
 
-            
+
         }
- 
-        
+
+
         ////////////////////// Getters //////////////////////////////////////
 
         public IEnumerable<Position> GetSeenPositions()

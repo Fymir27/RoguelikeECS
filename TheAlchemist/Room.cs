@@ -65,118 +65,33 @@ namespace TheAlchemist
 
         private void InitDiamond()
         {
-            // TODO:
-            var stuff = Util.Lerp(0, 0, 0, 0, 0);
-
-            int rowStart = (Width - 1) / 2; // x coord of block in first row (relative to pos)
-            float rowDifference = (float)rowStart / ((Height - 1) / 2);
-
-            int blockCount = (Width % 2 == 0) ? 2 : 1;
-            float accumulatedRowDifference = 0f;
-            int addedBlocksCount = 0;
-
-            for (int y = Pos.Y; y < Pos.Y + (Height + 1) / 2; y++)
-            {               
-                for (int x = Pos.X + rowStart; x < Pos.X + rowStart + blockCount; x++)
-                {
-                    Console.WriteLine(new Position(x, y));
-                    floor.RemoveTerrain(new Position(x, y));
-                }
-
-                accumulatedRowDifference += rowDifference;
-
-                addedBlocksCount = (int)Math.Floor(accumulatedRowDifference);
-
-                rowStart -= addedBlocksCount;
-                blockCount += 2 * addedBlocksCount;
-
-                accumulatedRowDifference -= addedBlocksCount;
-            }
-
-            accumulatedRowDifference = 0f;
-            rowStart = 0;
-            blockCount -= 2 * addedBlocksCount;
-
-            Console.WriteLine("Lower Half:");
-
-            for (int y = Pos.Y + Height / 2; y < Pos.Y + Height; y++)
-            {
-                Console.WriteLine("Y: " + y);
-                for (int x = Pos.X + rowStart; x < Pos.X + rowStart + blockCount; x++)
-                {
-                    Console.WriteLine(new Position(x, y));
-                    floor.RemoveTerrain(new Position(x, y));
-                }
-
-                accumulatedRowDifference += rowDifference;
-
-                addedBlocksCount = (int)Math.Floor(accumulatedRowDifference);
-
-                rowStart += addedBlocksCount;
-                blockCount = Math.Max(1, blockCount - 2 * addedBlocksCount);
-
-                accumulatedRowDifference -= addedBlocksCount;
-            }
-
-
-            /*
-
-            // horizontal coord (x) of first floor tile in first row (relative to Pos)
-            //   X# 
-            //  ####
-            // ######
-            // ######
-            //  ####
-            //   ##
-            //
             int halfWidth = (Width - 1) / 2;
+            int halfHeight = (Height - 1) / 2;
 
-            // vertical coord (y) of row where floor tiles in row start to decrease (relative to Pos)
-            //   ##
-            //  ####
-            // ######
-            // Y#####
-            //  ####
-            //   ##
-            //
-            int halfHeight = (Height + 1) / 2;
-
-            int blocksInRow = (Width % 2 == 0) ? 2 : 1;
-
-            int rowStart = Pos.X + halfWidth;
-
-            for (int y = Pos.Y; y < Pos.Y + halfHeight; y++)
+            int rowStart;
+            for (int y = 0; y < Height; y++)
             {
-                Console.WriteLine("Row: " + (y - Pos.Y));
-                for (int x = rowStart; x < rowStart + blocksInRow; x++)
+                if (y <= halfHeight)
                 {
-                    floor.RemoveTerrain(new Position(x, y));
+                    rowStart = Util.Lerp(y, 0, halfWidth, halfHeight, 0);
                 }
-                rowStart--;
-                blocksInRow += 2;
-            }
-
-            if (Height % 2 == 0)
-            {
-                rowStart += 1;
-                blocksInRow -= 2;
-            }
-            else
-            {
-                rowStart += 2;
-                blocksInRow -= 4;
-            }
-
-            for(int y = Pos.Y + halfHeight; y < Pos.Y + Height; y++)
-            {
-                for (int x = rowStart; x < rowStart + blocksInRow; x++)
+                else
                 {
-                    floor.RemoveTerrain(new Position(x, y));
+                    if (Height % 2 == 0)
+                    {
+                        rowStart = Util.Lerp(y, halfHeight + 1, 0, Height - 1, halfWidth);
+                    }
+                    else
+                    {
+                        rowStart = Util.Lerp(y + 1, halfHeight + 1, 0, Height, halfWidth);
+                    }
                 }
-                rowStart++;
-                blocksInRow -= 2;
-            }
-            */
+
+                for (int x = rowStart; x < Width - rowStart; x++)
+                {
+                    floor.RemoveTerrain(Pos + new Position(x, y));
+                }
+            }        
         }
     }
 }

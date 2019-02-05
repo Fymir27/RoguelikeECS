@@ -278,7 +278,18 @@ namespace TheAlchemist
 
         public static int Lerp(int x, int x0, int y0, int x1, int y1)
         {
-            return y0 + ((y1 - y0) / (x1 - x0)) * (x - x0);
+            //int deltaY = y1 - y0;
+            //int deltaX = x1 - x0;
+            //float slope = (float)deltaY / deltaX;
+            //int distance = x - x0;
+            //int res = (int)(y0 + slope * distance);
+
+            //Log.Message("Lerp: " + x + "|? --> " + new Position(x0, y0) + " ~~ " + new Position(x1, y1));
+            //Log.Message("Slope: " + deltaY + "/" + deltaX + " = " + slope);
+            //Log.Message("Result: " + x0 + " + " + slope + "*" + distance + " = " + res);
+            //return res;
+
+            return y0 + (int)Math.Round(((float)(y1 - y0) / (x1 - x0)) * (x - x0));
         }
     }
 }
