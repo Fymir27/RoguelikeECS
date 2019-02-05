@@ -62,11 +62,11 @@ namespace TheAlchemist.Systems
                     {
                         if (Util.CurrentFloor.IsDiscovered(pos))
                         {
-                            spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), new Color(Color.Black, 0.7f));                          
+                            //spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), new Color(Color.Black, 0.7f));                          
                         }
                         else
                         {
-                            spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), Color.Black);
+                            //spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), Color.Black);
                         }
                     }
 

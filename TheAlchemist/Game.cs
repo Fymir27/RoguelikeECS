@@ -63,8 +63,8 @@ namespace TheAlchemist
 
             Log.Init(AppDomain.CurrentDomain.BaseDirectory + "/log.html");
 
-            Floor test = new Floor(Content.RootDirectory + "/map.txt");
-            //Floor test = new Floor();
+            //Floor test = new Floor(Content.RootDirectory + "/map.txt");
+            Floor test = new Floor();
 
             Util.CurrentFloor = test;
             Util.CurrentFloor.CalculateTileVisibility();
@@ -121,6 +121,8 @@ namespace TheAlchemist
 
             base.Initialize();
             Log.Message("Initialization completed!");
+
+            CraftableComponent.foo();
         }
 
         /// <summary>

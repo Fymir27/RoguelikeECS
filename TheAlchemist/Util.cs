@@ -274,5 +274,11 @@ namespace TheAlchemist
         {
             return b ? 1 : -1;
         }
+
+
+        public static int Lerp(int x, int x0, int y0, int x1, int y1)
+        {
+            return y0 + ((y1 - y0) / (x1 - x0)) * (x - x0);
+        }
     }
 }

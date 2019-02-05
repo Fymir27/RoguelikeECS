@@ -673,6 +673,7 @@ namespace TheAlchemist
                 for (x = 0; x < width; x++)
                 {
                     tiles[x, y] = new Tile();
+                    PlaceTerrain(new Position(x, y), CreateWall());
                 }
             }
 
@@ -680,11 +681,21 @@ namespace TheAlchemist
 
             var room = new Room(roomPos, 10, 5, RoomShape.Rectangle, this);          
 
-            roomPos = new Position(14, 9);
+            PlaceCharacter(roomPos + new Position(1, 1), CreatePlayer());
 
-            var room2 = new Room(roomPos, 7, 7, RoomShape.Diamond, this);
+            Console.WriteLine("Room2:");
+            roomPos = new Position(6, 9);
+            var room2 = new Room(roomPos, 10, 8, RoomShape.Diamond, this);
 
-            PlaceCharacter(roomPos + new Position(18, 13), CreatePlayer());
+            Console.WriteLine("Room3:");
+            roomPos = new Position(3, 14);
+            var room3 = new Room(roomPos, 3, 8, RoomShape.Diamond, this);
+
+            Console.WriteLine("Room4:");
+            roomPos = new Position(14, 3);
+            var room4 = new Room(roomPos, 5, 5, RoomShape.Diamond, this);
+
+            
         }
  
         
@@ -770,6 +781,12 @@ namespace TheAlchemist
         // returns true if successful
         private bool RemoveEntity(Position pos, int entity)
         {
+            if(entity == 0)
+            {
+                Log.Warning("Trying to remove entity from " + pos + ": No entity of that type here!");
+                return false;
+            }
+
             if (IsOutOfBounds(pos))
             {
                 Log.Warning("Trying to remove " + DescriptionSystem.GetNameWithID(entity) + " out of bounds! " + pos);

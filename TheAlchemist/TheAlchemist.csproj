@@ -53,6 +53,7 @@
     <Compile Include="Components\InteractableComponent.cs" />
     <Compile Include="Components\InventoryComponent.cs" />
     <Compile Include="Components\ItemComponent.cs" />
+    <Compile Include="Components\CraftableComponent.cs" />
     <Compile Include="Components\UsableItemComponent.cs" />
     <Compile Include="Components\NPCComponent.cs" />
     <Compile Include="Components\PlayerComponent.cs" />
