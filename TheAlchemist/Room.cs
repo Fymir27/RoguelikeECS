@@ -33,6 +33,8 @@ namespace TheAlchemist
 
             this.floor = floor;
 
+            Log.Message("New Room created at " + pos + "-> Size: " + new Position(width, height) + ", " + shape.ToString());
+
             switch (shape)
             {
                 case RoomShape.Rectangle:
@@ -56,7 +58,7 @@ namespace TheAlchemist
 
             for (int y = Pos.Y; y < Pos.Y + Height; y++)
             {
-                for (int x = Pos.X; x < Pos.Y + Width; x++)
+                for (int x = Pos.X; x < Pos.X + Width; x++)
                 {
                     floor.RemoveTerrain(new Position(x, y));
                 }
@@ -83,7 +85,7 @@ namespace TheAlchemist
                     }
                     else
                     {
-                        rowStart = Util.Lerp(y + 1, halfHeight + 1, 0, Height, halfWidth);
+                        rowStart = Util.Lerp(y, halfHeight, 0, Height - 1, halfWidth);
                     }
                 }
 

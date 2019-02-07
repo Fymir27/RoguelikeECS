@@ -54,6 +54,8 @@ namespace TheAlchemist
         [JsonProperty]
         Tile[,] tiles;
 
+        bool[,] assignedToRoom;
+
         // seen by player at this moment
         List<Position> seen = new List<Position>();
 
@@ -664,6 +666,13 @@ namespace TheAlchemist
             Height = 25;
 
             tiles = new Tile[width, height];
+            assignedToRoom = new bool[width, height];
+
+            foreach (var item in assignedToRoom)
+            {
+                if(item == true)
+                    Log.Error("assignedToRoom init failed!");
+            }
 
             int x, y;
 
@@ -679,23 +688,73 @@ namespace TheAlchemist
 
             var roomPos = new Position(3, 3);
 
-            var room = new Room(roomPos, 10, 5, RoomShape.Rectangle, this);          
+            //var room = new Room(roomPos, 10, 5, RoomShape.Rectangle, this);          
 
             PlaceCharacter(roomPos + new Position(1, 1), CreatePlayer());
 
-            Console.WriteLine("Room2:");
-            roomPos = new Position(6, 9);
-            var room2 = new Room(roomPos, 10, 5, RoomShape.Diamond, this);
+            //Console.WriteLine("Room2:");
+            //roomPos = new Position(6, 9);
+            //var room2 = new Room(roomPos, 10, 5, RoomShape.Diamond, this);
 
-            Console.WriteLine("Room3:");
-            roomPos = new Position(3, 14);
-            var room3 = new Room(roomPos, 3, 8, RoomShape.Diamond, this);
+            //Console.WriteLine("Room3:");
+            //roomPos = new Position(3, 14);
+            //var room3 = new Room(new Position(1,1), 6, 7, RoomShape.Diamond, this);
 
-            Console.WriteLine("Room4:");
-            roomPos = new Position(14, 3);
-            var room4 = new Room(roomPos, 5, 5, RoomShape.Diamond, this);
+            //Console.WriteLine("Room4:");
+            //roomPos = new Position(14, 3);
+            //var room4 = new Room(roomPos, 5, 5, RoomShape.Diamond, this);
 
+            for (int i = 0; i < 5; i++)
+            {
+                int minWidth = 5;
+                int maxWidth = 20;
 
+                int minHeight = 5;
+                int maxHeight = 15;
+
+                int roomWidth = 0;
+                int roomHeight = 0;
+                RoomShape shape = RoomShape.Rectangle;
+
+                do
+                {
+                    roomWidth = Game.Random.Next(minWidth, maxWidth + 1);
+                    roomHeight = Game.Random.Next(minHeight, maxHeight + 1);
+                    roomPos = new Position(Game.Random.Next(1, Width - roomWidth - 1), Game.Random.Next(1, Height - roomHeight - 1));
+                }
+                while (!RoomPlaceable(roomPos, roomWidth, roomHeight));
+
+                shape = (RoomShape)Game.Random.Next(Enum.GetValues(typeof(RoomShape)).Length);
+
+                PlaceRoom(roomPos, roomWidth, roomHeight, shape);
+            }
+        }
+
+        Room PlaceRoom(Position pos, int width, int height, RoomShape shape)
+        {
+            for (int y = pos.Y - 1; y <= pos.Y + height; y++)
+            {
+                for (int x = pos.X - 1; x <= pos.X + width; x++)
+                {
+                    assignedToRoom[x, y] = true;
+                }
+            }
+            return new Room(pos, width, height, shape, this);
+        }
+
+        bool RoomPlaceable(Position pos, int width, int height)
+        {
+            for (int y = pos.Y; y < pos.Y + height; y++)
+            {
+                for (int x = pos.X; x < pos.X + width; x++)
+                {
+                    if(assignedToRoom[x, y])
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
 

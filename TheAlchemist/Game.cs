@@ -36,7 +36,8 @@ namespace TheAlchemist
         RenderSystem renderSystem;
         UISystem uiSystem;
 
-        public static Random Random { get; } = new Random();
+        public static int Seed = (int)DateTime.Now.TimeOfDay.TotalSeconds;
+        public static Random Random { get; } = new Random(Seed);
 
                
         public Game()
@@ -62,6 +63,7 @@ namespace TheAlchemist
             Util.ContentPath = Content.RootDirectory;
 
             Log.Init(AppDomain.CurrentDomain.BaseDirectory + "/log.html");
+            Log.Message("Seed: " + Seed);
 
             //Floor test = new Floor(Content.RootDirectory + "/map.txt");
             Floor test = new Floor();
