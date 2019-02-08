@@ -31,7 +31,8 @@ namespace TheAlchemist
         // returns serialized state of entity manager as string
         public static string ToJson()
         {
-            return JsonConvert.SerializeObject(new EntityManager(), Formatting.Indented, new JsonSerializerSettings() {
+            return JsonConvert.SerializeObject(new EntityManager(), Formatting.Indented, new JsonSerializerSettings()
+            {
                 TypeNameHandling = TypeNameHandling.Auto,
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             });
@@ -105,7 +106,7 @@ namespace TheAlchemist
         }
 
         public static T GetComponent<T>(int entityID) where T : Component<T>
-        {                  
+        {
             try
             {
                 return componentsOfEntity[entityID].FirstOrDefault(x => x.TypeID == Component<T>.TypeID) as T;
@@ -123,7 +124,7 @@ namespace TheAlchemist
             int entityID = entityIDCounter++;
 
             componentsOfEntity.Add(entityID, new List<IComponent>());
-            
+
             return entityID;
         }
 
@@ -132,7 +133,7 @@ namespace TheAlchemist
         {
             int entityID = CreateEntity();
             AddComponents(entityID, components);
-            return entityID;            
+            return entityID;
         }
 
         // creates new Entity from json template
@@ -170,7 +171,7 @@ namespace TheAlchemist
             {
                 componentsOfType.Add(componentType, new List<IComponent>());
             }
-            componentsOfType[componentType].Add(component);          
+            componentsOfType[componentType].Add(component);
         }
 
         // removes a single specific component from entity
@@ -198,7 +199,7 @@ namespace TheAlchemist
             try
             {
                 var componentsToRemove = GetComponents(entityID).Where(c => c.TypeID == typeID);
-                if(componentsToRemove.Count() == 0)
+                if (componentsToRemove.Count() == 0)
                 {
                     Log.Warning("No components of type " + typeID + " on " + entityID);
                     return;
@@ -216,7 +217,7 @@ namespace TheAlchemist
         // marks entity for later deletion
         public static void RemoveEntity(int entityID)
         {
-            if(toBeRemoved.Contains(entityID))
+            if (toBeRemoved.Contains(entityID))
             {
                 return;
             }
@@ -226,7 +227,7 @@ namespace TheAlchemist
         // deletes all entities that got previously marked for deletion and resets list
         public static void CleanUpEntities()
         {
-            foreach(int entity in toBeRemoved)
+            foreach (int entity in toBeRemoved)
             {
                 DeleteEntity(entity);
             }
@@ -264,7 +265,7 @@ namespace TheAlchemist
 
                 componentsOfEntity.Remove(entityID);
             }
-            catch(KeyNotFoundException)
+            catch (KeyNotFoundException)
             {
                 Log.Error("No such entity! (" + entityID + ")");
                 throw;
@@ -277,7 +278,7 @@ namespace TheAlchemist
             Console.WriteLine("----- DEBUG -----");
 
             Console.WriteLine("Entities: ");
-            foreach(var key in componentsOfEntity.Keys)
+            foreach (var key in componentsOfEntity.Keys)
             {
                 Console.Write(key + ": [");
                 foreach (var item in componentsOfEntity[key])

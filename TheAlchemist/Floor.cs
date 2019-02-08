@@ -20,8 +20,8 @@ namespace TheAlchemist
     }
 
     class Floor : IVisionGrid
-    {     
-      
+    {
+
         public bool IsOpaque(Position pos)
         {
             int terrain = GetTile(pos).Terrain;
@@ -94,7 +94,7 @@ namespace TheAlchemist
 
         public Tile GetTile(int x, int y)
         {
-            if(IsOutOfBounds(x, y))
+            if (IsOutOfBounds(x, y))
             {
                 return null;
             }
@@ -108,7 +108,7 @@ namespace TheAlchemist
 
         public void SetTile(int x, int y, Tile tile)
         {
-            if(IsOutOfBounds(x, y))
+            if (IsOutOfBounds(x, y))
             {
                 return;
             }
@@ -146,7 +146,7 @@ namespace TheAlchemist
 
             SetSeen(pos);
 
-            if(IsOpaque(pos))
+            if (IsOpaque(pos))
             {
                 return 1;
             }
@@ -175,7 +175,7 @@ namespace TheAlchemist
             };
 
             var playerPos = EntityManager.GetComponent<TransformComponent>(Util.PlayerID).Position;
-            seen.Add(playerPos);
+            SetSeen(playerPos);
 
             // cast main rays
             for (int i = 0; i < 4; i++)
@@ -189,13 +189,13 @@ namespace TheAlchemist
                     pos += mainRays[i]; //extend ray
                     SetSeen(pos);
 
-                    if(IsOpaque(pos))
+                    if (IsOpaque(pos))
                     {
                         // this is to better light corners of a room
                         var neighbour1 = pos + secondaryRays[i % 2];
                         var neighbour2 = pos - secondaryRays[i % 2];
 
-                        if(IsOpaque(neighbour1))
+                        if (IsOpaque(neighbour1))
                         {
                             if (power - dampening1 > 0)
                             {
@@ -214,28 +214,28 @@ namespace TheAlchemist
                         break;
                     }
 
-                    int maxExtention1 = SecondaryRay(pos, secondaryRays[i % 2],        power - dampening1);
+                    int maxExtention1 = SecondaryRay(pos, secondaryRays[i % 2], power - dampening1);
                     int maxExtention2 = SecondaryRay(pos, secondaryRays[i % 2] * (-1), power - dampening2);
 
                     bool blocked1 = maxExtention1 < power - dampening1;
-                    bool blocked2 = maxExtention2 < power - dampening2;                
+                    bool blocked2 = maxExtention2 < power - dampening2;
 
                     if (blocked1)
                     {
                         dampening1++;
                     }
 
-                    if(blocked2)
+                    if (blocked2)
                     {
                         dampening2++;
                     }
 
-                    
-                }   
+
+                }
             }
         }
 
-      
+
 
         /* public void CalculateTileVisibility()
          {
@@ -554,7 +554,7 @@ namespace TheAlchemist
 
             StreamReader file = new StreamReader(path);
 
-            
+
 
             List<List<int>> tmpTerrain = new List<List<int>>();
 
@@ -622,7 +622,7 @@ namespace TheAlchemist
             for (int i = 0; i < 5; i++)
             {
                 PlaceItem(playerPos + new Position(-1, 0), CreateGold(666));
-            }     
+            }
 
             // load items ////////////
             JObject itemsFile = JObject.Parse(File.ReadAllText(Util.ContentPath + "/items.json"));
@@ -630,7 +630,7 @@ namespace TheAlchemist
             int healthPotion = EntityManager.CreateEntity(itemsFile["healthPotion"].ToString());
             PlaceItem(playerPos + new Position(-1, 0), healthPotion);
 
-            int poison = EntityManager.CreateEntity(itemsFile["poisonPotion"].ToString());          
+            int poison = EntityManager.CreateEntity(itemsFile["poisonPotion"].ToString());
             PlaceItem(playerPos + new Position(-1, 0), poison);
 
             int strengthPotion = EntityManager.CreateEntity(itemsFile["strengthPotion"].ToString());
@@ -662,15 +662,15 @@ namespace TheAlchemist
 
         public Floor()
         {
-            Width = 40;
-            Height = 25;
+            Width = 100;
+            Height = 70;
 
             tiles = new Tile[width, height];
             assignedToRoom = new bool[width, height];
 
             foreach (var item in assignedToRoom)
             {
-                if(item == true)
+                if (item == true)
                     Log.Error("assignedToRoom init failed!");
             }
 
@@ -704,12 +704,12 @@ namespace TheAlchemist
 
             List<Room> rooms = new List<Room>();
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 10; i++)
             {
-                int minWidth = 5;
+                int minWidth = 10;
                 int maxWidth = 20;
 
-                int minHeight = 5;
+                int minHeight = 10;
                 int maxHeight = 15;
 
                 int roomWidth = 0;
@@ -736,6 +736,8 @@ namespace TheAlchemist
             }
 
             PlaceCharacter(rooms[0].Pos + new Position(rooms[0].Width / 2, rooms[0].Height / 2), CreatePlayer());
+
+            //PlaceCharacter(new Position(Width / 2, Height / 2), CreatePlayer());
         }
 
         Room PlaceRoom(Position pos, int width, int height, RoomShape shape)
@@ -756,7 +758,7 @@ namespace TheAlchemist
             {
                 for (int x = pos.X; x < pos.X + width; x++)
                 {
-                    if(assignedToRoom[x, y])
+                    if (assignedToRoom[x, y])
                     {
                         return false;
                     }
@@ -793,7 +795,7 @@ namespace TheAlchemist
                 return GetTile(pos).Discovered;
                 //return discovered[(int)pos.X, (int)pos.Y];
             }
-            catch(IndexOutOfRangeException)
+            catch (IndexOutOfRangeException)
             {
                 Log.Error("Invalid Position! " + pos);
                 throw;
@@ -802,7 +804,7 @@ namespace TheAlchemist
 
         public int GetTerrain(Position pos)
         {
-            if(IsOutOfBounds(pos))
+            if (IsOutOfBounds(pos))
             {
                 return 0;
             }
@@ -830,7 +832,7 @@ namespace TheAlchemist
 
         public int GetCharacter(Position pos)
         {
-            if(IsOutOfBounds(pos))
+            if (IsOutOfBounds(pos))
             {
                 return 0;
             }
@@ -840,7 +842,7 @@ namespace TheAlchemist
 
         public int GetFirstItem(Position pos)
         {
-            if(IsOutOfBounds(pos))
+            if (IsOutOfBounds(pos))
             {
                 return 0;
             }
@@ -865,7 +867,7 @@ namespace TheAlchemist
                 return new int[0];
             }
             var itemList = GetTile(pos).Items; //items[(int)pos.X, (int)pos.Y];
-            if(itemList == null)
+            if (itemList == null)
             {
                 return new int[0];
             }
@@ -879,7 +881,7 @@ namespace TheAlchemist
         // returns true if successful
         private bool RemoveEntity(Position pos, int entity)
         {
-            if(entity == 0)
+            if (entity == 0)
             {
                 Log.Warning("Trying to remove entity from " + pos + ": No entity of that type here!");
                 return false;
@@ -893,7 +895,7 @@ namespace TheAlchemist
 
             var sprite = EntityManager.GetComponent<RenderableSpriteComponent>(entity);
 
-            if (sprite != null) sprite.Visible = false; 
+            if (sprite != null) sprite.Visible = false;
 
             return true;
         }
@@ -918,7 +920,7 @@ namespace TheAlchemist
 
         public void RemoveCharacter(Position pos)
         {
-            if(IsOutOfBounds(pos))
+            if (IsOutOfBounds(pos))
             {
                 Log.Warning("Can't remove character out of bounds! " + pos);
                 return;
@@ -926,7 +928,7 @@ namespace TheAlchemist
 
             int character = GetTile(pos).Character; // characters[(int)pos.X, (int)pos.Y];
 
-            if(!RemoveEntity(pos, character))
+            if (!RemoveEntity(pos, character))
             {
                 return;
             }
@@ -953,8 +955,8 @@ namespace TheAlchemist
         } */
 
         public void RemoveItems(Position pos)
-        {        
-           if(IsOutOfBounds(pos))
+        {
+            if (IsOutOfBounds(pos))
             {
                 Log.Warning("Can't remove items out of bounds! " + pos);
                 return;
@@ -962,39 +964,39 @@ namespace TheAlchemist
 
             var itemsHere = GetTile(pos).Items; // items[(int)pos.X, (int)pos.Y];
 
-            if(itemsHere == null)
+            if (itemsHere == null)
             {
                 return; // nothing to remove
             }
 
-            foreach(int item in itemsHere)
+            foreach (int item in itemsHere)
             {
-                if(!RemoveEntity(pos, item))
+                if (!RemoveEntity(pos, item))
                 {
                     return;
                 }
-            }         
+            }
 
             itemsHere = null;
         }
 
         public void RemoveItem(Position pos, int item)
         {
-            if(!RemoveEntity(pos, item))
+            if (!RemoveEntity(pos, item))
             {
                 return;
             }
 
             var itemsHere = GetTile(pos).Items; // items[(int)pos.X, (int)pos.Y];
 
-            if(itemsHere == null)
+            if (itemsHere == null)
             {
                 Log.Warning("Trying to remove item that's not here! " + pos);
                 Log.Data(DescriptionSystem.GetDebugInfoEntity(item));
                 return;
             }
 
-            if(itemsHere.Count == 0 || !itemsHere.Contains(item))
+            if (itemsHere.Count == 0 || !itemsHere.Contains(item))
             {
                 Log.Warning("Trying to remove item that's not here! " + pos);
                 Log.Data(DescriptionSystem.GetDebugInfoEntity(item));
@@ -1014,9 +1016,9 @@ namespace TheAlchemist
         // returns true if successful
         private bool PlaceEntity(Position pos, int entity, int renderLayer = 0)
         {
-            if(entity == 0) // can happen during init
+            if (entity == 0) // can happen during init
             {
-                return false; 
+                return false;
             }
 
             if (IsOutOfBounds(pos))
@@ -1097,14 +1099,14 @@ namespace TheAlchemist
 
         public void PlaceItem(Position pos, int item)
         {
-            if(!PlaceEntity(pos, item, RenderableSpriteComponent.RenderLayer.Item))
+            if (!PlaceEntity(pos, item, RenderableSpriteComponent.RenderLayer.Item))
             {
                 return;
             }
 
             var tile = GetTile(pos);
 
-            if(tile.Items == null)
+            if (tile.Items == null)
             {
                 tile.Items = new List<int>() { item };
             }
@@ -1112,7 +1114,7 @@ namespace TheAlchemist
             {
                 tile.Items.Add(item);
             }
-            
+
             /*
             var itemsHere = items[(int)pos.X, (int)pos.Y];
 
@@ -1178,7 +1180,7 @@ namespace TheAlchemist
             characters[3, 3] = testEnemy;
         }*/
 
-        
+
 
         // returns shortest path
         public List<Position> GetPath(Position from, Position to)
@@ -1189,7 +1191,7 @@ namespace TheAlchemist
         // returns "straight" line (Bresenham)
         public List<Position> GetLine(Position from, Position to, bool stopAtSolid = true)
         {
-            if(IsOutOfBounds(from) || IsOutOfBounds(to))
+            if (IsOutOfBounds(from) || IsOutOfBounds(to))
             {
                 //Log.Error("Can't get Line between " + from + to + " - Out of bounds!");
                 //return null;
@@ -1202,7 +1204,7 @@ namespace TheAlchemist
             int dy = to.Y - from.Y;
 
             int sx = (dx > 0) ? 1 : -1;
-            int sy = (dy > 0) ? 1 : -1;           
+            int sy = (dy > 0) ? 1 : -1;
 
             Position diagonalStep = new Position(sx, sy);
 
@@ -1230,7 +1232,7 @@ namespace TheAlchemist
             {
                 error -= dslow;
 
-                if(error < 0)
+                if (error < 0)
                 {
                     error += dfast;
                     curPos += diagonalStep;
@@ -1245,7 +1247,7 @@ namespace TheAlchemist
                 if (!stopAtSolid)
                     continue;
 
-               if(IsSolid(curPos))
+                if (IsSolid(curPos))
                     break;
 
             }
@@ -1253,7 +1255,7 @@ namespace TheAlchemist
         }
 
         public List<Position> GetRandomLineNonDiagonal(Position from, Position to)
-        { 
+        {
             List<Position> line = new List<Position>() { from };
 
             Position verticalStep = from.Y < to.Y ? Position.Up : Position.Down;
@@ -1261,15 +1263,15 @@ namespace TheAlchemist
 
             Position pos = from;
 
-            while(pos != to)
+            while (pos != to)
             {
                 bool up = Game.Random.Next(2) > 0;
 
-                if(up && pos.Y != to.Y)
+                if (up && pos.Y != to.Y)
                 {
-                    pos += verticalStep;               
+                    pos += verticalStep;
                 }
-                else if(pos.X != to.X)
+                else if (pos.X != to.X)
                 {
                     pos += horizontalStep;
                 }
@@ -1292,7 +1294,7 @@ namespace TheAlchemist
             int playerArmor = EntityManager.CreateEntity();
 
             EntityManager.AddComponent(playerWeapon, new WeaponComponent() { Damage = 5 });
-            EntityManager.AddComponent(playerArmor, new ArmorComponent() { PercentMitigation = 0, FlatMitigation = 0});
+            EntityManager.AddComponent(playerArmor, new ArmorComponent() { PercentMitigation = 0, FlatMitigation = 0 });
 
             List<IComponent> playerComponents = new List<IComponent>()
             {
@@ -1328,7 +1330,7 @@ namespace TheAlchemist
             };
 
             return EntityManager.CreateEntity(wallComponents);
-        } 
+        }
 
         public static int CreateGold(int amount)
         {
@@ -1368,12 +1370,12 @@ namespace TheAlchemist
                 int angleCount = blocks * 2 + 1; // space for all start/centre/end angles
                 float angleDifferenceHalf = 1f / (blocks * 2);
 
-                result[i] = new float[angleCount]; 
-               
+                result[i] = new float[angleCount];
+
                 result[i][0] = 0f;
                 result[i][angleCount - 1] = 1f;
 
-                for(int j = 1; j < (angleCount - 1); j++)
+                for (int j = 1; j < (angleCount - 1); j++)
                 {
                     result[i][j] = result[i][j - 1] + angleDifferenceHalf;
                 }

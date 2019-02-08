@@ -26,7 +26,7 @@ namespace TheAlchemist
         public static void Render(SpriteBatch spriteBatch)
         {
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
-            spriteBatch.Draw(TextureManager.GetTexture("messageLogBox"), new Vector2(0, Util.WorldHeight), Color.White);
+            spriteBatch.Draw(TextureManager.GetTexture("messageLogBox"), new Vector2(0, Util.WorldViewPixelHeight), Color.White);
             //spriteBatch.DrawString(Util.BigFont, "Message Log", new Vector2(10, Util.WorldHeight + 10), Color.Black);
 
             string messageLogString = "";
@@ -34,11 +34,11 @@ namespace TheAlchemist
             {
                 messageLogString += MessageLog[i] + '\n';
             }
-            spriteBatch.DrawString(Util.DefaultFont, messageLogString, new Vector2(10, Util.WorldHeight + 10), Color.Black);
-           
+            spriteBatch.DrawString(Util.DefaultFont, messageLogString, new Vector2(10, Util.WorldViewPixelHeight + 10), Color.Black);
+
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
-            spriteBatch.Draw(TextureManager.GetTexture("inventory"), new Vector2(Util.WorldWidth, 220), InventoryOpen ? Color.Aquamarine : Color.White);
-            spriteBatch.DrawString(Util.BigFont, "Inventory", new Vector2(Util.WorldWidth + 10, 220 + 10), Color.Black);
+            spriteBatch.Draw(TextureManager.GetTexture("inventory"), new Vector2(Util.WorldViewPixelWidth, 220), InventoryOpen ? Color.Aquamarine : Color.White);
+            spriteBatch.DrawString(Util.BigFont, "Inventory", new Vector2(Util.WorldViewPixelWidth + 10, 220 + 10), Color.Black);
 
             var items = EntityManager.GetComponent<InventoryComponent>(Util.PlayerID).Items;
 
@@ -48,14 +48,14 @@ namespace TheAlchemist
             var itemsSecondHalf = items.Skip(InventoryColumnLength);
 
             string itemStringLeftCol = "";
-            foreach(var item in itemsFirstHalf)
+            foreach (var item in itemsFirstHalf)
             {
                 if (counter == InventoryCursorPosition)
                     itemStringLeftCol += "# ";
                 itemStringLeftCol += counter++ + ": " + DescriptionSystem.GetName(item) + " x" + EntityManager.GetComponent<ItemComponent>(item).Count + '\n';
             }
 
-            spriteBatch.DrawString(Util.DefaultFont, itemStringLeftCol, new Vector2(Util.WorldWidth + 20, 220 + 40), Color.Black);
+            spriteBatch.DrawString(Util.DefaultFont, itemStringLeftCol, new Vector2(Util.WorldViewPixelWidth + 20, 220 + 40), Color.Black);
 
             string itemStringRightCol = "";
             foreach (var item in itemsSecondHalf)
@@ -65,18 +65,18 @@ namespace TheAlchemist
                 itemStringRightCol += counter++ + ": " + DescriptionSystem.GetName(item) + " x" + EntityManager.GetComponent<ItemComponent>(item).Count + '\n';
             }
 
-            spriteBatch.DrawString(Util.DefaultFont, itemStringRightCol, new Vector2(Util.WorldWidth + 20 + 240, 220 + 40), Color.Black);
+            spriteBatch.DrawString(Util.DefaultFont, itemStringRightCol, new Vector2(Util.WorldViewPixelWidth + 20 + 240, 220 + 40), Color.Black);
 
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
-            spriteBatch.Draw(TextureManager.GetTexture("tooltip"), new Vector2(Util.WorldWidth, 0), Color.White);
-            
+            spriteBatch.Draw(TextureManager.GetTexture("tooltip"), new Vector2(Util.WorldViewPixelWidth, 0), Color.White);
+
 
             InputManager.CommandDomain curDomain = InputManager.Instance.GetCurrentDomain();
 
             string name = "";
             string description = "";
 
-            if(curDomain == InputManager.CommandDomain.Exploring)
+            if (curDomain == InputManager.CommandDomain.Exploring)
             {
                 name = "Player";
                 description = DescriptionSystem.GetCharacterTooltip(Util.PlayerID);
@@ -84,15 +84,15 @@ namespace TheAlchemist
             }
             else if (curDomain == InputManager.CommandDomain.Inventory)
             {
-                if(items.Count == 0)
+                if (items.Count == 0)
                 {
                     name = "Your inventory is empty!";
                     description = "";
                 }
                 else
                 {
-                    var descriptionC = EntityManager.GetComponent<DescriptionComponent>(items[InventoryCursorPosition -1]);
-                    if(descriptionC == null)
+                    var descriptionC = EntityManager.GetComponent<DescriptionComponent>(items[InventoryCursorPosition - 1]);
+                    if (descriptionC == null)
                     {
                         name = "???";
                         description = "???";
@@ -104,7 +104,7 @@ namespace TheAlchemist
                     }
                 }
             }
-            else if(curDomain == InputManager.CommandDomain.Targeting)
+            else if (curDomain == InputManager.CommandDomain.Targeting)
             {
                 var pos = EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position;
                 int character = Util.CurrentFloor.GetCharacter(pos);
@@ -113,20 +113,20 @@ namespace TheAlchemist
 
                 int descrEntity = 0;
 
-                if(character != 0)
+                if (character != 0)
                 {
                     descrEntity = character;
                 }
-                else if(item != 0)
+                else if (item != 0)
                 {
                     descrEntity = item;
                 }
-                else if(terrain != 0)
+                else if (terrain != 0)
                 {
                     descrEntity = terrain;
                 }
 
-                if(descrEntity == 0)
+                if (descrEntity == 0)
                 {
                     name = "Floor";
                     description = "There's nothing there!";
@@ -134,7 +134,7 @@ namespace TheAlchemist
                 else
                 {
                     var descriptionC = EntityManager.GetComponent<DescriptionComponent>(descrEntity);
-                    if(descriptionC == null)
+                    if (descriptionC == null)
                     {
                         name = "???";
                         description = "???";
@@ -148,21 +148,21 @@ namespace TheAlchemist
             }
 
             // draw name
-            spriteBatch.DrawString(Util.BigFont, name, new Vector2(Util.WorldWidth + 10, 10), Color.Black);
+            spriteBatch.DrawString(Util.BigFont, name, new Vector2(Util.WorldViewPixelWidth + 10, 10), Color.Black);
 
             // split description into multiple lines
             int rowLength = 40;
             int cur = 0;
             int limit = 55;
-            while(cur + rowLength < description.Length)
+            while (cur + rowLength < description.Length)
             {
-                if(limit-- == 0)
+                if (limit-- == 0)
                 {
                     return;
                 }
                 //Console.WriteLine(cur + "|" + description.Length);
                 int newlPos = description.IndexOf('\n', cur, rowLength);
-                if(newlPos >= 0)
+                if (newlPos >= 0)
                 {
                     cur = newlPos + 1;
                     continue;
@@ -184,7 +184,7 @@ namespace TheAlchemist
             }
 
             // draw description text
-            spriteBatch.DrawString(Util.BigFont, description, new Vector2(Util.WorldWidth + 10, 40), Color.Black);
+            spriteBatch.DrawString(Util.BigFont, description, new Vector2(Util.WorldViewPixelWidth + 10, 40), Color.Black);
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
         }
 

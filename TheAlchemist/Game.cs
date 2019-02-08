@@ -11,7 +11,7 @@ namespace TheAlchemist
 {
     using Systems;
     using Components;
-    
+
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
@@ -39,12 +39,14 @@ namespace TheAlchemist
         public static int Seed = (int)DateTime.Now.TimeOfDay.TotalSeconds;
         public static Random Random { get; } = new Random(Seed);
 
-               
+
         public Game()
         {
-            graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = Util.ScreenWidth;
-            graphics.PreferredBackBufferHeight = Util.ScreenHeight;
+            graphics = new GraphicsDeviceManager(this)
+            {
+                PreferredBackBufferWidth = Util.ScreenWidth,
+                PreferredBackBufferHeight = Util.ScreenHeight
+            };
             //graphics.IsFullScreen = true;
 
             Window.AllowUserResizing = true;
@@ -105,7 +107,7 @@ namespace TheAlchemist
             itemSystem.HealthGainedEvent += healthSystem.HandleGainedHealth;
             itemSystem.HealthLostEvent += healthSystem.HandleLostHealth;
             itemSystem.StatChangedEvent += statSystem.ChangeStat;
-           
+
             npcBehaviourSystem.EnemyMovedEvent += movementSystem.HandleMovementEvent;
 
             movementSystem.CollisionEvent += collisionSystem.HandleCollision;
@@ -119,7 +121,7 @@ namespace TheAlchemist
             combatSystem.HealthLostEvent += healthSystem.HandleLostHealth;
 
             Log.Message("Loading Keybindings...");
-            string keybindings = File.ReadAllText(Util.ContentPath + "/keybindings.json");          
+            string keybindings = File.ReadAllText(Util.ContentPath + "/keybindings.json");
             input.LoadKeyBindings(keybindings);
             input.EnterDomain(InputManager.CommandDomain.Exploring); // start out with exploring as bottom level command domain
             input.ControlledEntity = Util.PlayerID;
@@ -140,13 +142,13 @@ namespace TheAlchemist
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             virtualScreen = new RenderTarget2D(GraphicsDevice, Util.ScreenWidth, Util.ScreenHeight);
-            renderedWorld = new RenderTarget2D(GraphicsDevice, Util.WorldWidth, Util.WorldHeight);
+            renderedWorld = new RenderTarget2D(GraphicsDevice, Util.WorldViewPixelWidth, Util.WorldViewPixelHeight);
 
             Util.DefaultFont = Content.Load<SpriteFont>("default");
             Util.SmallFont = Content.Load<SpriteFont>("small");
             Util.BigFont = Content.Load<SpriteFont>("big");
 
-            string[] textures = 
+            string[] textures =
             {
                 "player", "box", "wall", "targetIndicator",
                 "doorOpen", "doorClosed", "square",
@@ -161,7 +163,7 @@ namespace TheAlchemist
             };
 
             TextureManager.Init(Content);
-            TextureManager.LoadTextures(textures);         
+            TextureManager.LoadTextures(textures);
         }
 
         /// <summary>

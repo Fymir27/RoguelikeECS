@@ -19,6 +19,8 @@ namespace TheAlchemist.Systems
 
         public bool FogOfWarEnabled = true;
 
+        Position min; // top left world position thats beeing rendered / thats on screen
+
         public RenderSystem(GraphicsDevice graphics)
         {
             this.graphics = graphics;
@@ -27,8 +29,8 @@ namespace TheAlchemist.Systems
 
         public void RenderWorld(RenderTarget2D renderTarget)
         {
-            graphics.SetRenderTarget(renderTarget);           
-          
+            graphics.SetRenderTarget(renderTarget);
+
             spriteBatch.Begin(); //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
             graphics.Clear(Color.White);
 
@@ -36,8 +38,101 @@ namespace TheAlchemist.Systems
             var seenPositions = Util.CurrentFloor.GetSeenPositions();
 
             var renderedSprites = EntityManager
-                .GetAllComponentsOfType<RenderableSpriteComponent>()
-                .Where(component => component.Visible);
+               .GetAllComponentsOfType<RenderableSpriteComponent>()
+               .Where(component => component.Visible);
+
+            var renderedTerrain = new List<RenderableSpriteComponent>();
+            var renderedItems = new List<RenderableSpriteComponent>();
+            var renderedCharacters = new List<RenderableSpriteComponent>();
+            var renderedDarkness = new List<RenderableSpriteComponent>();
+
+            Position playerPos = Util.GetPlayerPos();
+            Floor floor = Util.CurrentFloor;
+
+            // camera capped to floor
+            int minX = Math.Max(0, Math.Min(floor.Width - Util.WorldViewTileWidth, playerPos.X - Util.WorldViewTileWidth / 2));
+            int minY = Math.Max(0, Math.Min(floor.Height - Util.WorldViewTileHeight, playerPos.Y - Util.WorldViewTileHeight / 2));
+
+            // camera uncapped
+            //int minX = playerPos.X - Util.WorldViewTileWidth / 2;
+            //int minY = playerPos.Y - Util.WorldViewTileHeight / 2;
+
+            min = new Position(minX, minY);
+
+            for (int y = 0; y < Util.WorldViewTileHeight; y++)
+            {
+                for (int x = 0; x < Util.WorldViewTileWidth; x++)
+                {
+                    var relScreenPos = new Position(x, y);
+                    var worldPos = min + relScreenPos;
+
+                    Tile tile = floor.GetTile(worldPos);
+
+                    if (tile == null || !tile.Discovered)
+                    {
+                        // black square
+                        renderedDarkness.Add(new RenderableSpriteComponent()
+                        {
+                            Texture = "square",
+                            Position = Util.WorldToScreenPosition(relScreenPos),
+                            Tint = Color.Black,
+                        });
+
+                        continue; // everything else is hidden
+                    }
+
+                    if (tile.Terrain != 0)
+                    {
+                        var sprite = EntityManager.GetComponent<RenderableSpriteComponent>(tile.Terrain);
+
+                        if (sprite != null && sprite.Visible)
+                        {
+                            renderedTerrain.Add(sprite);
+                        }
+                    }
+
+                    if (!seenPositions.Contains(worldPos))
+                    {
+                        // grey square
+                        renderedDarkness.Add(new RenderableSpriteComponent()
+                        {
+                            Texture = "square",
+                            Position = Util.WorldToScreenPosition(relScreenPos),
+                            Tint = new Color(Color.Black, 0.7f)
+                        });
+
+                        continue; // hide everything else
+                    }
+
+                    if (tile.Items != null && tile.Items.Count > 0)
+                    {
+                        var sprite = EntityManager.GetComponent<RenderableSpriteComponent>(tile.Items.Last());
+
+                        if (sprite != null && sprite.Visible)
+                        {
+                            renderedItems.Add(sprite);
+                        }
+                    }
+
+                    if (tile.Character != 0)
+                    {
+                        var sprite = EntityManager.GetComponent<RenderableSpriteComponent>(tile.Character);
+
+                        if (sprite != null && sprite.Visible)
+                        {
+                            renderedCharacters.Add(sprite);
+                        }
+                    }
+                }
+            }
+
+            renderedTerrain.ForEach(DrawSprite);
+            renderedItems.ForEach(DrawSprite);
+            renderedCharacters.ForEach(DrawSprite);
+            renderedDarkness.ForEach(DrawSprite);
+
+
+            /*
 
             // order sprite by Layer to determine what to draw first
             var orderedSprites = renderedSprites.OrderBy(sprite => sprite.Layer);
@@ -51,7 +146,7 @@ namespace TheAlchemist.Systems
                 {
                     continue; // only render npcs on seen positions
                 }
-                spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, sprite.Tint);              
+                spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, sprite.Tint);
             }
 
             // mask hidden and discovered tiles
@@ -66,7 +161,7 @@ namespace TheAlchemist.Systems
                     {
                         if (Util.CurrentFloor.IsDiscovered(pos))
                         {
-                            spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), new Color(Color.Black, 0.7f));                          
+                            spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), new Color(Color.Black, 0.7f));
                         }
                         else
                         {
@@ -77,7 +172,9 @@ namespace TheAlchemist.Systems
                 }
             }
 
-            SKIPFOW:
+        SKIPFOW:
+
+            */
 
             /* no rendered texts at the moment!
             var renderedTexts = EntityManager
@@ -93,6 +190,15 @@ namespace TheAlchemist.Systems
             spriteBatch.End(); //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
 
             graphics.SetRenderTarget(null);
+        }
+
+        void DrawSprite(RenderableSpriteComponent sprite)
+        {
+            if (sprite.EntityID != 0)
+            {
+                sprite.Position = Util.WorldToScreenPosition(EntityManager.GetComponent<TransformComponent>(sprite.EntityID).Position - min);
+            }
+            spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, sprite.Tint);
         }
     }
 }

@@ -12,11 +12,11 @@ namespace TheAlchemist
 {
     using Systems;
     using Components;
-    
+
     public enum Direction
     {
-        North,   
-        NorthEast,  
+        North,
+        NorthEast,
         East,
         SouthEast,
         South,
@@ -94,7 +94,7 @@ namespace TheAlchemist
         public static bool ErrorOccured = false;
         // ignores errors when on
         public static bool BrutalModeOn = false;
- 
+
         public static SpriteFont DefaultFont { get; set; } = null;
         public static SpriteFont SmallFont { get; set; } = null;
         public static SpriteFont BigFont { get; set; } = null;
@@ -106,8 +106,12 @@ namespace TheAlchemist
 
         // virtual size of world (or rather view that is displayed)
         public static int TileSize { get; } = 20;
-        public static int WorldWidth { get; } = 800;
-        public static int WorldHeight { get; } = 500;
+        public static int WorldViewPixelWidth { get; } = 820;
+        public static int WorldViewPixelHeight { get; } = 500;
+
+        // size of world view in tiles
+        public static int WorldViewTileWidth { get; } = 41;
+        public static int WorldViewTileHeight { get; } = 25;
 
         public static int PlayerID { get; set; } = 0;
         public static Floor CurrentFloor { get; set; } = null;
@@ -115,14 +119,14 @@ namespace TheAlchemist
 
         public static int TargetIndicatorID { get; set; } = 0;
 
-        public static FOV FOV = FOV.Medium;   
-    
+        public static FOV FOV = FOV.Medium;
+
         // gets called for every new type of component/entity/...
         public static class TypeID<T>
         {
             static int counter = 0;
             public static int Get()
-            {             
+            {
                 return ++counter;
             }
         }
@@ -140,7 +144,7 @@ namespace TheAlchemist
         public static string GetStringFromEnumerable<T>(IEnumerable<T> list)
         {
             string result = "[";
-            foreach(var elem in list)
+            foreach (var elem in list)
             {
                 result += elem.ToString() + ",";
             }
@@ -153,6 +157,11 @@ namespace TheAlchemist
             return new Vector2(worldPos.X * TileSize, worldPos.Y * TileSize);
         }
 
+        public static Position GetPlayerPos()
+        {
+            return EntityManager.GetComponent<TransformComponent>(PlayerID).Position;
+        }
+
         // returns Direction 180 degrees from param direction
         public static Direction GetOppositeDirection(Direction direction)
         {
@@ -163,7 +172,7 @@ namespace TheAlchemist
         // returns a "unit" vector in Direction dir
         public static Position GetUnitVectorInDirection(Direction dir)
         {
-            switch(dir)
+            switch (dir)
             {
                 case Direction.North:
                     return new Position(0, -1);
@@ -189,11 +198,11 @@ namespace TheAlchemist
             var health = EntityManager.GetComponent<HealthComponent>(entity);
 
             // entity dead, don't do anything
-            if(health.Amount <= 0)
+            if (health.Amount <= 0)
             {
                 return;
             }
-           
+
             TurnOverEvent?.Invoke(entity);
 
             if (entity == PlayerID)
@@ -212,7 +221,7 @@ namespace TheAlchemist
         }
 
         public static T DeserializeObject<T>(string obj)
-        {           
+        {
             var settings = new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto
@@ -221,7 +230,7 @@ namespace TheAlchemist
             {
                 return JsonConvert.DeserializeObject<T>(obj, settings);
             }
-            catch(JsonException e)
+            catch (JsonException e)
             {
                 Log.Error("Deserialization went wrong! " + typeof(T));
                 Log.Error(e.Message);
@@ -233,14 +242,14 @@ namespace TheAlchemist
         // otherwise it will produce a warning at runtime because 
         // this function tries to remove old sprites (which there are none of)
         public static void UpdateTargetLine(bool init = false)
-        {         
+        {
             var targetPos = EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position;
             // calculate line to target indicator
             var line = CurrentFloor.GetLine(
                 EntityManager.GetComponent<TransformComponent>(Util.PlayerID).Position,
                 targetPos);
 
-            if(line.Count > 1)
+            if (line.Count > 1)
             {
                 line.RemoveAt(0); // don't draw square on player unless targeting self
             }
@@ -253,7 +262,7 @@ namespace TheAlchemist
 
             List<IComponent> updatedSprites = new List<IComponent>();
 
-            foreach(var pos in line)
+            foreach (var pos in line)
             {
                 updatedSprites.Add(new RenderableSpriteComponent()
                 {
@@ -272,7 +281,7 @@ namespace TheAlchemist
 
             // add updated sprites to entity
             EntityManager.AddComponents(Util.TargetIndicatorID, updatedSprites);
-         
+
         }
 
         public static int Sign(bool b)
