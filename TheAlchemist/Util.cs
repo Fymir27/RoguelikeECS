@@ -41,6 +41,11 @@ namespace TheAlchemist
         public Position(int x, int y) { X = x; Y = y; }
         public Position(Position other) { X = other.X; Y = other.Y; }
 
+        public static Position Up = new Position(0, 1);
+        public static Position Right = new Position(1, 0);
+        public static Position Down = new Position(0, -1);
+        public static Position Left = new Position(-1, 0);
+
         public static implicit operator Position(Vector2 other) { return new Position((int)other.X, (int)other.Y); }
 
         public static Position operator +(Position first, Position second)

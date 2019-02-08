@@ -690,8 +690,6 @@ namespace TheAlchemist
 
             //var room = new Room(roomPos, 10, 5, RoomShape.Rectangle, this);          
 
-            PlaceCharacter(roomPos + new Position(1, 1), CreatePlayer());
-
             //Console.WriteLine("Room2:");
             //roomPos = new Position(6, 9);
             //var room2 = new Room(roomPos, 10, 5, RoomShape.Diamond, this);
@@ -703,6 +701,8 @@ namespace TheAlchemist
             //Console.WriteLine("Room4:");
             //roomPos = new Position(14, 3);
             //var room4 = new Room(roomPos, 5, 5, RoomShape.Diamond, this);
+
+            List<Room> rooms = new List<Room>();
 
             for (int i = 0; i < 5; i++)
             {
@@ -726,8 +726,16 @@ namespace TheAlchemist
 
                 shape = (RoomShape)Game.Random.Next(Enum.GetValues(typeof(RoomShape)).Length);
 
-                PlaceRoom(roomPos, roomWidth, roomHeight, shape);
+                rooms.Add(PlaceRoom(roomPos, roomWidth, roomHeight, shape));
             }
+
+            List<Room> connectedRooms = new List<Room>();
+            for (int i = 0; i < rooms.Count; i++)
+            {
+                ConnectRooms(rooms[i], rooms[(i + 1) % rooms.Count]);
+            }
+
+            PlaceCharacter(rooms[0].Pos + new Position(rooms[0].Width / 2, rooms[0].Height / 2), CreatePlayer());
         }
 
         Room PlaceRoom(Position pos, int width, int height, RoomShape shape)
@@ -755,6 +763,19 @@ namespace TheAlchemist
                 }
             }
             return true;
+        }
+
+        void ConnectRooms(Room room1, Room room2)
+        {
+            Position from = room1.GetPossibleDoor();
+            Position to = room2.GetPossibleDoor();
+
+            var line = GetRandomLineNonDiagonal(from, to);
+
+            foreach (var pos in line)
+            {
+                RemoveTerrain(pos);
+            }
         }
 
 
@@ -787,6 +808,24 @@ namespace TheAlchemist
             }
             return GetTile(pos).Terrain;
             //return terrain[(int)pos.X, (int)pos.Y];
+        }
+
+        public bool IsSolid(Position pos)
+        {
+            int terrainID = GetTerrain(pos);
+
+            if (terrainID == 0)
+                return false;
+
+            var terrainCollider = EntityManager.GetComponent<ColliderComponent>(terrainID);
+
+            if (terrainCollider == null)
+                return false;
+
+            if (terrainCollider.Solid)
+                return true;
+
+            return false;
         }
 
         public int GetCharacter(Position pos)
@@ -1206,21 +1245,44 @@ namespace TheAlchemist
                 if (!stopAtSolid)
                     continue;
 
-                int terrainID = GetTerrain(curPos);
-
-                if (terrainID == 0)
-                    continue;
-
-                var terrainCollider = EntityManager.GetComponent<ColliderComponent>(terrainID);
-
-                if (terrainCollider == null)
-                    continue;
-
-                if (terrainCollider.Solid)
+               if(IsSolid(curPos))
                     break;
 
             }
             return result;
+        }
+
+        public List<Position> GetRandomLineNonDiagonal(Position from, Position to)
+        { 
+            List<Position> line = new List<Position>() { from };
+
+            Position verticalStep = from.Y < to.Y ? Position.Up : Position.Down;
+            Position horizontalStep = from.X < to.X ? Position.Right : Position.Left;
+
+            Position pos = from;
+
+            while(pos != to)
+            {
+                bool up = Game.Random.Next(2) > 0;
+
+                if(up && pos.Y != to.Y)
+                {
+                    pos += verticalStep;               
+                }
+                else if(pos.X != to.X)
+                {
+                    pos += horizontalStep;
+                }
+                else
+                {
+                    pos += verticalStep;
+                }
+
+                //var pos = new Position(x, y);
+                line.Add(pos);
+            }
+
+            return line;
         }
 
         public static int CreatePlayer()

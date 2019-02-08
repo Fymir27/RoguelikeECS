@@ -60,15 +60,9 @@ namespace TheAlchemist
         // returns entities that have a specific type of component attached
         public static IEnumerable<int> GetEntitiesWithComponent<T>() where T : Component<T>
         {
-            try
-            {
-                return entitiesWithComponent[Component<T>.TypeID];
-            }
-            catch (KeyNotFoundException)
-            {
-                Log.Warning("No entity with such Component exists! (" + typeof(T) + ")");
-                return new List<int>();
-            }
+
+            entitiesWithComponent.TryGetValue(Component<T>.TypeID, out List<int> res);
+            return res != null ? res : new List<int>();
         }
 
         // returns all components of specific type

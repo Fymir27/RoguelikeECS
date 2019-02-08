@@ -16,7 +16,10 @@ namespace TheAlchemist
     {
         public Position Pos;
         public int Width, Height;
-        public RoomShape Shape;        
+        public RoomShape Shape;
+
+        // for possible doors
+        List<Position> outline = new List<Position>();
 
         public int Difficulty;
         public int Vegetation;
@@ -50,6 +53,13 @@ namespace TheAlchemist
                     Log.Error("Room shape not implemented! -> " + shape);
                     break;
             }
+
+            string outlineString = "Outline:\n";
+            foreach (var item in outline)
+            {
+                outlineString += item.ToString() + ",";
+            }
+            Log.Data(outlineString);
         }
 
         private void InitRectangular()
@@ -60,9 +70,14 @@ namespace TheAlchemist
             {
                 for (int x = Pos.X; x < Pos.X + Width; x++)
                 {
-                    floor.RemoveTerrain(new Position(x, y));
+                    Position pos = new Position(x, y);
+                    if(x == Pos.X || y == Pos.X || x == Pos.X + Width - 1 || y == Pos.Y + Height - 1)
+                    {
+                        outline.Add(pos);
+                    }
+                    floor.RemoveTerrain(pos);
                 }
-            }         
+            }
         }
 
         private void InitDiamond()
@@ -91,9 +106,20 @@ namespace TheAlchemist
 
                 for (int x = rowStart; x < Width - rowStart; x++)
                 {
+                    if(x == rowStart || x == Width - rowStart - 1)
+                    {
+                        outline.Add(Pos + new Position(x, y));
+                    }
                     floor.RemoveTerrain(Pos + new Position(x, y));
                 }
             }        
+        }
+
+
+        // returns random position where door can be adjacent (outline)
+        public Position GetPossibleDoor()
+        {
+            return outline[Game.Random.Next(outline.Count)];
         }
     }
 }

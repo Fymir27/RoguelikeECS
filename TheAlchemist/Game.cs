@@ -89,6 +89,9 @@ namespace TheAlchemist
             uiSystem = new UISystem();
             statSystem = new StatSystem();
 
+            // turn off FOW
+            renderSystem.FogOfWarEnabled = false;
+
             // hook up all events with their handlers
             Log.Message("Registering Event Handlers...");
 

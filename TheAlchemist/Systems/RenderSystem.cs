@@ -17,6 +17,8 @@ namespace TheAlchemist.Systems
         GraphicsDevice graphics;
         SpriteBatch spriteBatch;
 
+        public bool FogOfWarEnabled = true;
+
         public RenderSystem(GraphicsDevice graphics)
         {
             this.graphics = graphics;
@@ -51,8 +53,10 @@ namespace TheAlchemist.Systems
                 }
                 spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, sprite.Tint);              
             }
-         
+
             // mask hidden and discovered tiles
+            if (!FogOfWarEnabled) goto SKIPFOW;
+
             for (int y = 0; y < Util.CurrentFloor.Height; y++)
             {
                 for (int x = 0; x < Util.CurrentFloor.Width; x++)
@@ -62,16 +66,18 @@ namespace TheAlchemist.Systems
                     {
                         if (Util.CurrentFloor.IsDiscovered(pos))
                         {
-                            //spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), new Color(Color.Black, 0.7f));                          
+                            spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), new Color(Color.Black, 0.7f));                          
                         }
                         else
                         {
-                            //spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), Color.Black);
+                            spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), Color.Black);
                         }
                     }
 
                 }
             }
+
+            SKIPFOW:
 
             /* no rendered texts at the moment!
             var renderedTexts = EntityManager
