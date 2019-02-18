@@ -37,10 +37,6 @@ namespace TheAlchemist.Systems
             // seen by player
             var seenPositions = Util.CurrentFloor.GetSeenPositions();
 
-            var renderedSprites = EntityManager
-               .GetAllComponentsOfType<RenderableSpriteComponent>()
-               .Where(component => component.Visible);
-
             var renderedTerrain = new List<RenderableSpriteComponent>();
             var renderedItems = new List<RenderableSpriteComponent>();
             var renderedCharacters = new List<RenderableSpriteComponent>();
@@ -116,6 +112,7 @@ namespace TheAlchemist.Systems
 
                     if (tile.Character != 0)
                     {
+                        //Log.Data(DescriptionSystem.GetDebugInfoEntity(tile.Character));
                         var sprite = EntityManager.GetComponent<RenderableSpriteComponent>(tile.Character);
 
                         if (sprite != null && sprite.Visible)
@@ -197,6 +194,7 @@ namespace TheAlchemist.Systems
             if (sprite.EntityID != 0)
             {
                 sprite.Position = Util.WorldToScreenPosition(EntityManager.GetComponent<TransformComponent>(sprite.EntityID).Position - min);
+                //Log.Message("Drawing sprite of entity at: " + sprite.Position);
             }
             spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, sprite.Tint);
         }

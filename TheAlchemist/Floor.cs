@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Drawing;
 using System.Threading.Tasks;
+
 using Microsoft.Xna.Framework;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TheAlchemist
 {
     using Components;
     using Systems;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
+
 
     public interface IVisionGrid
     {
@@ -55,6 +60,11 @@ namespace TheAlchemist
         Tile[,] tiles;
 
         bool[,] assignedToRoom;
+
+        List<Room> rooms;
+        int curRoomNr = 1;
+        public int GetNewRoomNr() { return curRoomNr++; }
+        public int[,] roomNrs;
 
         // seen by player at this moment
         List<Position> seen = new List<Position>();
@@ -667,6 +677,7 @@ namespace TheAlchemist
 
             tiles = new Tile[width, height];
             assignedToRoom = new bool[width, height];
+            roomNrs = new int[width, height];
 
             foreach (var item in assignedToRoom)
             {
@@ -702,7 +713,7 @@ namespace TheAlchemist
             //roomPos = new Position(14, 3);
             //var room4 = new Room(roomPos, 5, 5, RoomShape.Diamond, this);
 
-            List<Room> rooms = new List<Room>();
+            rooms = new List<Room>();
 
             for (int i = 0; i < 10; i++)
             {
@@ -729,13 +740,24 @@ namespace TheAlchemist
                 rooms.Add(PlaceRoom(roomPos, roomWidth, roomHeight, shape));
             }
 
+
+            // find possible connections between rooms
+            FindConnectionPoints();
+            ConnectRooms();
+            SpawnEnemies();
+
+            /*
             List<Room> connectedRooms = new List<Room>();
             for (int i = 0; i < rooms.Count; i++)
             {
                 ConnectRooms(rooms[i], rooms[(i + 1) % rooms.Count]);
+
             }
+            */
 
             PlaceCharacter(rooms[0].Pos + new Position(rooms[0].Width / 2, rooms[0].Height / 2), CreatePlayer());
+
+
 
             //PlaceCharacter(new Position(Width / 2, Height / 2), CreatePlayer());
         }
@@ -767,6 +789,63 @@ namespace TheAlchemist
             return true;
         }
 
+        void ConnectRooms()
+        {
+            foreach (var room in rooms)
+            {
+                int maxConnectionCount = 2;
+                var dict = room.connectionPoints;
+
+                if (dict.Count == 0)
+                {
+                    //Log.Error("ROOM HAS NO CONNECTION POINTS, OH NO!");
+                    continue;
+                }
+
+                var tuple = dict[dict.Keys.ElementAt(Game.Random.Next(0, Math.Min(dict.Count, maxConnectionCount + 1)))];
+
+                var startPositions = tuple.Item1;
+                var endPositions = tuple.Item2;
+
+                var connectionIndex = Game.Random.Next(startPositions.Count);
+
+                var start = startPositions[connectionIndex];
+                var end = endPositions[connectionIndex];
+
+                var path = GetRandomLineNonDiagonal(start, end);
+
+                foreach (Position pos in path)
+                {
+                    RemoveTerrain(pos);
+                    roomNrs[pos.X, pos.Y] = room.Nr;
+                }
+
+                PlaceTerrain(start, CreateDoor());
+                PlaceTerrain(end, CreateDoor());
+            }
+        }
+
+        void SpawnEnemies()
+        {
+            GameData data = GameData.Instance;
+            List<string> names = data.GetEnemyNames();
+
+            foreach (var room in rooms)
+            {
+                int maxSpawnCount = 3;
+                int spawnCount = Game.Random.Next(0, maxSpawnCount + 1);
+
+                for (int i = 0; i < spawnCount; i++)
+                {
+                    var pos = room.freePositions[Game.Random.Next(0, room.freePositions.Count)];
+                    var name = Util.PickRandomElement(names);
+                    PlaceCharacter(pos, GameData.Instance.CreateEnemy(name));
+                    //Log.Data(DescriptionSystem.GetDebugInfoEntity(GetCharacter(pos)));
+                    room.freePositions.Remove(pos);
+                }
+            }
+        }
+
         void ConnectRooms(Room room1, Room room2)
         {
             Position from = room1.GetPossibleDoor();
@@ -774,12 +853,250 @@ namespace TheAlchemist
 
             var line = GetRandomLineNonDiagonal(from, to);
 
+            Position door1 = Position.Zero;
+            Position door2 = Position.Zero;
+
+            Position prev = Position.Zero;
+            List<Position> doors = new List<Position>();
+            bool insideWall = false;
+
             foreach (var pos in line)
             {
+                if (IsSolid(pos))
+                {
+                    if (!insideWall)
+                    {
+                        doors.Add(pos);
+                        insideWall = true;
+                    }
+                }
+                else
+                {
+                    if (insideWall)
+                    {
+                        doors.Add(prev);
+                        insideWall = false;
+                    }
+                }
                 RemoveTerrain(pos);
+                prev = pos;
+            }
+
+            foreach (var doorPos in doors)
+            {
+                PlaceTerrain(doorPos, CreateDoor());
             }
         }
 
+        enum FindConnectionState
+        {
+            Init,
+            FromFound,
+            LookingForTo
+        }
+
+        // initializes the connection points between all the rooms (Positions where corridors between them start and end)
+        void FindConnectionPoints()
+        {
+            int roomFrom = 0;
+            Position from = Position.Zero;
+            Position prev = Position.Zero;
+
+            var state = FindConnectionState.Init;
+
+            #region horizontal
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    int nr = roomNrs[x, y];
+
+                    switch (state)
+                    {
+                        case FindConnectionState.Init:
+                            if (nr != 0)
+                            {
+                                roomFrom = nr;
+                                state = FindConnectionState.FromFound;
+                            }
+                            break;
+
+                        case FindConnectionState.FromFound:
+                            if (nr == 0)
+                            {
+                                from = new Position(x, y);
+                                state = FindConnectionState.LookingForTo;
+                            }
+                            break;
+
+                        case FindConnectionState.LookingForTo:
+                            if (nr != 0)
+                            {
+                                rooms[roomFrom - 1].AddConnection(nr, from, prev);
+                                roomFrom = nr;
+                                state = FindConnectionState.FromFound;
+                                break;
+                            }
+                            else // check if the connection is an exact tangent to another room
+                            {
+                                int roomNrAbove = roomNrs[x, y - 1];
+                                int roomNrBelow = roomNrs[x, y + 1];
+
+                                if (roomNrAbove != 0)
+                                {
+                                    if (roomNrAbove == roomFrom)
+                                    {
+                                        from = new Position(x, y);
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        rooms[roomFrom - 1].AddConnection(roomNrAbove, from, new Position(x, y));
+                                        roomFrom = 0;
+                                        state = FindConnectionState.Init;
+                                        break;
+                                    }
+
+                                }
+
+                                if (roomNrBelow != 0)
+                                {
+                                    if (roomNrBelow == roomFrom)
+                                    {
+                                        from = new Position(x, y);
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        rooms[roomFrom - 1].AddConnection(roomNrBelow, from, new Position(x, y));
+                                        roomFrom = 0;
+                                        state = FindConnectionState.Init;
+                                        break;
+                                    }
+
+                                }
+                            }
+                            break;
+                    }
+                    prev = new Position(x, y);
+                }
+                roomFrom = 0;
+                state = FindConnectionState.Init;
+            }
+            #endregion
+
+            roomFrom = 0;
+            from = Position.Zero;
+            prev = Position.Zero;
+
+            state = FindConnectionState.Init;
+
+            #region vertical
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    int nr = roomNrs[x, y];
+
+                    switch (state)
+                    {
+                        case FindConnectionState.Init:
+                            if (nr != 0)
+                            {
+                                roomFrom = nr;
+                                state = FindConnectionState.FromFound;
+                            }
+                            break;
+
+                        case FindConnectionState.FromFound:
+                            if (nr == 0)
+                            {
+                                from = new Position(x, y);
+                                state = FindConnectionState.LookingForTo;
+                            }
+                            break;
+
+                        case FindConnectionState.LookingForTo:
+                            if (nr != 0)
+                            {
+                                rooms[roomFrom - 1].AddConnection(nr, from, prev);
+                                roomFrom = nr;
+                                state = FindConnectionState.FromFound;
+                                break;
+                            }
+                            else // check if the connection is an exact tangent to another room
+                            {
+                                int roomNrRight = roomNrs[x + 1, y];
+                                int roomNrLeft = roomNrs[x - 1, y];
+
+                                if (roomNrRight != 0)
+                                {
+                                    if (roomNrRight == roomFrom)
+                                    {
+                                        from = new Position(x, y);
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        rooms[roomFrom - 1].AddConnection(roomNrRight, from, new Position(x, y));
+                                        roomFrom = 0;
+                                        state = FindConnectionState.Init;
+                                        break;
+                                    }
+
+                                }
+
+                                if (roomNrLeft != 0)
+                                {
+                                    if (roomNrLeft == roomFrom)
+                                    {
+                                        from = new Position(x, y);
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        rooms[roomFrom - 1].AddConnection(roomNrLeft, from, new Position(x, y));
+                                        roomFrom = 0;
+                                        state = FindConnectionState.Init;
+                                        break;
+                                    }
+
+                                }
+                            }
+                            break;
+                    }
+                    prev = new Position(x, y);
+                }
+                roomFrom = 0;
+                state = FindConnectionState.Init;
+            }
+            #endregion
+
+            #region Debug output
+            /*
+            foreach (var room in rooms)
+            {
+                Log.Message("Connections FROM room " + room.Nr + ":");
+                foreach (var keyValuePair in room.connectionPoints)
+                {
+                    Log.Message("Connections to room " + keyValuePair.Key + ":");
+                    Log.Message("Start: " + Util.GetStringFromEnumerable(keyValuePair.Value.Item1));
+                    Log.Message("End: " + Util.GetStringFromEnumerable(keyValuePair.Value.Item2));
+
+                    foreach (var pos in keyValuePair.Value.Item1)
+                    {
+                        //roomNrs[pos.X, pos.Y] = keyValuePair.Key;
+                    }
+
+                    foreach (var pos in keyValuePair.Value.Item2)
+                    {
+                        //roomNrs[pos.X, pos.Y] = room.Nr;
+                    }
+                }
+            }
+            */
+            #endregion
+        }
 
         ////////////////////// Getters //////////////////////////////////////
 
@@ -1093,7 +1410,7 @@ namespace TheAlchemist
             {
                 itemsHere.AddRange(items);
             }
-         
+
         }
         */
 
@@ -1381,6 +1698,28 @@ namespace TheAlchemist
                 }
             }
             return result;
+        }
+
+        public void GenerateImage(string path, GraphicsDevice gDevice)
+        {
+            var texFloor = new Texture2D(gDevice, Width, Height);
+
+            Color[] colors = new Color[Width * Height];
+
+
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    var color = roomNrs[x, y] == 0 ? Color.Black : Util.Colors[(roomNrs[x, y] % (Util.Colors.Length))];
+                    colors[y * Width + x % Width] = color;
+                }
+            }
+
+            texFloor.SetData(colors);
+
+            FileStream fileStream = new FileStream(path, FileMode.OpenOrCreate);
+            texFloor.SaveAsPng(fileStream, Width, Height);
         }
     }
     /*

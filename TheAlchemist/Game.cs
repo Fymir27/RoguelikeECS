@@ -36,7 +36,7 @@ namespace TheAlchemist
         RenderSystem renderSystem;
         UISystem uiSystem;
 
-        public static int Seed = (int)DateTime.Now.TimeOfDay.TotalSeconds;
+        public static int Seed = 2601; // (int)DateTime.Now.TimeOfDay.TotalSeconds;
         public static Random Random { get; } = new Random(Seed);
 
 
@@ -48,6 +48,8 @@ namespace TheAlchemist
                 PreferredBackBufferHeight = Util.ScreenHeight
             };
             //graphics.IsFullScreen = true;
+
+            Util.GraphicsDevice = GraphicsDevice;
 
             Window.AllowUserResizing = true;
 
@@ -67,8 +69,13 @@ namespace TheAlchemist
             Log.Init(AppDomain.CurrentDomain.BaseDirectory + "/log.html");
             Log.Message("Seed: " + Seed);
 
+            var gameData = GameData.Instance = new GameData();
+            gameData.Load(Util.ContentPath);
+
             //Floor test = new Floor(Content.RootDirectory + "/map.txt");
             Floor test = new Floor();
+
+            //EntityManager.Dump();
 
             Util.CurrentFloor = test;
             Util.CurrentFloor.CalculateTileVisibility();
@@ -164,6 +171,8 @@ namespace TheAlchemist
 
             TextureManager.Init(Content);
             TextureManager.LoadTextures(textures);
+
+            Util.CurrentFloor.GenerateImage("./floor.png", GraphicsDevice);
         }
 
         /// <summary>

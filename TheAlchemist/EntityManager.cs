@@ -275,42 +275,49 @@ namespace TheAlchemist
         // debug
         public static void Dump()
         {
-            Console.WriteLine("----- DEBUG -----");
+            string s = "";
 
-            Console.WriteLine("Entities: ");
+            Log.Message("----- Dump of all entities: -----");
+
+            Log.Message("Entities: ");
             foreach (var key in componentsOfEntity.Keys)
             {
-                Console.Write(key + ": [");
+                s += key + ": [";
                 foreach (var item in componentsOfEntity[key])
                 {
-                    Console.Write(item.ComponentID + ", ");
+                    s += item.ComponentID + ", ";
                 }
-                Console.WriteLine("]");
+                s += "]\n";
             }
+            Log.Data(s);
 
-            Console.WriteLine("EntitiesWithComponent ");
+            s = "";
+            Log.Message("EntitiesWithComponent ");
             foreach (var key in entitiesWithComponent.Keys)
             {
-                Console.Write(key + ": [");
+                s += key + ": [";
                 foreach (var item in entitiesWithComponent[key])
                 {
-                    Console.Write(item + ", ");
+                    s += item + ", ";
                 }
-                Console.WriteLine("]");
+                s += "]\n";
             }
+            Log.Data(s);
 
-            Console.WriteLine("ComponentsOfType ");
+            s = "";
+            Log.Message("ComponentsOfType ");
             foreach (var key in componentsOfType.Keys)
             {
-                Console.Write(key + ": [");
+                s += key + ": [";
                 foreach (var item in componentsOfType[key])
                 {
-                    Console.Write(item.ComponentID + ", ");
+                    s += item.ComponentID + ", ";
                 }
-                Console.WriteLine("]");
+                s += "]\n";
             }
+            Log.Data(s);
 
-            Console.WriteLine("----- DEBUG -----");
+            Log.Message("----- End of dump -----");
         }
     }
 }

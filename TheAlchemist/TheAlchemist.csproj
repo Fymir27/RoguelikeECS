@@ -65,6 +65,7 @@
     <Compile Include="EntityManager.cs" />
     <Compile Include="Floor.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="GameData.cs" />
     <Compile Include="InputManager.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Program.cs" />

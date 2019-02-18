@@ -14,12 +14,16 @@ namespace TheAlchemist
 
     class Room
     {
+        public int Nr;
         public Position Pos;
         public int Width, Height;
         public RoomShape Shape;
 
+        public Dictionary<int, Tuple<List<Position>, List<Position>>> connectionPoints = new Dictionary<int, Tuple<List<Position>, List<Position>>>();
+
         // for possible doors
         List<Position> outline = new List<Position>();
+        public List<Position> freePositions = new List<Position>();
 
         public int Difficulty;
         public int Vegetation;
@@ -29,6 +33,7 @@ namespace TheAlchemist
 
         public Room(Position pos, int width, int height, RoomShape shape, Floor floor)
         {
+            Nr = floor.GetNewRoomNr();
             Pos = pos;
             Width = width;
             Height = height;
@@ -54,12 +59,14 @@ namespace TheAlchemist
                     break;
             }
 
+            /*
             string outlineString = "Outline:\n";
             foreach (var item in outline)
             {
                 outlineString += item.ToString() + ",";
             }
             Log.Data(outlineString);
+            */
         }
 
         private void InitRectangular()
@@ -71,11 +78,11 @@ namespace TheAlchemist
                 for (int x = Pos.X; x < Pos.X + Width; x++)
                 {
                     Position pos = new Position(x, y);
-                    if(x == Pos.X || y == Pos.X || x == Pos.X + Width - 1 || y == Pos.Y + Height - 1)
+                    if (x == Pos.X || y == Pos.X || x == Pos.X + Width - 1 || y == Pos.Y + Height - 1)
                     {
                         outline.Add(pos);
                     }
-                    floor.RemoveTerrain(pos);
+                    AddToRoom(pos);
                 }
             }
         }
@@ -106,20 +113,43 @@ namespace TheAlchemist
 
                 for (int x = rowStart; x < Width - rowStart; x++)
                 {
-                    if(x == rowStart || x == Width - rowStart - 1)
+                    var pos = Pos + new Position(x, y);
+                    if (x == rowStart || x == Width - rowStart - 1)
                     {
-                        outline.Add(Pos + new Position(x, y));
+                        outline.Add(pos);
                     }
-                    floor.RemoveTerrain(Pos + new Position(x, y));
+                    AddToRoom(pos);
                 }
-            }        
+            }
         }
 
+        private void AddToRoom(Position pos)
+        {
+            floor.RemoveTerrain(pos);
+            floor.roomNrs[pos.X, pos.Y] = Nr;
+            freePositions.Add(pos);
+        }
 
         // returns random position where door can be adjacent (outline)
         public Position GetPossibleDoor()
         {
             return outline[Game.Random.Next(outline.Count)];
+        }
+
+        public void AddConnection(int otherRoomNr, Position from, Position to)
+        {
+            if (connectionPoints.ContainsKey(otherRoomNr))
+            {
+                connectionPoints[otherRoomNr].Item1.Add(from);
+                connectionPoints[otherRoomNr].Item2.Add(to);
+            }
+            else
+            {
+                connectionPoints[otherRoomNr] = new Tuple<List<Position>, List<Position>>(
+                    new List<Position>() { from },
+                    new List<Position>() { to }
+                );
+            }
         }
     }
 }

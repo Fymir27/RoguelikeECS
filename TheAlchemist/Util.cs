@@ -33,6 +33,7 @@ namespace TheAlchemist
     }
 
     // marks a position in the game world
+    [JsonObject]
     public struct Position
     {
         public int X;
@@ -41,10 +42,12 @@ namespace TheAlchemist
         public Position(int x, int y) { X = x; Y = y; }
         public Position(Position other) { X = other.X; Y = other.Y; }
 
-        public static Position Up = new Position(0, 1);
-        public static Position Right = new Position(1, 0);
-        public static Position Down = new Position(0, -1);
-        public static Position Left = new Position(-1, 0);
+        public static readonly Position Zero = new Position(0, 0);
+
+        public static readonly Position Up = new Position(0, 1);
+        public static readonly Position Right = new Position(1, 0);
+        public static readonly Position Down = new Position(0, -1);
+        public static readonly Position Left = new Position(-1, 0);
 
         public static implicit operator Position(Vector2 other) { return new Position((int)other.X, (int)other.Y); }
 
@@ -120,6 +123,20 @@ namespace TheAlchemist
         public static int TargetIndicatorID { get; set; } = 0;
 
         public static FOV FOV = FOV.Medium;
+
+        public static Color[] Colors =
+        {
+            Color.Red,
+            Color.Blue,
+            Color.Green,
+            Color.Yellow,
+            Color.Violet,
+            Color.Orange,
+            Color.Beige,
+            Color.Turquoise
+        };
+
+        public static GraphicsDevice GraphicsDevice = null;
 
         // gets called for every new type of component/entity/...
         public static class TypeID<T>
@@ -289,7 +306,6 @@ namespace TheAlchemist
             return b ? 1 : -1;
         }
 
-
         public static int Lerp(int x, int x0, int y0, int x1, int y1)
         {
             //int deltaY = y1 - y0;
@@ -304,6 +320,11 @@ namespace TheAlchemist
             //return res;
 
             return y0 + (int)Math.Round(((float)(y1 - y0) / (x1 - x0)) * (x - x0));
+        }
+
+        public static T PickRandomElement<T>(List<T> list)
+        {
+            return list[Game.Random.Next(0, list.Count)];
         }
     }
 }

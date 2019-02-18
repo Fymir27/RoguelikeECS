@@ -12,8 +12,8 @@ namespace TheAlchemist.Systems
     class DescriptionSystem
     {
         public static string GetName(int entity)
-        {           
-            return EntityManager.GetComponent<Components.DescriptionComponent>(entity)?.Name;            
+        {
+            return EntityManager.GetComponent<Components.DescriptionComponent>(entity)?.Name;
         }
 
         public static string GetNameWithID(int entity)
@@ -33,11 +33,15 @@ namespace TheAlchemist.Systems
             var components = EntityManager.GetComponents(entity);
             foreach (var component in components)
             {
-                sb.AppendLine(component.GetType().ToString());
-                foreach(var item in component.GetType().GetProperties())
+                if (typeof(StatComponent).IsInstanceOfType(component))
                 {
-                    if (item.Name == "EntityID")
-                        continue;
+                    continue; // doesnt work!
+                }
+                sb.AppendLine(component.GetType().ToString());
+                foreach (var item in component.GetType().GetProperties())
+                {
+                    //if (item.Name == "EntityID")
+                    //continue;
                     sb.AppendLine("[ " + item.Name + ": " + item.GetValue(component) + " ]");
                 }
                 sb.AppendLine();
@@ -52,8 +56,8 @@ namespace TheAlchemist.Systems
             tooltip += "Health  ";
 
             var hp = EntityManager.GetComponent<HealthComponent>(entity);
-                            
-            if(hp != null)
+
+            if (hp != null)
             {
                 float relativeAmount = hp.Amount / hp.Max;
                 int maxBars = 30;
@@ -71,7 +75,7 @@ namespace TheAlchemist.Systems
 
             var stats = EntityManager.GetComponent<StatComponent>(entity);
 
-            if(stats != null)
+            if (stats != null)
             {
                 tooltip += "Strength:     " + stats[Stat.Strength] + '\n';
                 tooltip += "Dexterity:    " + stats[Stat.Dexterity] + '\n';
