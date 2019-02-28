@@ -789,8 +789,11 @@ namespace TheAlchemist
             return true;
         }
 
+        // TODO: use (randomized) depth first search?
         void ConnectRooms()
         {
+            List<Tuple<int, int>> roomsConnected = new List<Tuple<int, int>>();
+
             foreach (var room in rooms)
             {
                 int maxConnectionCount = 2;
@@ -798,30 +801,52 @@ namespace TheAlchemist
 
                 if (dict.Count == 0)
                 {
-                    //Log.Error("ROOM HAS NO CONNECTION POINTS, OH NO!");
+                    Log.Error("ROOM HAS NO CONNECTION POINTS, OH NO!");
                     continue;
                 }
 
-                var tuple = dict[dict.Keys.ElementAt(Game.Random.Next(0, Math.Min(dict.Count, maxConnectionCount + 1)))];
+                int key = 0;
+                Tuple<List<Position>, List<Position>> tuple = null;
+                bool roomsAlreadyConnected = false;
 
-                var startPositions = tuple.Item1;
-                var endPositions = tuple.Item2;
-
-                var connectionIndex = Game.Random.Next(startPositions.Count);
-
-                var start = startPositions[connectionIndex];
-                var end = endPositions[connectionIndex];
-
-                var path = GetRandomLineNonDiagonal(start, end);
-
-                foreach (Position pos in path)
+                while(dict.Count > 0)
                 {
-                    RemoveTerrain(pos);
-                    roomNrs[pos.X, pos.Y] = room.Nr;
-                }
+                    key = dict.Keys.ElementAt(Game.Random.Next(0, Math.Min(dict.Count, maxConnectionCount + 1)));
+                    tuple = dict[key];
 
-                PlaceTerrain(start, CreateDoor());
-                PlaceTerrain(end, CreateDoor());
+                    roomsAlreadyConnected = roomsConnected.Any(connection =>
+                         (connection.Item1 == room.Nr && connection.Item2 == key) ||
+                         (connection.Item1 == key && connection.Item2 == room.Nr)
+                    );
+
+                    if(roomsAlreadyConnected)
+                    {
+                        dict.Remove(key);
+                    }
+                    else
+                    {
+                        var startPositions = tuple.Item1;
+                        var endPositions = tuple.Item2;
+
+                        var connectionIndex = Game.Random.Next(startPositions.Count);
+
+                        var start = startPositions[connectionIndex];
+                        var end = endPositions[connectionIndex];
+
+                        var path = GetRandomLineNonDiagonal(start, end);
+
+                        foreach (Position pos in path)
+                        {
+                            RemoveTerrain(pos);
+                            roomNrs[pos.X, pos.Y] = room.Nr;
+                        }
+
+                        PlaceTerrain(start, CreateDoor());
+                        PlaceTerrain(end, CreateDoor());
+
+                        roomsConnected.Add(new Tuple<int, int>(room.Nr, key));
+                    }
+                }            
             }
         }
 
@@ -932,7 +957,7 @@ namespace TheAlchemist
                         case FindConnectionState.LookingForTo:
                             if (nr != 0)
                             {
-                                rooms[roomFrom - 1].AddConnection(nr, from, prev);
+                                SaveConnection(roomFrom, nr, from, prev);
                                 roomFrom = nr;
                                 state = FindConnectionState.FromFound;
                                 break;
@@ -951,7 +976,7 @@ namespace TheAlchemist
                                     }
                                     else
                                     {
-                                        rooms[roomFrom - 1].AddConnection(roomNrAbove, from, new Position(x, y));
+                                        SaveConnection(roomFrom, roomNrAbove, from, new Position(x, y));
                                         roomFrom = 0;
                                         state = FindConnectionState.Init;
                                         break;
@@ -968,7 +993,7 @@ namespace TheAlchemist
                                     }
                                     else
                                     {
-                                        rooms[roomFrom - 1].AddConnection(roomNrBelow, from, new Position(x, y));
+                                        SaveConnection(roomFrom, roomNrBelow, from, new Position(x, y));
                                         roomFrom = 0;
                                         state = FindConnectionState.Init;
                                         break;
@@ -1019,7 +1044,7 @@ namespace TheAlchemist
                         case FindConnectionState.LookingForTo:
                             if (nr != 0)
                             {
-                                rooms[roomFrom - 1].AddConnection(nr, from, prev);
+                                SaveConnection(roomFrom, nr, from, prev);
                                 roomFrom = nr;
                                 state = FindConnectionState.FromFound;
                                 break;
@@ -1038,7 +1063,7 @@ namespace TheAlchemist
                                     }
                                     else
                                     {
-                                        rooms[roomFrom - 1].AddConnection(roomNrRight, from, new Position(x, y));
+                                        SaveConnection(roomFrom, roomNrRight, from, new Position(x, y));
                                         roomFrom = 0;
                                         state = FindConnectionState.Init;
                                         break;
@@ -1055,7 +1080,7 @@ namespace TheAlchemist
                                     }
                                     else
                                     {
-                                        rooms[roomFrom - 1].AddConnection(roomNrLeft, from, new Position(x, y));
+                                        SaveConnection(roomFrom, roomNrLeft, from, new Position(x, y));
                                         roomFrom = 0;
                                         state = FindConnectionState.Init;
                                         break;
@@ -1096,6 +1121,12 @@ namespace TheAlchemist
             }
             */
             #endregion
+        }
+
+        void SaveConnection(int room1, int room2, Position pos1, Position pos2)
+        {
+            rooms[room1 - 1].AddConnection(room2, pos1, pos2);
+            rooms[room2 - 1].AddConnection(room1, pos2, pos1);
         }
 
         ////////////////////// Getters //////////////////////////////////////
