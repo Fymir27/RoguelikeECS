@@ -15,6 +15,7 @@ namespace TheAlchemist
     class Room
     {
         public int Nr;
+        public bool Connected = false;
         public Position Pos;
         public int Width, Height;
         public RoomShape Shape;

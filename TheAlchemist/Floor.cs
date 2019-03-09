@@ -743,7 +743,7 @@ namespace TheAlchemist
 
             // find possible connections between rooms
             FindConnectionPoints();
-            ConnectRooms();
+            ConnectRoomsRDFS();
             SpawnEnemies();
 
             /*
@@ -789,9 +789,59 @@ namespace TheAlchemist
             return true;
         }
 
-        // TODO: use (randomized) depth first search?
-        void ConnectRooms()
+        /// <summary>
+        /// connects all the rooms using randomized Depth first search
+        /// </summary>
+        void ConnectRoomsRDFS()
         {
+            Stack<Room> stack = new Stack<Room>();
+
+            Room curRoom = rooms[0];
+            List<int> neighbours = new List<int>();
+
+            int connectedRooms = 1;
+
+            while (connectedRooms < (rooms.Count))
+            {
+                curRoom.Connected = true;
+
+                neighbours = curRoom.connectionPoints.Keys.Where(roomNr => !rooms[roomNr - 1].Connected).ToList();
+
+                if (neighbours.Count == 0)
+                {
+                    curRoom = stack.Pop();
+                    continue;
+                }
+                else if (neighbours.Count > 1)
+                {
+                    stack.Push(curRoom);
+                }
+
+                connectedRooms++;
+
+                int nextRoomNr = Util.PickRandomElement(neighbours);
+
+                ConnectRooms(curRoom.Nr, nextRoomNr);
+
+                // randomly also connect another room if there are more neighbours
+                if (neighbours.Count > 1 && Game.Random.Next(0, 3) == 0)
+                {
+                    int additionalRoomNr = nextRoomNr;
+                    while (additionalRoomNr == nextRoomNr)
+                    {
+                        additionalRoomNr = Util.PickRandomElement(neighbours);
+                    }
+                    ConnectRooms(curRoom.Nr, additionalRoomNr);
+                }
+
+                // other room becomes cur room
+                // push rest of neighbours onto stack
+                curRoom = rooms[nextRoomNr - 1];
+
+            }
+
+
+            /* old strategy (not reliable)
             List<Tuple<int, int>> roomsConnected = new List<Tuple<int, int>>();
 
             foreach (var room in rooms)
@@ -848,6 +898,7 @@ namespace TheAlchemist
                     }
                 }            
             }
+            */
         }
 
         void SpawnEnemies()
@@ -869,6 +920,28 @@ namespace TheAlchemist
                     room.freePositions.Remove(pos);
                 }
             }
+        }
+
+        void ConnectRooms(int roomNr1, int roomNr2)
+        {
+            Room room1 = rooms[roomNr1 - 1];
+            var connection = room1.connectionPoints[roomNr2];
+
+            // choose random path between the two chosen rooms
+            int pathIndex = Game.Random.Next(0, connection.Item1.Count);
+
+            Position from = connection.Item1[pathIndex];
+            Position to = connection.Item2[pathIndex];
+            var path = GetRandomLineNonDiagonal(from, to);
+
+            foreach (Position pos in path)
+            {
+                RemoveTerrain(pos);
+                roomNrs[pos.X, pos.Y] = roomNr1;
+            }
+
+            PlaceTerrain(from, CreateDoor());
+            PlaceTerrain(to, CreateDoor());
         }
 
         void ConnectRooms(Room room1, Room room2)
