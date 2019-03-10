@@ -22,13 +22,13 @@ namespace TheAlchemist.Systems
 
         public MovementSystem()
         {
-           
+
         }
 
         public void HandleMovementEvent(int entity, Direction dir)
-        { 
+        {
             // move inventory cursor instead!
-            if(entity == Util.PlayerID && UI.InventoryOpen)
+            if (entity == Util.PlayerID && UI.InventoryOpen)
             {
                 return;
             }
@@ -39,7 +39,7 @@ namespace TheAlchemist.Systems
 
             // target indicator does not need collision etc...
             // just move position if its not oob
-            if(entity == Util.TargetIndicatorID)
+            if (entity == Util.TargetIndicatorID)
             {
                 if (floor.IsOutOfBounds(newPos))
                     return;
@@ -69,7 +69,7 @@ namespace TheAlchemist.Systems
             int terrain = floor.GetTerrain(newPos);
 
             // check if collidable with
-            if(terrain != 0 && EntityManager.GetComponent<ColliderComponent>(terrain) != null)
+            if (terrain != 0 && EntityManager.GetComponent<ColliderComponent>(terrain) != null)
             {
                 // check if terrain is solid before possible interaction
                 // this is because solidity might be changed by interaction (e.g. door gets opened)
@@ -83,8 +83,8 @@ namespace TheAlchemist.Systems
                 }
 
                 // check if terrain is solid
-                if(solid)
-                {                
+                if (solid)
+                {
                     return; // don't move
                 }
             }
@@ -94,6 +94,17 @@ namespace TheAlchemist.Systems
             // Move entity
             floor.RemoveCharacter(entityTransform.Position);
             floor.PlaceCharacter(newPos, entity);
+
+            //trigger special Message on step on
+            if (entity == Util.PlayerID && terrain != 0)
+            {
+                string message = (DescriptionSystem.GetSpecialMessage(terrain, DescriptionComponent.MessageType.StepOn));
+
+                if (message.Length > 0)
+                {
+                    UISystem.Message(message);
+                }
+            }
 
             Util.TurnOver(entity);
         }

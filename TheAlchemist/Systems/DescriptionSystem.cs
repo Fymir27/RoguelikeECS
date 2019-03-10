@@ -26,6 +26,14 @@ namespace TheAlchemist.Systems
             return EntityManager.GetComponent<Components.DescriptionComponent>(entity)?.Description;
         }
 
+        public static string GetSpecialMessage(int entity, DescriptionComponent.MessageType type)
+        {
+            string message = "";
+            var messages = EntityManager.GetComponent<DescriptionComponent>(entity)?.SpecialMessages;
+            messages?.TryGetValue(type, out message);
+            return message;
+        }
+
         public static string GetDebugInfoEntity(int entity)
         {
             StringBuilder sb = new StringBuilder();

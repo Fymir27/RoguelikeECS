@@ -74,7 +74,8 @@ namespace TheAlchemist.Systems
                             Tint = Color.Black,
                         });
 
-                        continue; // everything else is hidden
+                        if (FogOfWarEnabled)
+                            continue; // everything else is hidden
                     }
 
                     if (tile.Terrain != 0)
@@ -97,7 +98,8 @@ namespace TheAlchemist.Systems
                             Tint = new Color(Color.Black, 0.7f)
                         });
 
-                        continue; // hide everything else
+                        if (FogOfWarEnabled)
+                            continue; // hide everything else
                     }
 
                     if (tile.Items != null && tile.Items.Count > 0)
@@ -126,7 +128,9 @@ namespace TheAlchemist.Systems
             renderedTerrain.ForEach(DrawSprite);
             renderedItems.ForEach(DrawSprite);
             renderedCharacters.ForEach(DrawSprite);
-            renderedDarkness.ForEach(DrawSprite);
+
+            if (FogOfWarEnabled)
+                renderedDarkness.ForEach(DrawSprite);
 
 
             /*

@@ -697,22 +697,6 @@ namespace TheAlchemist
                 }
             }
 
-            var roomPos = new Position(3, 3);
-
-            //var room = new Room(roomPos, 10, 5, RoomShape.Rectangle, this);          
-
-            //Console.WriteLine("Room2:");
-            //roomPos = new Position(6, 9);
-            //var room2 = new Room(roomPos, 10, 5, RoomShape.Diamond, this);
-
-            //Console.WriteLine("Room3:");
-            //roomPos = new Position(3, 14);
-            //var room3 = new Room(new Position(1,1), 6, 7, RoomShape.Diamond, this);
-
-            //Console.WriteLine("Room4:");
-            //roomPos = new Position(14, 3);
-            //var room4 = new Room(roomPos, 5, 5, RoomShape.Diamond, this);
-
             rooms = new List<Room>();
 
             for (int i = 0; i < 10; i++)
@@ -726,6 +710,8 @@ namespace TheAlchemist
                 int roomWidth = 0;
                 int roomHeight = 0;
                 RoomShape shape = RoomShape.Rectangle;
+
+                Position roomPos = Position.Zero;
 
                 do
                 {
@@ -746,13 +732,49 @@ namespace TheAlchemist
             ConnectRoomsRDFS();
             SpawnEnemies();
 
-            /*
-            List<Room> connectedRooms = new List<Room>();
-            for (int i = 0; i < rooms.Count; i++)
-            {
-                ConnectRooms(rooms[i], rooms[(i + 1) % rooms.Count]);
+            var riverFrom = new Position(Width / 2 + 3, 1);
+            var riverTo = new Position(Width / 2 - 3, Height - 2);
 
-            }
+            CreateRiver(riverFrom, riverTo, 5);
+
+            /*
+            int door = CreateDoor();
+            int wall = CreateWall();
+
+            Log.Message("DoorID: " + door);
+            Log.Message("WallID: " + wall);
+
+            var terrain = new Dictionary<string, IEnumerable<IComponent>>();
+
+            terrain.Add("door", EntityManager.GetComponents(door));
+
+            terrain.Add("wall", EntityManager.GetComponents(wall));
+
+            EntityManager.RemoveEntity(door);
+            EntityManager.RemoveEntity(wall);
+            EntityManager.CleanUpEntities();
+
+            var water = new List<IComponent>()
+            {
+                new DescriptionComponent()
+                {
+                    Name = "Water",
+                    Description = "It's wet",
+                    SpecialMessages = new Dictionary<DescriptionComponent.MessageType, string>()
+                    {
+                        { DescriptionComponent.MessageType.StepOn, "Splash!" }
+                    }
+                },
+                new RenderableSpriteComponent()
+                {
+                    Texture = "square",
+                    Tint = Color.CadetBlue
+                }
+            };
+
+            terrain.Add("water", water);
+
+            File.WriteAllText(Util.ContentPath + "/terrain.json", Util.SerializeObject(terrain, true));
             */
 
             PlaceCharacter(rooms[0].Pos + new Position(rooms[0].Width / 2, rooms[0].Height / 2), CreatePlayer());
@@ -1610,7 +1632,7 @@ namespace TheAlchemist
         }
 
         // returns "straight" line (Bresenham)
-        public List<Position> GetLine(Position from, Position to, bool stopAtSolid = true)
+        public List<Position> GetLine(Position from, Position to, bool stopAtSolid = true, bool onlyCardinal = false)
         {
             if (IsOutOfBounds(from) || IsOutOfBounds(to))
             {
@@ -1656,7 +1678,13 @@ namespace TheAlchemist
                 if (error < 0)
                 {
                     error += dfast;
+
                     curPos += diagonalStep;
+
+                    if (onlyCardinal)
+                    {
+                        result.Add(curPos - parallelStep);
+                    }
                 }
                 else
                 {
@@ -1673,6 +1701,49 @@ namespace TheAlchemist
 
             }
             return result;
+        }
+
+        // returns line without moving diagonally
+        public List<Position> GetLineCardinal(Position from, Position to)
+        {
+
+            var line = new List<Position>() { from };
+
+            Position verticalStep = from.Y < to.Y ? Position.Up : Position.Down;
+            Position horizontalStep = from.X < to.X ? Position.Right : Position.Left;
+
+            int deltaX = Math.Abs(to.X - from.X);
+            int deltaY = Math.Abs(to.Y - from.Y);
+
+            Position fastStep = deltaX > deltaY ? horizontalStep : verticalStep;
+            Position slowStep = deltaX > deltaY ? verticalStep : horizontalStep;
+
+            Position pos = from;
+
+
+
+            while (pos != to)
+            {
+                bool up = Game.Random.Next(2) > 0;
+
+                if (up && pos.Y != to.Y)
+                {
+                    pos += verticalStep;
+                }
+                else if (pos.X != to.X)
+                {
+                    pos += horizontalStep;
+                }
+                else
+                {
+                    pos += verticalStep;
+                }
+
+                //var pos = new Position(x, y);
+                line.Add(pos);
+            }
+
+            return line;
         }
 
         public List<Position> GetRandomLineNonDiagonal(Position from, Position to)
@@ -1775,6 +1846,39 @@ namespace TheAlchemist
                 new ColliderComponent() { Solid = true },
                 //new RenderableTextComponent() { GetTextFrom = () => doorComponent.Open.ToString() }
             });
+        }
+
+        public void CreateRiver(Position from, Position to, int width)
+        {
+            Log.Message("Creating River...");
+
+            int dx = Math.Abs(to.X - from.X);
+            int dy = Math.Abs(to.Y - from.Y);
+
+            bool horizontal = dx > dy;
+
+            Position step = horizontal ? Position.Down : Position.Right;
+
+            for (int i = 0; i < width; i++)
+            {
+                var line = GetLine(from, to, false, true);
+
+                foreach (var pos in line)
+                {
+                    int terrain = GetTile(pos).Terrain;
+
+                    if (terrain != 0)
+                    {
+                        RemoveTerrain(pos);
+                    }
+
+                    PlaceTerrain(pos, GameData.Instance.CreateTerrain("water"));
+                }
+
+                Log.Message("Line: " + from + to + "; Water tiles: " + line.Count);
+                from += step;
+                to += step;
+            }
         }
 
         public string ToJson()

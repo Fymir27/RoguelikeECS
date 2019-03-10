@@ -6,8 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-
-
 namespace TheAlchemist.Components
 {
     using Systems; // for access to description system
@@ -27,6 +25,7 @@ namespace TheAlchemist.Components
         // screen position
         // if this property is set manually it will have that fixed value
         // otherwise the position will always be calculated on the world position of the entity
+        [Newtonsoft.Json.JsonIgnore]
         public Vector2 Position
         {
             get
@@ -41,7 +40,7 @@ namespace TheAlchemist.Components
                         .Position;
                     return Util.WorldToScreenPosition(worldPos);
                 }
-                catch(NullReferenceException)
+                catch (NullReferenceException)
                 {
                     Log.Error("RenderableComponent has neither a fixed Position nor can it find a TransformComponent!" + DescriptionSystem.GetName(EntityID) + " (Entity " + EntityID + ", Component " + componentID + ")");
                     throw;
@@ -71,7 +70,7 @@ namespace TheAlchemist.Components
     }
 
     public delegate string StringGetter();
-    
+
     class RenderableTextComponent : RenderableComponent<RenderableTextComponent>
     {
         // if this is set manually the component will have a fixed text
@@ -101,7 +100,7 @@ namespace TheAlchemist.Components
             get
             {
                 if (font == null)
-                    font = Util.DefaultFont;               
+                    font = Util.DefaultFont;
                 return font;
             }
             set

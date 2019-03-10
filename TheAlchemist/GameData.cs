@@ -17,9 +17,9 @@ namespace TheAlchemist
     {
         public static GameData Instance = null;
 
-        Dictionary<string, string> enemies;
-        Dictionary<string, string> items;
-        Dictionary<string, string> terrain;
+        public Dictionary<string, string> Enemies { get; private set; }
+        public Dictionary<string, string> Items { get; private set; }
+        public Dictionary<string, string> Terrain { get; private set; }
 
 
         public void Load(string basePath)
@@ -28,13 +28,13 @@ namespace TheAlchemist
             {
 
                 Log.Message("Loading enemies...");
-                enemies = LoadEntities(basePath + "/enemies.json");
+                Enemies = LoadEntities(basePath + "/enemies.json");
 
                 Log.Message("Loading items...");
-                items = LoadEntities(basePath + "/items.json");
+                Items = LoadEntities(basePath + "/items.json");
 
-                //Log.Message("Loading enemies...");
-                //terrain = LoadEntities(basePath + "/terrain.json");
+                Log.Message("Loading terrain...");
+                Terrain = LoadEntities(basePath + "/terrain.json");
             }
             catch (JsonException e)
             {
@@ -45,33 +45,33 @@ namespace TheAlchemist
 
         public List<string> GetEnemyNames()
         {
-            return enemies.Keys.ToList();
+            return Enemies.Keys.ToList();
         }
 
         public List<string> GetItemNames()
         {
-            return items.Keys.ToList();
+            return Items.Keys.ToList();
         }
 
         public List<string> GetTerrainNames()
         {
-            return terrain.Keys.ToList();
+            return Terrain.Keys.ToList();
         }
 
 
         public int CreateEnemy(string name)
         {
-            return EntityManager.CreateEntity(enemies[name]);
+            return EntityManager.CreateEntity(Enemies[name]);
         }
 
         public int CreateItem(string name)
         {
-            return EntityManager.CreateEntity(items[name]);
+            return EntityManager.CreateEntity(Items[name]);
         }
 
         public int CreateTerrain(string name)
         {
-            return EntityManager.CreateEntity(terrain[name]);
+            return EntityManager.CreateEntity(Terrain[name]);
         }
 
 
