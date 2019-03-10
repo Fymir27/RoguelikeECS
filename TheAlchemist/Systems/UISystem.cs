@@ -15,6 +15,7 @@ namespace TheAlchemist.Systems
     class UISystem
     {
         public static int sameMessageCount = 1;
+        public static string lastMessage = "";
 
         public void HandleInventoryToggled()
         {
@@ -75,12 +76,17 @@ namespace TheAlchemist.Systems
         // posts a message to the Message Log
         public static void Message(string message)
         {
-            if (message == UI.MessageLog[UI.MessageLogLineCount - 1])
+            if (message == lastMessage)
             {
+                if (sameMessageCount > 3)
+                    return;
+
                 sameMessageCount++;
-                //UI.MessageLog[UI.MessageLogLineCount - 1] += " ~";
+                UI.MessageLog[UI.MessageLogLineCount - 1] += " ~";
                 return;
             }
+
+            lastMessage = message;
 
             sameMessageCount = 1;
 
