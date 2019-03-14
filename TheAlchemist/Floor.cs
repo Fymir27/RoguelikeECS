@@ -959,6 +959,7 @@ namespace TheAlchemist
             foreach (Position pos in path)
             {
                 RemoveTerrain(pos);
+                PlaceTerrain(pos, GameData.Instance.CreateTerrain("floor"));
                 roomNrs[pos.X, pos.Y] = roomNr1;
             }
 
@@ -999,6 +1000,7 @@ namespace TheAlchemist
                     }
                 }
                 RemoveTerrain(pos);
+                PlaceTerrain(pos, GameData.Instance.CreateTerrain("floor"));
                 prev = pos;
             }
 
@@ -1870,6 +1872,7 @@ namespace TheAlchemist
                     if (terrain != 0)
                     {
                         RemoveTerrain(pos);
+                        PlaceTerrain(pos, GameData.Instance.CreateTerrain("floor"));
                     }
 
                     PlaceTerrain(pos, GameData.Instance.CreateTerrain("water"));

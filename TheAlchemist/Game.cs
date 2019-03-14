@@ -158,7 +158,7 @@ namespace TheAlchemist
             string[] textures =
             {
                 "player", "box", "wall", "targetIndicator",
-                "doorOpen", "doorClosed", "square",
+                "doorOpen", "doorClosed", "square", "floor",
                 // enemies:
                 "rat", "spider",
                 "bat", "enemy",

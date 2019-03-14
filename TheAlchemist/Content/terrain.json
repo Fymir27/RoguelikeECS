@@ -87,5 +87,14 @@
             "Layer": 0,
             "EntityID": 0
         }
+    ],
+    "floor": [
+        {
+            "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+            "Texture": "floor",
+            "Visible": true,
+            "Layer": 0,
+            "EntityID": 0
+        }
     ]
 }
