@@ -226,6 +226,9 @@
 /processorParam:TextureFormat=Color
 /build:targetIndicator.png
 
+#begin terrain.json
+/copy:terrain.json
+
 #begin tooltip.png
 /importer:TextureImporter
 /processor:TextureProcessor
