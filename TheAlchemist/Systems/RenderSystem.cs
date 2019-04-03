@@ -14,21 +14,55 @@ namespace TheAlchemist.Systems
 
     class RenderSystem
     {
+        public bool FogOfWarEnabled = true;
+
         GraphicsDevice graphics;
         SpriteBatch spriteBatch;
 
-        public bool FogOfWarEnabled = true;
-
         Position min; // top left world position thats beeing rendered / thats on screen
+
+        RenderableSpriteComponent blackSquare;
+        RenderableSpriteComponent greySquare;
+        RenderableSpriteComponent floorSprite;
+        RenderableSpriteComponent targetLine;
+        RenderableSpriteComponent targetIndicator;
 
         public RenderSystem(GraphicsDevice graphics)
         {
             this.graphics = graphics;
             spriteBatch = new SpriteBatch(graphics);
+
+            blackSquare = new RenderableSpriteComponent()
+            {
+                Texture = "square",
+                Tint = Color.Black
+            };
+
+            greySquare = new RenderableSpriteComponent()
+            {
+                Texture = "square",
+                Tint = new Color(Color.Black, 0.7f)
+            };
+
+            targetLine = new RenderableSpriteComponent()
+            {
+                Texture = "square",
+                Tint = new Color(Color.Gold, 0.7f),
+            };
+
+            targetIndicator = new RenderableSpriteComponent()
+            {
+                Texture = "targetIndicator"
+            };
         }
 
         public void RenderWorld(RenderTarget2D renderTarget)
         {
+            floorSprite = new RenderableSpriteComponent()
+            {
+                Texture = Util.CurrentFloor.FloorTexture
+            };
+
             graphics.SetRenderTarget(renderTarget);
 
             spriteBatch.Begin(); //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
@@ -64,42 +98,30 @@ namespace TheAlchemist.Systems
 
                     Tile tile = floor.GetTile(worldPos);
 
-                    if (tile == null || !tile.Discovered)
+                    if (FogOfWarEnabled && !tile.Discovered)
                     {
-                        // black square
-                        renderedDarkness.Add(new RenderableSpriteComponent()
-                        {
-                            Texture = "square",
-                            Position = Util.WorldToScreenPosition(relScreenPos),
-                            Tint = Color.Black,
-                        });
-
-                        if (FogOfWarEnabled)
-                            continue; // everything else is hidden
+                        DrawSprite(blackSquare, relScreenPos);
+                        continue;
                     }
 
-                    if (tile.Terrain != 0)
+                    if (tile.Terrain == 0)
+                    {
+                        DrawSprite(floorSprite, relScreenPos);
+                    }
+                    else
                     {
                         var sprite = EntityManager.GetComponent<RenderableSpriteComponent>(tile.Terrain);
 
                         if (sprite != null && sprite.Visible)
                         {
-                            renderedTerrain.Add(sprite);
+                            DrawSprite(sprite, relScreenPos);
                         }
                     }
 
-                    if (!seenPositions.Contains(worldPos))
+                    if (FogOfWarEnabled && !seenPositions.Contains(worldPos))
                     {
-                        // grey square
-                        renderedDarkness.Add(new RenderableSpriteComponent()
-                        {
-                            Texture = "square",
-                            Position = Util.WorldToScreenPosition(relScreenPos),
-                            Tint = new Color(Color.Black, 0.7f)
-                        });
-
-                        if (FogOfWarEnabled)
-                            continue; // hide everything else
+                        DrawSprite(greySquare, relScreenPos);
+                        continue;
                     }
 
                     if (tile.Items != null && tile.Items.Count > 0)
@@ -108,7 +130,7 @@ namespace TheAlchemist.Systems
 
                         if (sprite != null && sprite.Visible)
                         {
-                            renderedItems.Add(sprite);
+                            DrawSprite(sprite, relScreenPos);
                         }
                     }
 
@@ -119,88 +141,45 @@ namespace TheAlchemist.Systems
 
                         if (sprite != null && sprite.Visible)
                         {
-                            renderedCharacters.Add(sprite);
+                            DrawSprite(sprite, relScreenPos);
                         }
                     }
                 }
             }
 
-            renderedTerrain.ForEach(DrawSprite);
-            renderedItems.ForEach(DrawSprite);
-            renderedCharacters.ForEach(DrawSprite);
-
-            if (FogOfWarEnabled)
-                renderedDarkness.ForEach(DrawSprite);
-
-
-            /*
-
-            // order sprite by Layer to determine what to draw first
-            var orderedSprites = renderedSprites.OrderBy(sprite => sprite.Layer);
-
-            foreach (var sprite in orderedSprites)
+            // draw target line if necessary
+            if (InputManager.Instance.GetCurrentDomain() == InputManager.CommandDomain.Targeting)
             {
-                var transform = EntityManager.GetComponent<TransformComponent>(sprite.EntityID);
+                var targetPos = EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position;
+                var line = Util.CurrentFloor.GetLine(playerPos, targetPos, true);
 
-                if (EntityManager.GetComponent<NPCComponent>(sprite.EntityID) != null &&
-                    !seenPositions.Any(pos => pos == transform.Position))
+                if (line.Count > 1)
                 {
-                    continue; // only render npcs on seen positions
+                    line.RemoveAt(0); // don't draw square on player unless targeting self
                 }
-                spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, sprite.Tint);
-            }
 
-            // mask hidden and discovered tiles
-            if (!FogOfWarEnabled) goto SKIPFOW;
-
-            for (int y = 0; y < Util.CurrentFloor.Height; y++)
-            {
-                for (int x = 0; x < Util.CurrentFloor.Width; x++)
+                foreach (var pos in line)
                 {
-                    var pos = new Vector2(x, y);
-                    if (!seenPositions.Any(seenPos => seenPos == pos))
-                    {
-                        if (Util.CurrentFloor.IsDiscovered(pos))
-                        {
-                            spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), new Color(Color.Black, 0.7f));
-                        }
-                        else
-                        {
-                            spriteBatch.Draw(TextureManager.GetTexture("square"), Util.WorldToScreenPosition(pos), Color.Black);
-                        }
-                    }
-
+                    DrawSprite(targetLine, pos - min);
                 }
+
+                DrawSprite(targetIndicator, targetPos - min);
+
             }
-
-        SKIPFOW:
-
-            */
-
-            /* no rendered texts at the moment!
-            var renderedTexts = EntityManager
-               .GetAllComponents<RenderableTextComponent>()
-               .Where(text => text.Visible);
-
-            foreach (var text in renderedTexts)
-            {
-                spriteBatch.DrawString(text.Font, text.Text, text.Position, Color.Black);
-            }
-            */
 
             spriteBatch.End(); //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
 
             graphics.SetRenderTarget(null);
         }
 
-        void DrawSprite(RenderableSpriteComponent sprite)
+        /// <summary>
+        /// Draws sprite to screen
+        /// </summary>
+        /// <param name="sprite">sprite to draw</param>
+        /// <param name="pos">relative screen position</param>
+        void DrawSprite(RenderableSpriteComponent sprite, Position pos)
         {
-            if (sprite.EntityID != 0)
-            {
-                sprite.Position = Util.WorldToScreenPosition(EntityManager.GetComponent<TransformComponent>(sprite.EntityID).Position - min);
-                //Log.Message("Drawing sprite of entity at: " + sprite.Position);
-            }
-            spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), sprite.Position, sprite.Tint);
+            spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), Util.WorldToScreenPosition(pos), sprite.Tint);
         }
     }
 }

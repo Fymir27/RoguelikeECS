@@ -18,7 +18,6 @@ namespace TheAlchemist.Systems
         public event CollisionEventHandler CollisionEvent;
         public event BasicAttackHandler BasicAttackEvent;
         public event InteractionHandler InteractionEvent;
-        public event UpdateTargetLineHandler UpdateTargetLineEvent;
 
         public MovementSystem()
         {
@@ -48,7 +47,6 @@ namespace TheAlchemist.Systems
                     return;
 
                 entityTransform.Position = newPos;
-                UpdateTargetLineEvent?.Invoke();
                 return;
             }
 

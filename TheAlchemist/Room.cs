@@ -127,7 +127,7 @@ namespace TheAlchemist
         private void AddToRoom(Position pos)
         {
             floor.RemoveTerrain(pos);
-            floor.PlaceTerrain(pos, GameData.Instance.CreateTerrain("floor"));
+            //floor.PlaceTerrain(pos, GameData.Instance.CreateTerrain("floor"));
             floor.roomNrs[pos.X, pos.Y] = Nr;
             freePositions.Add(pos);
         }

@@ -26,8 +26,6 @@ namespace TheAlchemist
         public event MovementEventHandler MovementEvent;
         public event ItemPickupHandler PickupItemEvent;
 
-        public event UpdateTargetLineHandler UpdateTargetLineEvent;
-        
         public event InventoryToggledHandler InventoryToggledEvent;
         public event InventoryCursorMovedHandler InventoryCursorMovedEvent;
         public event ItemUsedHandler ItemUsedEvent;
@@ -227,7 +225,7 @@ namespace TheAlchemist
                 case Command.MoveNW:
                     break;
                 case Command.Wait:
-                    if(!Util.PlayerTurnOver)
+                    if (!Util.PlayerTurnOver)
                     {
                         Util.TurnOver(Util.PlayerID);
                     }
@@ -336,7 +334,7 @@ namespace TheAlchemist
         {
             Dictionary<Keys, Command> keybindings;
             keyToCommand.TryGetValue(domain, out keybindings);
-            if(keybindings == null)
+            if (keybindings == null)
             {
                 Log.Warning("Domain empty! " + domain);
                 return Keys.None;
@@ -344,7 +342,7 @@ namespace TheAlchemist
 
             bool commandDefined = keybindings.ContainsValue(command);
 
-            if(!commandDefined)
+            if (!commandDefined)
             {
                 Log.Warning("Command not defined! " + command);
                 return Keys.None;
@@ -424,7 +422,7 @@ namespace TheAlchemist
             }
 
             // TODO: is this even good?
-            if(usableItem.Usages.Count == 1) // only one possible usage
+            if (usableItem.Usages.Count == 1) // only one possible usage
             {
                 UseItem(usableItem.Usages[0]);
                 return;
@@ -473,17 +471,16 @@ namespace TheAlchemist
             }
 
             if (domainHistory.Peek() == CommandDomain.Targeting)
-            {               
+            {
                 ControlledEntity = Util.PlayerID;
                 EntityManager.RemoveAllComponentsOfType(Util.TargetIndicatorID, RenderableSpriteComponent.TypeID);
-                LeaveCurrentDomain();               
+                LeaveCurrentDomain();
             }
             else
             {
                 ControlledEntity = Util.TargetIndicatorID;
                 var playerPos = EntityManager.GetComponent<TransformComponent>(Util.PlayerID).Position;
                 EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position = playerPos;
-                UpdateTargetLineEvent?.Invoke();
                 EnterDomain(CommandDomain.Targeting);
             }
         }

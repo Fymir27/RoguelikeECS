@@ -258,7 +258,7 @@ namespace TheAlchemist
         // set init to true if targeting mode has just been entered
         // otherwise it will produce a warning at runtime because 
         // this function tries to remove old sprites (which there are none of)
-        public static void UpdateTargetLine(bool init = false)
+        /*public static void UpdateTargetLine(bool init = false)
         {
             var targetPos = EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position;
             // calculate line to target indicator
@@ -299,7 +299,7 @@ namespace TheAlchemist
             // add updated sprites to entity
             EntityManager.AddComponents(Util.TargetIndicatorID, updatedSprites);
 
-        }
+        }*/
 
         public static int Sign(bool b)
         {

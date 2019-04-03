@@ -70,7 +70,7 @@ namespace TheAlchemist
         List<Position> seen = new List<Position>();
 
         // precalculated for visibility calc.
-        static float[][] angles = CalculateAngles(5); // assuming no entity see farther than 5 tiles
+        //static float[][] angles = CalculateAngles(5); // assuming no entity see farther than 5 tiles
 
         // used for visibility calc
         struct Octant
@@ -99,6 +99,7 @@ namespace TheAlchemist
         public int Width { get => width; set => width = value; }
         public int Height { get => height; set => height = value; }
 
+        public string FloorTexture = "";
 
         // ------------------------------------------------
 
@@ -675,6 +676,8 @@ namespace TheAlchemist
             Width = 100;
             Height = 70;
 
+            FloorTexture = "floor";
+
             tiles = new Tile[width, height];
             assignedToRoom = new bool[width, height];
             roomNrs = new int[width, height];
@@ -959,7 +962,7 @@ namespace TheAlchemist
             foreach (Position pos in path)
             {
                 RemoveTerrain(pos);
-                PlaceTerrain(pos, GameData.Instance.CreateTerrain("floor"));
+                //PlaceTerrain(pos, GameData.Instance.CreateTerrain("floor"));
                 roomNrs[pos.X, pos.Y] = roomNr1;
             }
 
@@ -1000,7 +1003,7 @@ namespace TheAlchemist
                     }
                 }
                 RemoveTerrain(pos);
-                PlaceTerrain(pos, GameData.Instance.CreateTerrain("floor"));
+                //PlaceTerrain(pos, GameData.Instance.CreateTerrain("floor"));
                 prev = pos;
             }
 
@@ -1872,7 +1875,7 @@ namespace TheAlchemist
                     if (terrain != 0)
                     {
                         RemoveTerrain(pos);
-                        PlaceTerrain(pos, GameData.Instance.CreateTerrain("floor"));
+                        //PlaceTerrain(pos, GameData.Instance.CreateTerrain("floor"));
                     }
 
                     PlaceTerrain(pos, GameData.Instance.CreateTerrain("water"));

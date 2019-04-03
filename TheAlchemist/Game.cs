@@ -98,7 +98,7 @@ namespace TheAlchemist
             uiSystem = new UISystem();
             statSystem = new StatSystem();
 
-            // turn off FOW
+            // toggle FOW
             renderSystem.FogOfWarEnabled = true;
 
             // hook up all events with their handlers
@@ -109,7 +109,6 @@ namespace TheAlchemist
             input.InventoryCursorMovedEvent += uiSystem.HandleInventoryCursorMoved;
             input.PickupItemEvent += itemSystem.PickUpItem;
             input.ItemUsedEvent += itemSystem.UseItem;
-            input.UpdateTargetLineEvent += () => Util.UpdateTargetLine(init: true);
 
             itemSystem.HealthGainedEvent += healthSystem.HandleGainedHealth;
             itemSystem.HealthLostEvent += healthSystem.HandleLostHealth;
@@ -120,7 +119,6 @@ namespace TheAlchemist
             movementSystem.CollisionEvent += collisionSystem.HandleCollision;
             movementSystem.BasicAttackEvent += combatSystem.HandleBasicAttack;
             movementSystem.InteractionEvent += interactionSystem.HandleInteraction;
-            movementSystem.UpdateTargetLineEvent += () => Util.UpdateTargetLine();
 
             Util.TurnOverEvent += healthSystem.RegenerateEntity;
             Util.TurnOverEvent += statSystem.TurnOver;

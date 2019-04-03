@@ -22,6 +22,7 @@ namespace TheAlchemist.Components
         public bool Visible { get; set; } = true;
         public int Layer { get; set; } = 0;
 
+
         // screen position
         // if this property is set manually it will have that fixed value
         // otherwise the position will always be calculated on the world position of the entity
@@ -55,6 +56,7 @@ namespace TheAlchemist.Components
 
         private bool hasFixedPosition = false;
         private Vector2 fixedPosition;
+
     }
 
     class RenderableSpriteComponent : RenderableComponent<RenderableSpriteComponent>
