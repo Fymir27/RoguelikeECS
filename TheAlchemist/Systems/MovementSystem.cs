@@ -62,6 +62,13 @@ namespace TheAlchemist.Systems
                     RaiseBasicAttackEvent(entity, otherCharacter);
                     return; // don't move
                 }
+                else
+                {
+                    Log.Warning("Character without collider:");
+                    Log.Data(DescriptionSystem.GetDebugInfoEntity(otherCharacter));
+                    UISystem.Message("Something seems to be there...");
+                    return;
+                }
             }
 
             int terrain = floor.GetTerrain(newPos);

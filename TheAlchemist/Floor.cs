@@ -734,6 +734,7 @@ namespace TheAlchemist
             FindConnectionPoints();
             ConnectRoomsRDFS();
             SpawnEnemies();
+            SpawnItems();
 
             var riverFrom = new Position(Width / 2 + 3, 1);
             var riverTo = new Position(Width / 2 - 3, Height - 2);
@@ -942,6 +943,26 @@ namespace TheAlchemist
                     var name = Util.PickRandomElement(names);
                     PlaceCharacter(pos, GameData.Instance.CreateEnemy(name));
                     //Log.Data(DescriptionSystem.GetDebugInfoEntity(GetCharacter(pos)));
+                    room.freePositions.Remove(pos);
+                }
+            }
+        }
+
+        void SpawnItems()
+        {
+            GameData data = GameData.Instance;
+            List<string> names = data.GetItemNames();
+
+            foreach (var room in rooms)
+            {
+                int maxSpawnCount = 1;
+                int spawnCount = Game.Random.Next(0, maxSpawnCount + 1);
+
+                for (int i = 0; i < spawnCount; i++)
+                {
+                    var pos = room.freePositions[Game.Random.Next(0, room.freePositions.Count)];
+                    var name = Util.PickRandomElement(names);
+                    PlaceItem(pos, GameData.Instance.CreateItem(name));
                     room.freePositions.Remove(pos);
                 }
             }
