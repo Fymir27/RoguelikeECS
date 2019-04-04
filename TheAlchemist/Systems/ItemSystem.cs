@@ -18,7 +18,7 @@ namespace TheAlchemist.Systems
         Consume,
         Throw
     }
-   
+
     public delegate void ItemPickupHandler(int character);
     public delegate void ItemUsedHandler(int character, int item, ItemUsage usage);
 
@@ -56,7 +56,7 @@ namespace TheAlchemist.Systems
             Position position = EntityManager.GetComponent<TransformComponent>(character).Position;
             int pickupItemID = Util.CurrentFloor.GetFirstItem(position);
 
-            if(pickupItemID == 0)
+            if (pickupItemID == 0)
             {
                 UISystem.Message("Nothing here to be picked up!");
                 return;
@@ -74,7 +74,7 @@ namespace TheAlchemist.Systems
             {
                 UISystem.Message("Inventory is full! -> " + DescriptionSystem.GetNameWithID(character));
                 return;
-            }                
+            }
 
             // post message to player
             UISystem.Message(DescriptionSystem.GetNameWithID(character) + " picked up " + DescriptionSystem.GetNameWithID(pickupItemID));
@@ -102,15 +102,15 @@ namespace TheAlchemist.Systems
                 var invItemComponentIDs = EntityManager.GetComponentTypeIDs(invItemID);
 
                 // check if both items have the exact same components attached
-                match = invItemComponentIDs.All(pickupComponentTypeIDs.Contains) && invItemComponentIDs.Count() == pickupComponentTypeIDs.Count();             
+                match = invItemComponentIDs.All(pickupComponentTypeIDs.Contains) && invItemComponentIDs.Count() == pickupComponentTypeIDs.Count();
 
-                if(match)
-                {                  
+                if (match)
+                {
                     var pickedUpItemInfo = EntityManager.GetComponent<ItemComponent>(pickupItemID);
 
                     // cumulative count doesnt exceed max -> just increase count 
                     // in inventory and remove picked up item
-                    if(invItemInfo.Count + pickedUpItemInfo.Count <= invItemInfo.MaxCount)
+                    if (invItemInfo.Count + pickedUpItemInfo.Count <= invItemInfo.MaxCount)
                     {
                         invItemInfo.Count += pickedUpItemInfo.Count;
                         EntityManager.RemoveEntity(pickupItemID);
@@ -125,7 +125,7 @@ namespace TheAlchemist.Systems
                         inventory.Items.Add(pickupItemID);
                     }
                     break;
-                }              
+                }
             }
 
             if (!match)
@@ -141,13 +141,13 @@ namespace TheAlchemist.Systems
         {
             var usableItem = EntityManager.GetComponent<UsableItemComponent>(item);
 
-            if(usableItem == null)
+            if (usableItem == null)
             {
                 UISystem.Message("You can't use that!");
                 return;
             }
 
-            if(!usableItem.Usages.Contains(usage))
+            if (!usableItem.Usages.Contains(usage))
             {
                 UISystem.Message("You can't use that like that!");
                 return;
@@ -165,7 +165,7 @@ namespace TheAlchemist.Systems
                     InputManager.Instance.InitiateTargeting((pos) => ThrowItem(character, item, pos));
                     //UISystem.Message("Throwing items is not yet implemented");
                     break;
-            }          
+            }
         }
 
         public void DecreaseItemCount(int character, int item)
@@ -186,9 +186,9 @@ namespace TheAlchemist.Systems
         {
             var itemEffects = EntityManager.GetComponent<UsableItemComponent>(item).Effects;
 
-            foreach(var effect in itemEffects)
+            foreach (var effect in itemEffects)
             {
-                switch(effect.Type)
+                switch (effect.Type)
                 {
                     case EffectType.Health:
                         if (effect.Harmful)
@@ -227,7 +227,7 @@ namespace TheAlchemist.Systems
 
             if (targetCharacter == 0)
             {
-                if(usableComponent.BreakOnThrow)
+                if (usableComponent.BreakOnThrow)
                 {
                     UISystem.Message("The item breaks!");
                 }
@@ -235,13 +235,13 @@ namespace TheAlchemist.Systems
                 {
                     bool solid = false;
 
-                    var collider = EntityManager.GetComponent<ColliderComponent>(targetTerrain);                   
-                    if(collider != null)
+                    var collider = EntityManager.GetComponent<ColliderComponent>(targetTerrain);
+                    if (collider != null)
                     {
                         solid = collider.Solid;
                     }
 
-                    if(solid)
+                    if (solid)
                     {
                         // TODO: bounce off wall
                         UISystem.Message("You can't throw that there!");
@@ -263,6 +263,15 @@ namespace TheAlchemist.Systems
                                 HealthLostEvent?.Invoke(targetCharacter, effect.Potency * 0.2f);
                             else
                                 HealthGainedEvent?.Invoke(targetCharacter, effect.Potency * 0.2f);
+                            break;
+
+                        case EffectType.Str:
+                        case EffectType.Dex:
+                        case EffectType.Int:
+                            int amount = (int)Math.Round(effect.Potency * 0.1f * 0.5f) * Util.Sign(!effect.Harmful);
+                            Stat stat = GetStatFromEffectType(effect.Type);
+                            int duration = 7 * (int)Math.Round(effect.Potency * 0.1f * 0.5f);
+                            StatChangedEvent?.Invoke(targetCharacter, stat, amount, duration);
                             break;
 
                         default:
@@ -294,7 +303,7 @@ namespace TheAlchemist.Systems
 
         private Stat GetStatFromEffectType(EffectType effect)
         {
-            switch(effect)
+            switch (effect)
             {
                 case EffectType.Str: return Stat.Strength;
 

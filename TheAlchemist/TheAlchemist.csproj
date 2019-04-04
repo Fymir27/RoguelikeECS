@@ -45,6 +45,7 @@
     <Compile Include="Components\ArmorComponent.cs" />
     <Compile Include="Components\ColliderComponent.cs" />
     <Compile Include="Components\Component.cs" />
+    <Compile Include="Components\CraftingMaterialComponent.cs" />
     <Compile Include="Components\DescriptionComponent.cs" />
     <Compile Include="Components\DoorComponent.cs" />
     <Compile Include="Components\EqupimentComponent.cs" />
@@ -71,8 +72,10 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Room.cs" />
+    <Compile Include="Singleton.cs" />
     <Compile Include="Systems\CollisionSystem.cs" />
     <Compile Include="Systems\CombatSystem.cs" />
+    <Compile Include="Systems\CraftingSystem.cs" />
     <Compile Include="Systems\DescriptionSystem.cs" />
     <Compile Include="Systems\HealthSystem.cs" />
     <Compile Include="Systems\InputSystem.cs" />
@@ -168,6 +171,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
+  <ProjectExtensions />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -32,6 +32,7 @@ namespace TheAlchemist
         InteractionSystem interactionSystem;
         ItemSystem itemSystem;
         StatSystem statSystem;
+        CraftingSystem craftingSystem;
 
         RenderSystem renderSystem;
         UISystem uiSystem;
@@ -97,6 +98,7 @@ namespace TheAlchemist
             itemSystem = new ItemSystem();
             uiSystem = new UISystem();
             statSystem = new StatSystem();
+            craftingSystem = new CraftingSystem();
 
             // toggle FOW
             renderSystem.FogOfWarEnabled = true;
@@ -109,6 +111,11 @@ namespace TheAlchemist
             input.InventoryCursorMovedEvent += uiSystem.HandleInventoryCursorMoved;
             input.PickupItemEvent += itemSystem.PickUpItem;
             input.ItemUsedEvent += itemSystem.UseItem;
+
+            // crafting
+            input.AddItemAsIngredientEvent += craftingSystem.AddIngredient;
+            input.CraftItemEvent += craftingSystem.CraftItem;
+            input.ResetCraftingEvent += craftingSystem.ResetCrafting;
 
             itemSystem.HealthGainedEvent += healthSystem.HandleGainedHealth;
             itemSystem.HealthLostEvent += healthSystem.HandleLostHealth;
@@ -135,6 +142,16 @@ namespace TheAlchemist
             Log.Message("Initialization completed!");
 
             CraftableComponent.foo();
+
+            Util.GetPlayerInventory().Items.AddRange(new List<int>()
+                {
+                GameData.Instance.CreateItem("healthPotion"),
+                GameData.Instance.CreateItem("healthPotion"),
+                GameData.Instance.CreateItem("healthPotion"),
+                GameData.Instance.CreateItem("healthPotion"),
+                GameData.Instance.CreateItem("healthPotion")
+
+            });
         }
 
         /// <summary>

@@ -30,7 +30,9 @@ namespace TheAlchemist
         public event InventoryCursorMovedHandler InventoryCursorMovedEvent;
         public event ItemUsedHandler ItemUsedEvent;
 
-
+        public event AddCraftingIngredientHandler AddItemAsIngredientEvent;
+        public event ResetCraftingHandler ResetCraftingEvent;
+        public event CraftItemHandler CraftItemEvent;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public enum Command
@@ -64,7 +66,13 @@ namespace TheAlchemist
             UseItem, // general usage -> just prints specific item usage, unless there is only one usage Type
             ConsumeItem,
             DropItem,
-            ThrowItem
+            ThrowItem,
+
+            // Crafting
+            ToggleCrafting,
+            AddIngredient,
+            ResetCrafting,
+            CraftItem
         }
 
         // idea from Kyzrati @GridSageGames (Cogmind)
@@ -75,7 +83,8 @@ namespace TheAlchemist
             Exploring, // default/running around
             Examining,
             Targeting,
-            Inventory
+            Inventory,
+            Crafting
         }
 
         Stack<CommandDomain> domainHistory = new Stack<CommandDomain>();
@@ -270,6 +279,20 @@ namespace TheAlchemist
                     UseItem(ItemUsage.Throw);
                     break;
 
+                case Command.ToggleCrafting:
+                    ToggleCrafting();
+                    break;
+                case Command.AddIngredient:
+                    AddItemAsCraftingIngredient();
+                    break;
+                case Command.ResetCrafting:
+                    ResetCraftingEvent?.Invoke();
+                    break;
+                case Command.CraftItem:
+                    CraftItemEvent?.Invoke();
+                    ToggleCrafting(); // TODO: leave crafting open?
+                    break;
+
                 default:
                     Log.Error("Command not implemented! " + command);
                     break;
@@ -410,8 +433,7 @@ namespace TheAlchemist
         /// </summary>
         private void TryUseItem()
         {
-            int cursorPos = UI.InventoryCursorPosition;
-            var item = EntityManager.GetComponent<InventoryComponent>(ControlledEntity).Items[cursorPos - 1];
+            var item = Util.GetCurrentItem();
 
             var usableItem = EntityManager.GetComponent<UsableItemComponent>(item);
 
@@ -449,9 +471,8 @@ namespace TheAlchemist
 
         private void UseItem(ItemUsage usage)
         {
-            int cursorPos = UI.InventoryCursorPosition;
-            var item = EntityManager.GetComponent<InventoryComponent>(ControlledEntity).Items[cursorPos - 1];
 
+            var item = Util.GetCurrentItem();
             ItemUsedEvent?.Invoke(ControlledEntity, item, usage);
             //ToggleInventory();
         }
@@ -473,7 +494,6 @@ namespace TheAlchemist
             if (domainHistory.Peek() == CommandDomain.Targeting)
             {
                 ControlledEntity = Util.PlayerID;
-                EntityManager.RemoveAllComponentsOfType(Util.TargetIndicatorID, RenderableSpriteComponent.TypeID);
                 LeaveCurrentDomain();
             }
             else
@@ -507,6 +527,36 @@ namespace TheAlchemist
             targetConfirmationCallback?.Invoke(targetPos);
             targetConfirmationCallback = null;
             ToggleTargetMode();
+        }
+
+        private void ToggleCrafting()
+        {
+            if (UI.CraftingMode)
+            {
+                UI.CraftingMode = false;
+                LeaveCurrentDomain();
+                LeaveCurrentDomain(); // TODO: leave inventory open?
+            }
+            else
+            {
+                if (GetCurrentDomain() != CommandDomain.Inventory)
+                {
+                    ToggleInventory();
+                }
+                UI.CraftingMode = true;
+                EnterDomain(CommandDomain.Crafting);
+            }
+        }
+
+        public void AddItemAsCraftingIngredient()
+        {
+            int item = Util.GetCurrentItem();
+            if (item == 0)
+            {
+                UISystem.Message("Your inventory is empty!");
+                return;
+            }
+            AddItemAsIngredientEvent?.Invoke(item);
         }
     }
 }

@@ -46,8 +46,7 @@ namespace TheAlchemist.Systems
             switch (dir)
             {
                 case Direction.North:
-                    if (newCursorPosition > 1)
-                        newCursorPosition--;
+                    newCursorPosition--;
                     break;
 
                 case Direction.East:
@@ -96,6 +95,11 @@ namespace TheAlchemist.Systems
             }
 
             UI.MessageLog[UI.MessageLogLineCount - 1] = message;
+        }
+
+        public static void ToggleCrafting()
+        {
+            UI.CraftingMode = !UI.CraftingMode;
         }
     }
 }

@@ -19,8 +19,10 @@ namespace TheAlchemist
         public static int InventoryCursorPosition { get; set; } = 1;
         public static int InventoryColumnLength { get; set; } = 25;
 
+        public static bool CraftingMode = false;
+
         // TODO: save older messages
-        public static int MessageLogLineCount { get; set; } = 10;
+        public static int MessageLogLineCount { get; set; } = 11;
         public static string[] MessageLog { get; set; } = new string[MessageLogLineCount];
 
         public static void Render(SpriteBatch spriteBatch)
@@ -29,12 +31,27 @@ namespace TheAlchemist
             spriteBatch.Draw(TextureManager.GetTexture("messageLogBox"), new Vector2(0, Util.WorldViewPixelHeight), Color.White);
             //spriteBatch.DrawString(Util.BigFont, "Message Log", new Vector2(10, Util.WorldHeight + 10), Color.Black);
 
-            string messageLogString = "";
-            for (int i = 0; i < MessageLogLineCount; i++)
+            if (CraftingMode)
             {
-                messageLogString += MessageLog[i] + '\n';
+                StringBuilder sb = new StringBuilder();
+                sb.Append("\n +++  Crafting  +++ \n");
+                sb.Append("(press 'R' to reset and 'Enter' to craft)\n\n");
+                sb.Append("Current Recipe:\n");
+                foreach (var ingredientName in CraftingSystem.Instance.GetIngredientNames())
+                {
+                    sb.Append("- " + ingredientName + "\n");
+                }
+                spriteBatch.DrawString(Util.DefaultFont, sb.ToString(), new Vector2(10, Util.WorldViewPixelHeight + 10), Color.Black);
             }
-            spriteBatch.DrawString(Util.DefaultFont, messageLogString, new Vector2(10, Util.WorldViewPixelHeight + 10), Color.Black);
+            else
+            {
+                string messageLogString = "";
+                for (int i = 0; i < MessageLogLineCount; i++)
+                {
+                    messageLogString += MessageLog[i] + '\n';
+                }
+                spriteBatch.DrawString(Util.DefaultFont, messageLogString, new Vector2(10, Util.WorldViewPixelHeight + 10), Color.Black);
+            }
 
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
             spriteBatch.Draw(TextureManager.GetTexture("inventory"), new Vector2(Util.WorldViewPixelWidth, 220), InventoryOpen ? Color.Aquamarine : Color.White);
@@ -46,6 +63,8 @@ namespace TheAlchemist
 
             var itemsFirstHalf = items.Take(InventoryColumnLength);
             var itemsSecondHalf = items.Skip(InventoryColumnLength);
+
+            SyncInventoryCursor();
 
             string itemStringLeftCol = "";
             foreach (var item in itemsFirstHalf)
@@ -188,6 +207,13 @@ namespace TheAlchemist
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
         }
 
-
+        public static void SyncInventoryCursor()
+        {
+            int itemCount = Util.GetPlayerInventory().Items.Count();
+            if (InventoryCursorPosition < 1)
+                InventoryCursorPosition = 1;
+            else if (InventoryCursorPosition > itemCount)
+                InventoryCursorPosition = itemCount;
+        }
     }
 }

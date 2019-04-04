@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 namespace TheAlchemist
 {
     using Components;
+    using Systems;
 
     // This class loads and saves JSON representations of template enemies/items/terrain...
     class GameData
@@ -20,6 +21,7 @@ namespace TheAlchemist
         public Dictionary<string, string> Enemies { get; private set; }
         public Dictionary<string, string> Items { get; private set; }
         public Dictionary<string, string> Terrain { get; private set; }
+        //public Dictionary<Craftable, >
 
 
         public void Load(string basePath)

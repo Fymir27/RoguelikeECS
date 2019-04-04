@@ -5,6 +5,7 @@
     "Down": "MoveS",
     "Left": "MoveW",
     "I": "ToggleInv",
+    "C": "ToggleCrafting",
     "Space": "PickupItem",
     "X": "ToggleTargeting",
     "OemPeriod": "Wait"
@@ -13,6 +14,7 @@
   "Inventory": {
     "I": "ToggleInv",
     "Escape": "ToggleInv",
+    "C": "ToggleCrafting",
     "Space": "UseItem",
     "Up": "MoveInvCursorUp",
     "Right": "MoveInvCursorRight",
@@ -22,6 +24,18 @@
     "F": "ThrowItem"
   },
 
+  "Crafting": {
+    "C": "ToggleCrafting",
+    "Escape": "ToggleCrafting",
+    "Up": "MoveInvCursorUp",
+    "Right": "MoveInvCursorRight",
+    "Down": "MoveInvCursorDown",
+    "Left": "MoveInvCursorLeft",
+    "Space": "AddIngredient",
+    "R": "ResetCrafting",
+    "Enter": "CraftItem"
+  },
+
   "Targeting": {
     "Up": "MoveN",
     "Right": "MoveE",
@@ -29,7 +43,7 @@
     "Left": "MoveW",
     "X": "ToggleTargeting",
     "Escape": "ToggleTargeting",
-	"Enter": "ConfirmTarget",
-	"F": "ConfirmTarget"
+    "Enter": "ConfirmTarget",
+    "F": "ConfirmTarget"
   }
 }

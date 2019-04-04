@@ -326,5 +326,26 @@ namespace TheAlchemist
         {
             return list[Game.Random.Next(0, list.Count)];
         }
+
+        public static InventoryComponent GetPlayerInventory()
+        {
+            return EntityManager.GetComponent<InventoryComponent>(PlayerID);
+        }
+
+        public static int GetCurrentItem()
+        {
+            UI.SyncInventoryCursor();
+            int cursorPos = UI.InventoryCursorPosition;
+            int item = 0;
+            try
+            {
+                item = EntityManager.GetComponent<InventoryComponent>(InputManager.Instance.ControlledEntity).Items[cursorPos - 1];
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                Log.Warning("Inventory is empty! " + DescriptionSystem.GetNameWithID(InputManager.Instance.ControlledEntity));
+            }
+            return item;
+        }
     }
 }

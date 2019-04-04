@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace TheAlchemist.Components
 {
     class Component<T> : IComponent
-    {      
+    {
         public static int TypeID { get { return typeID; } }
 
         protected static int typeID = Util.TypeID<IComponent>.Get();
@@ -30,7 +30,7 @@ namespace TheAlchemist.Components
                 entityID = value;
             }
         }
-       
+
         public Component()
         {
 
@@ -42,10 +42,5 @@ namespace TheAlchemist.Components
            return GetType() + ", TypeID: " + typeID + ", ComponentID: " + componentID;
         }
         */
-
-        public T GetConcreteComponent()
-        {
-            return (T)Convert.ChangeType(this, typeof(T));
-        }
     }
 }
