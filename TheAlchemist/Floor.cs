@@ -781,7 +781,17 @@ namespace TheAlchemist
             File.WriteAllText(Util.ContentPath + "/terrain.json", Util.SerializeObject(terrain, true));
             */
 
-            PlaceCharacter(rooms[0].Pos + new Position(rooms[0].Width / 2, rooms[0].Height / 2), CreatePlayer());
+            var playerPos = rooms[0].Pos + new Position(rooms[0].Width / 2, rooms[0].Height / 2);
+            PlaceCharacter(playerPos, CreatePlayer());
+
+            int size = 5;
+            for (y = playerPos.Y - size; y <= playerPos.Y + size; y++)
+            {
+                for (x = playerPos.X - size; x <= playerPos.X + size; x++)
+                {
+                    GetTile(x, y).Discovered = true;
+                }
+            }
 
 
 
