@@ -150,8 +150,8 @@ namespace TheAlchemist
                 GameData.Instance.CreateItem("healthPotion"),
                 GameData.Instance.CreateItem("poisonPotion"),
                 GameData.Instance.CreateItem("dexterityPotion"),
-                GameData.Instance.CreateItem("IntelligencePotion"),
-                GameData.Instance.CreateItem("StrengthPotion"),
+                GameData.Instance.CreateItem("intelligencePotion"),
+                GameData.Instance.CreateItem("strengthPotion"),
                 GameData.Instance.CreateItem("poisonPotion")
 
             });

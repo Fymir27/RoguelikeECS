@@ -60,20 +60,32 @@ namespace TheAlchemist
             return Terrain.Keys.ToList();
         }
 
+        public int TryCreateEntity(Dictionary<string, string> dict, string name)
+        {
+            try
+            {
+                return EntityManager.CreateEntity(dict[name]);
+            }
+            catch (KeyNotFoundException e)
+            {
+                Log.Error("GameData.CreateEntity: This entity doesn't exist! ->" + name);
+                return 0;
+            }
+        }
 
         public int CreateEnemy(string name)
         {
-            return EntityManager.CreateEntity(Enemies[name]);
+            return TryCreateEntity(Enemies, name);
         }
 
         public int CreateItem(string name)
         {
-            return EntityManager.CreateEntity(Items[name]);
+            return TryCreateEntity(Items, name);
         }
 
         public int CreateTerrain(string name)
         {
-            return EntityManager.CreateEntity(Terrain[name]);
+            return TryCreateEntity(Terrain, name);
         }
 
 
