@@ -18,6 +18,8 @@ namespace TheAlchemist.Components
 
         public MaterialType Type { get; set; }
 
-        public UsableItemComponent.ItemEffect Effect { get; set; }
+        public List<UsableItemComponent.ItemEffect> Effects { get; set; }
+
+        public int Instability { get; set; } //TODO:
     }
 }

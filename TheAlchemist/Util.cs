@@ -168,6 +168,16 @@ namespace TheAlchemist
             return result.Substring(0, result.Length - 1) + "]";
         }
 
+        public static string GetStringFromCollection(System.Collections.ICollection collection)
+        {
+            string result = "[";
+            foreach (var elem in collection)
+            {
+                result += elem.ToString() + ",";
+            }
+            return result.Substring(0, result.Length - 1) + "]";
+        }
+
         // transforms world position to screen position based on tile size
         public static Vector2 WorldToScreenPosition(Position worldPos)
         {

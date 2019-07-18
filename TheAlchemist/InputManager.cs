@@ -535,7 +535,10 @@ namespace TheAlchemist
             {
                 UI.CraftingMode = false;
                 LeaveCurrentDomain();
-                LeaveCurrentDomain(); // TODO: leave inventory open?
+                if (GetCurrentDomain() == CommandDomain.Inventory)
+                {
+                    LeaveCurrentDomain(); // TODO: leave inventory open?
+                }
             }
             else
             {

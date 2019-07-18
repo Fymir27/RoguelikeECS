@@ -1,4 +1,43 @@
 {
+  "templatePotion": [
+    {
+      "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
+      "Count": 1,
+      "MaxCount": 1,
+      "Value": 0,
+      "Weight": 0.0,
+      "OnGround": true
+    },
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Potion",
+      "Description": "Quaff it!"
+    },
+    {
+      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
+      "Effects": [],
+      "Usages": [
+        "Consume",
+        "Throw"
+      ]
+    },
+    {
+      "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+      "Texture": "potion",
+      "Tint": {
+        "B": 255,
+        "G": 255,
+        "R": 255,
+        "A": 255
+      }
+    },
+    {
+      "$type": "TheAlchemist.Components.CraftingMaterialComponent, TheAlchemist",
+      "MaterialType": "Potion",
+      "Effects": []
+    }
+  ],
+
   "healthPotion": [
     {
       "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
@@ -39,7 +78,14 @@
     },
     {
       "$type": "TheAlchemist.Components.CraftingMaterialComponent, TheAlchemist",
-      "MaterialType": "Potion"
+      "MaterialType": "Potion",
+      "Effects": [
+        {
+          "Type": "Health",
+          "Harmful": false,
+          "Potency": 50
+        }
+      ]
     }
   ],
   "poisonPotion": [
@@ -79,6 +125,17 @@
         "R": 0,
         "A": 255
       }
+    },
+    {
+      "$type": "TheAlchemist.Components.CraftingMaterialComponent, TheAlchemist",
+      "MaterialType": "Potion",
+      "Effects": [
+        {
+          "Type": "Health",
+          "Harmful": true,
+          "Potency": 50
+        }
+      ]
     }
   ],
   "strengthPotion": [
@@ -118,6 +175,17 @@
         "R": 255,
         "A": 255
       }
+    },
+    {
+      "$type": "TheAlchemist.Components.CraftingMaterialComponent, TheAlchemist",
+      "MaterialType": "Potion",
+      "Effects": [
+        {
+          "Type": "Str",
+          "Harmful": false,
+          "Potency": 50
+        }
+      ]
     }
   ],
   "dexterityPotion": [
@@ -157,6 +225,17 @@
         "R": 0,
         "A": 255
       }
+    },
+    {
+      "$type": "TheAlchemist.Components.CraftingMaterialComponent, TheAlchemist",
+      "MaterialType": "Potion",
+      "Effects": [
+        {
+          "Type": "Dex",
+          "Harmful": false,
+          "Potency": 50
+        }
+      ]
     }
   ],
   "intelligencePotion": [
@@ -196,6 +275,17 @@
         "R": 0,
         "A": 255
       }
+    },
+    {
+      "$type": "TheAlchemist.Components.CraftingMaterialComponent, TheAlchemist",
+      "MaterialType": "Potion",
+      "Effects": [
+        {
+          "Type": "Int",
+          "Harmful": false,
+          "Potency": 50
+        }
+      ]
     }
   ]
 }

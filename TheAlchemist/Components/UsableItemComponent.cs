@@ -11,7 +11,7 @@ namespace TheAlchemist.Components
     using static TheAlchemist.Systems.ItemSystem;
 
     class UsableItemComponent : Component<UsableItemComponent>
-    {       
+    {
         public struct ItemEffect
         {
             public EffectType Type;
@@ -23,11 +23,16 @@ namespace TheAlchemist.Components
                 Harmful = harmful;
                 Potency = potency;
             }
+
+            public override string ToString()
+            {
+                return "(" + Type.ToString() + ", " + Harmful + ", " + Potency + ")";
+            }
         }
 
-        public List<ItemEffect> Effects;
-        public List<Systems.ItemUsage> Usages;
+        public List<ItemEffect> Effects { get; set; }
+        public List<Systems.ItemUsage> Usages { get; set; }
 
-        public bool BreakOnThrow = true;
+        public bool BreakOnThrow { get; set; } = true;
     }
 }

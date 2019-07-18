@@ -43,8 +43,10 @@ namespace TheAlchemist.Components
                 }
                 catch (NullReferenceException)
                 {
-                    Log.Error("RenderableComponent has neither a fixed Position nor can it find a TransformComponent!" + DescriptionSystem.GetName(EntityID) + " (Entity " + EntityID + ", Component " + componentID + ")");
-                    throw;
+                    Log.Warning("RenderableComponent has neither a fixed Position nor can it find a TransformComponent!" + DescriptionSystem.GetName(EntityID) + " (Entity " + EntityID + ", Component " + componentID + ")");
+                    //Log.Data(DescriptionSystem.GetDebugInfoEntity(EntityID));
+                    return Vector2.Zero;
+                    //throw;
                 }
             }
             set

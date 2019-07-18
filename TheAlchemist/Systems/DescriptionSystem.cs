@@ -46,11 +46,41 @@ namespace TheAlchemist.Systems
                     continue; // doesnt work!
                 }
                 sb.AppendLine(component.GetType().ToString());
-                foreach (var item in component.GetType().GetProperties())
+
+                foreach (var propertyInfo in component.GetType().GetProperties())
                 {
+                    if (propertyInfo == null)
+                    {
+                        sb.AppendLine("[ NULL ]");
+                        continue;
+                    }
+
+                    sb.Append("[ " + propertyInfo.Name + ": ");
+
                     //if (item.Name == "EntityID")
                     //continue;
-                    sb.AppendLine("[ " + item.Name + ": " + item.GetValue(component) + " ]");
+
+                    if (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetInterfaces().Any(t => t.GetGenericTypeDefinition() == typeof(ICollection<>)))
+                    {
+                        //var genericType = item.PropertyType.GetGenericTypeDefinition();
+                        //sb.AppendLine("Interfaces: " + Util.GetStringFromEnumerable(genericType.GetInterfaces()));
+                        //sb.AppendLine("typeof(ICollection<>): " + typeof(ICollection<>));
+                        //sb.AppendLine("match?: " + genericType.GetInterfaces().Any(t => t.GetGenericTypeDefinition() == typeof(ICollection<>)));
+
+                        var value = propertyInfo.GetValue(component);
+
+                        if (value == null)
+                        {
+                            sb.AppendLine("NULL ]");
+                            continue;
+                        }
+
+                        sb.AppendLine(Util.GetStringFromCollection(value as System.Collections.ICollection));
+                    }
+                    else
+                    {
+                        sb.AppendLine(propertyInfo.GetValue(component) + " ]");
+                    }
                 }
                 sb.AppendLine();
             }
