@@ -156,6 +156,7 @@
     <None Include="Content\default.spritefont" />
     <None Include="Content\items.json" />
     <None Include="Content\keybindings.json" />
+    <None Include="Content\monospace.spritefont" />
     <None Include="Content\small.spritefont" />
     <None Include="Meta\the_alchemist_design.md" />
     <None Include="Meta\todo.md" />

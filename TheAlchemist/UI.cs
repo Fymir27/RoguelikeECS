@@ -34,14 +34,15 @@ namespace TheAlchemist
             if (CraftingMode)
             {
                 StringBuilder sb = new StringBuilder();
-                sb.Append("\n +++  Crafting  +++ \n");
+                //sb.Append("\n(( Crafting ))\n");
                 sb.Append("(press 'R' to reset and 'Enter' to craft)\n\n");
                 sb.Append("Current Recipe:\n");
                 foreach (var ingredientName in CraftingSystem.Instance.GetIngredientNames())
                 {
                     sb.Append("- " + ingredientName + "\n");
                 }
-                spriteBatch.DrawString(Util.DefaultFont, sb.ToString(), new Vector2(10, Util.WorldViewPixelHeight + 10), Color.Black);
+                spriteBatch.DrawString(Util.BigFont, "Crafting", new Vector2(10, Util.WorldViewPixelHeight + 10), Color.Black);
+                spriteBatch.DrawString(Util.DefaultFont, sb.ToString(), new Vector2(10, Util.WorldViewPixelHeight + 40), Color.Black);
             }
             else
             {
@@ -203,7 +204,7 @@ namespace TheAlchemist
             }
 
             // draw description text
-            spriteBatch.DrawString(Util.BigFont, description, new Vector2(Util.WorldViewPixelWidth + 10, 40), Color.Black);
+            spriteBatch.DrawString(Util.MonospaceFont, description, new Vector2(Util.WorldViewPixelWidth + 10, 40), Color.Black);
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
         }
 

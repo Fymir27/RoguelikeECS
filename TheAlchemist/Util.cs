@@ -101,6 +101,7 @@ namespace TheAlchemist
         public static SpriteFont DefaultFont { get; set; } = null;
         public static SpriteFont SmallFont { get; set; } = null;
         public static SpriteFont BigFont { get; set; } = null;
+        public static SpriteFont MonospaceFont { get; set; } = null;
         public static string ContentPath { get; set; } = "";
 
         // size of virtual screen (disregarding resizing)

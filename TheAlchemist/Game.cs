@@ -174,6 +174,7 @@ namespace TheAlchemist
             Util.DefaultFont = Content.Load<SpriteFont>("default");
             Util.SmallFont = Content.Load<SpriteFont>("small");
             Util.BigFont = Content.Load<SpriteFont>("big");
+            Util.MonospaceFont = Content.Load<SpriteFont>("monospace");
 
             string[] textures =
             {

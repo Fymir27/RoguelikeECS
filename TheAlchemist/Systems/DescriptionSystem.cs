@@ -87,40 +87,66 @@ namespace TheAlchemist.Systems
             return sb.ToString();
         }
 
+        /// <summary>
+        /// returns the characters tooltip as a string
+        /// only displayed correctly if using monspace font
+        /// </summary>
+        /// <param name="entity">ID of entity</param>
+        /// <returns>tooltip as string</returns>
         public static string GetCharacterTooltip(int entity)
         {
-            string tooltip = "";
+            StringBuilder tooltip = new StringBuilder();
 
-            tooltip += "Health  ";
+            int maxBars = 25;
+
+            tooltip.Append("Health ");
 
             var hp = EntityManager.GetComponent<HealthComponent>(entity);
 
             if (hp != null)
             {
                 float relativeAmount = hp.Amount / hp.Max;
-                int maxBars = 30;
                 int curBars = (int)Math.Round(maxBars * relativeAmount);
-                tooltip += new string('#', curBars);
+                tooltip.Append(GetAsciiBar(curBars, maxBars));
             }
             else
             {
-                tooltip += "???";
+                tooltip.Append("???");
             }
 
-            tooltip += '\n';
+            tooltip.Append('\n');
 
             // TODO: Mana
+            tooltip.Append("Mana   ");
+            tooltip.Append(GetAsciiBar(maxBars, maxBars));
+            tooltip.Append('\n');
 
             var stats = EntityManager.GetComponent<StatComponent>(entity);
 
             if (stats != null)
             {
-                tooltip += "Strength:     " + stats[Stat.Strength] + '\n';
-                tooltip += "Dexterity:    " + stats[Stat.Dexterity] + '\n';
-                tooltip += "Intelligence: " + stats[Stat.Intelligence] + '\n';
+                tooltip.Append("Strength:     " + stats[Stat.Strength] + '\n');
+                tooltip.Append("Dexterity:    " + stats[Stat.Dexterity] + '\n');
+                tooltip.Append("Intelligence: " + stats[Stat.Intelligence] + '\n');
             }
 
-            return tooltip;
+            return tooltip.ToString();
+        }
+
+        /// <summary>
+        /// Creates Ascii bar like this: [======   ]
+        /// </summary>
+        /// <param name="cur">current amount (count of symbols to display)</param>
+        /// <param name="max">maximum amount (count of symbols to display)</param>
+        /// <returns></returns>
+        public static string GetAsciiBar(int cur, int max)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append('[');
+            sb.Append(new string('=', cur));
+            sb.Append(new string(' ', max - cur));
+            sb.Append(']');
+            return sb.ToString();
         }
     }
 }
