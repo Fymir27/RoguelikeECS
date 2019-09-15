@@ -324,6 +324,7 @@ namespace TheAlchemist
 
         public void EnterDomain(CommandDomain domain)
         {
+            //Log.Message("Entered domain " + domain.ToString());
             if (domainHistory.Count > 0)
             {
                 if (domainHistory.Peek() == domain)
@@ -337,6 +338,7 @@ namespace TheAlchemist
 
         public void LeaveCurrentDomain()
         {
+            //Log.Message("Left domain " + GetCurrentDomain().ToString());
             if (domainHistory.Count > 1)
             {
                 domainHistory.Pop();
@@ -537,7 +539,7 @@ namespace TheAlchemist
                 LeaveCurrentDomain();
                 if (GetCurrentDomain() == CommandDomain.Inventory)
                 {
-                    LeaveCurrentDomain(); // TODO: leave inventory open?
+                    ToggleInventory(); // TODO: leave inventory open?
                 }
             }
             else
