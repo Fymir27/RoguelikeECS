@@ -118,6 +118,16 @@ namespace TheAlchemist.Systems
                         }
                     }
 
+                    if(tile.Structure != 0)
+                    {
+                        var sprite = EntityManager.GetComponent<RenderableSpriteComponent>(tile.Structure);
+
+                        if (sprite != null && sprite.Visible)
+                        {
+                            DrawSprite(sprite, relScreenPos);
+                        }
+                    }
+
                     if (FogOfWarEnabled && !seenPositions.Contains(worldPos))
                     {
                         DrawSprite(greySquare, relScreenPos);

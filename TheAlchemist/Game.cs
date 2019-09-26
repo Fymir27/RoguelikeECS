@@ -74,11 +74,11 @@ namespace TheAlchemist
             gameData.Load(Util.ContentPath);
 
             //Floor test = new Floor(Content.RootDirectory + "/map.txt");
-            Floor test = new Floor();
+            Floor testFloor = new Floor();
 
             //EntityManager.Dump();
 
-            Util.CurrentFloor = test;
+            Util.CurrentFloor = testFloor;
             Util.CurrentFloor.CalculateTileVisibility();
 
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(Util.PlayerID));
@@ -110,6 +110,7 @@ namespace TheAlchemist
             input.InventoryToggledEvent += uiSystem.HandleInventoryToggled;
             input.InventoryCursorMovedEvent += uiSystem.HandleInventoryCursorMoved;
             input.PickupItemEvent += itemSystem.PickUpItem;
+            input.InteractionEvent += interactionSystem.HandleInteraction;
             input.ItemUsedEvent += itemSystem.UseItem;
 
             // crafting
@@ -156,6 +157,10 @@ namespace TheAlchemist
 
             });
 
+            int testBush = GameData.Instance.CreateTerrain("bush");
+            testFloor.PlaceStructure(Util.GetPlayerPos() + Position.Left, testBush);
+            //testFloor.Plac
+
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(Util.GetPlayerInventory().Items[0]));
         }
 
@@ -187,7 +192,9 @@ namespace TheAlchemist
                 "gold", "potion",
                 // UI:
                 "inventory", "inventoryOpen",
-                "messageLogBox", "tooltip"
+                "messageLogBox", "tooltip",
+                // other stuff:
+                "bush"
             };
 
             TextureManager.Init(Content);

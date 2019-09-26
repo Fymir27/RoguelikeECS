@@ -94,6 +94,8 @@ namespace TheAlchemist
     {
         public static event TurnOverHandler TurnOverEvent;
 
+        public static int TurnCount = 0;
+
         public static bool ErrorOccured = false;
         // ignores errors when on
         public static bool BrutalModeOn = true;
@@ -237,6 +239,7 @@ namespace TheAlchemist
             {
                 CurrentFloor.CalculateTileVisibility();
                 PlayerTurnOver = true;
+                TurnCount++;
             }
         }
 

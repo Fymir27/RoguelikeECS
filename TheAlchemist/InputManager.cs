@@ -24,6 +24,7 @@ namespace TheAlchemist
         public int ControlledEntity = 0;
 
         public event MovementEventHandler MovementEvent;
+        public event InteractionHandler InteractionEvent;
         public event ItemPickupHandler PickupItemEvent;
 
         public event InventoryToggledHandler InventoryToggledEvent;
@@ -50,7 +51,7 @@ namespace TheAlchemist
             MoveNW,
             Wait,
 
-            PickupItem,
+            Interact,
 
             // UI
             ToggleInv,
@@ -241,8 +242,8 @@ namespace TheAlchemist
                     break;
                 // -------------------------------
 
-                case Command.PickupItem:
-                    PickUpItem();
+                case Command.Interact:
+                    Interact();
                     break;
 
                 case Command.ToggleInv:
@@ -424,8 +425,21 @@ namespace TheAlchemist
             InventoryCursorMovedEvent?.Invoke(dir);
         }
 
-        private void PickUpItem()
+        private void Interact()
         {
+            var tile = Util.CurrentFloor.GetTile(Util.GetPlayerPos());
+
+            if(tile.Structure != 0)
+            {
+                var interactableStructure = EntityManager.GetComponent<InteractableComponent>(tile.Structure);
+
+                if(interactableStructure != null)
+                {
+                    InteractionEvent?.Invoke(Util.PlayerID, tile.Structure);
+                    return;
+                }
+            }          
+
             PickupItemEvent?.Invoke(ControlledEntity);
         }
 

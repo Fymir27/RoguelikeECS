@@ -15,27 +15,72 @@ namespace TheAlchemist.Systems
     {
         public bool HandleInteraction(int actor, int other)
         {          
+            var interactable = EntityManager.GetComponent<InteractableComponent>(other);
 
-            var door = EntityManager.GetComponent<DoorComponent>(other);
-
-            if(door != null)
+            if(interactable == null)
             {
-                if(door.Open)
-                {
-                    return false;
-                }
-                //Log.Message("Its a door!");
-
-                door.Open = true;
-
-                // open door by setting its colider to non solid
-                EntityManager.GetComponent<ColliderComponent>(other).Solid = false;
-
-                // change texture to open
-                EntityManager.GetComponent<RenderableSpriteComponent>(other).Texture = door.TextureOpen;
+                Log.Error("HandleInteraction called on non-interactable object!");
+                Log.Data(DescriptionSystem.GetDebugInfoEntity(other));
+                return false;
             }
 
             Log.Message("Interaction between " + DescriptionSystem.GetNameWithID(actor) + " and " + DescriptionSystem.GetNameWithID(other));
+            Log.Data(DescriptionSystem.GetDebugInfoEntity(other));
+
+            if(interactable.ChangeSolidity)
+            {
+                var collider = EntityManager.GetComponent<ColliderComponent>(other);
+
+                if(collider == null)
+                {
+                    Log.Warning("Interactable has ChangeSolidity set but has no collider attached! " + DescriptionSystem.GetNameWithID(other));
+                    Log.Data(DescriptionSystem.GetDebugInfoEntity(other));
+                }
+                else if(collider.Solid == false)
+                {
+                    //TODO: make it solid again? ( ._.)?
+                }
+                else
+                {
+                    collider.Solid = false;
+                }
+            }
+
+            if(interactable.ChangeTexture)
+            {
+                var renderable = EntityManager.GetComponent<RenderableSpriteComponent>(other);
+
+                if(renderable == null)
+                {
+                    Log.Error("Interactable has ChangeTexture set but does not have RenderableSprite attached! " + DescriptionSystem.GetNameWithID(other));
+                    Log.Data(DescriptionSystem.GetDebugInfoEntity(other));
+                    return false;
+                }
+
+                if(interactable.AlternateTexture == "")
+                {
+                    Log.Warning("Interactable has ChangeTexture set but does not define AlternateTexture! " + DescriptionSystem.GetNameWithID(other));
+                    Log.Data(DescriptionSystem.GetDebugInfoEntity(other));
+                    renderable.Texture = "square"; // placholder; something's not right
+                }
+                else
+                {
+                    renderable.Texture = interactable.AlternateTexture;
+                }
+            }
+
+            if(interactable.GrantsItems)
+            {
+                if(interactable.Items == null || interactable.Items.Count == 0)
+                {
+                    Log.Warning("Interactable has GrantItems set but does not define Items! " + DescriptionSystem.GetNameWithID(other));
+                    Log.Data(DescriptionSystem.GetDebugInfoEntity(other));
+                }
+                else
+                {
+                    //TODO: pick up item(s)
+                }
+            }                 
 
             Util.TurnOver(actor);
             return true;

@@ -6,11 +6,10 @@
     "Left": "MoveW",
     "I": "ToggleInv",
     "C": "ToggleCrafting",
-    "Space": "PickupItem",
+    "Space": "Interact",
     "X": "ToggleTargeting",
     "OemPeriod": "Wait"
   },
-
   "Inventory": {
     "I": "ToggleInv",
     "Escape": "ToggleInv",
@@ -23,7 +22,6 @@
     "Q": "ConsumeItem",
     "F": "ThrowItem"
   },
-
   "Crafting": {
     "C": "ToggleCrafting",
     "Escape": "ToggleCrafting",
@@ -35,7 +33,6 @@
     "R": "ResetCrafting",
     "Enter": "CraftItem"
   },
-
   "Targeting": {
     "Up": "MoveN",
     "Right": "MoveE",

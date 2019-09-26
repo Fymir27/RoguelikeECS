@@ -739,7 +739,7 @@ namespace TheAlchemist
             var riverFrom = new Position(Width / 2 + 3, 1);
             var riverTo = new Position(Width / 2 - 3, Height - 2);
 
-            CreateRiver(riverFrom, riverTo, 5);
+            //CreateRiver(riverFrom, riverTo, 5);
 
             /*
             int door = CreateDoor();
@@ -1353,6 +1353,15 @@ namespace TheAlchemist
             return itemList;
         }
 
+        public int GetStructure(Position pos)
+        {
+            if (IsOutOfBounds(pos))
+            {
+                return 0;
+            }
+            return GetTile(pos).Structure;
+        }
+
         //////////////////// Removal ////////////////////////////////////////
 
         // prepares entity for removal from floor by
@@ -1413,6 +1422,24 @@ namespace TheAlchemist
             }
 
             GetTile(pos).Character = 0; // characters[(int)pos.X, (int)pos.Y] = 0;
+        }
+
+        public void RemoveStructure(Position pos)
+        {
+            if (IsOutOfBounds(pos))
+            {
+                Log.Warning("Can't remove structure out of bounds! " + pos);
+                return;
+            }
+
+            int structure = GetTile(pos).Structure;
+
+            if (!RemoveEntity(pos, structure))
+            {
+                return;
+            }
+
+            GetTile(pos).Structure = 0; 
         }
 
         /* public void MoveCharacter(Position oldPos, Position newPos)
@@ -1549,6 +1576,16 @@ namespace TheAlchemist
             }
             //characters[pos.X, pos.Y] = character;
             GetTile(pos).Character = character;
+        }
+
+        public void PlaceStructure(Position pos, int structure)
+        {
+            if (!PlaceEntity(pos, structure, RenderableSpriteComponent.RenderLayer.Structure))
+            {
+                return;
+            }
+
+            GetTile(pos).Structure = structure;
         }
 
         /* public void PlaceItems(Position pos, IEnumerable<int> items)
@@ -1872,16 +1909,7 @@ namespace TheAlchemist
 
         public int CreateDoor()
         {
-            var doorComponent = new DoorComponent() { Open = false, TextureClosed = "doorClosed", TextureOpen = "doorOpen" };
-            return EntityManager.CreateEntity(new List<IComponent>()
-            {
-                doorComponent,
-                new DescriptionComponent() { Name = "Door", Description = "What may be behind this one?" },
-                new InteractableComponent() { },
-                new RenderableSpriteComponent() { Texture = doorComponent.Open ? doorComponent.TextureOpen : doorComponent.TextureClosed },
-                new ColliderComponent() { Solid = true },
-                //new RenderableTextComponent() { GetTextFrom = () => doorComponent.Open.ToString() }
-            });
+            return GameData.Instance.CreateTerrain("door");
         }
 
         public void CreateRiver(Position from, Position to, int width)

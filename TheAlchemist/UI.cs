@@ -98,7 +98,7 @@ namespace TheAlchemist
 
             if (curDomain == InputManager.CommandDomain.Exploring)
             {
-                name = "Player";
+                name = "Player (Turns: " + Util.TurnCount + ")";
                 description = DescriptionSystem.GetCharacterTooltip(Util.PlayerID);
                 //description = "HP: " + EntityManager.GetComponent<HealthComponent>(Util.PlayerID).GetString();
             }

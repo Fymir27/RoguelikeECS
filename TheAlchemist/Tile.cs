@@ -9,6 +9,7 @@ namespace TheAlchemist
     class Tile
     {
         public int Terrain;
+        public int Structure;
         public int Character;
         public List<int> Items;
         public bool Discovered;

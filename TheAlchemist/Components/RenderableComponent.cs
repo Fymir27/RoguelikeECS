@@ -15,8 +15,9 @@ namespace TheAlchemist.Components
         public class RenderLayer
         {
             public static readonly int Terrain = 0;
-            public static readonly int Item = 1;
-            public static readonly int Character = 2;
+            public static readonly int Structure = 1;
+            public static readonly int Item = 2;
+            public static readonly int Character = 3;            
         }
 
         public bool Visible { get; set; } = true;
