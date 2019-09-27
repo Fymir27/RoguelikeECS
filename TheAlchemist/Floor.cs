@@ -635,7 +635,7 @@ namespace TheAlchemist
                 PlaceItem(playerPos + new Position(-1, 0), CreateGold(666));
             }
 
-            // load items ////////////
+            /*/ load items ////////////
             JObject itemsFile = JObject.Parse(File.ReadAllText(Util.ContentPath + "/items.json"));
 
             int healthPotion = EntityManager.CreateEntity(itemsFile["healthPotion"].ToString());
@@ -667,6 +667,8 @@ namespace TheAlchemist
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(rat));
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(bat));
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(spider));
+
+            */
 
             Log.Message("Floor loaded: " + path + " (" + Width + "|" + Height + ")");
         }
@@ -792,8 +794,6 @@ namespace TheAlchemist
                     GetTile(x, y).Discovered = true;
                 }
             }
-
-
 
             //PlaceCharacter(new Position(Width / 2, Height / 2), CreatePlayer());
         }
@@ -940,7 +940,7 @@ namespace TheAlchemist
         void SpawnEnemies()
         {
             GameData data = GameData.Instance;
-            List<string> names = data.GetEnemyNames();
+            List<string> names = data.GetCharacterNames();
 
             foreach (var room in rooms)
             {
@@ -951,7 +951,7 @@ namespace TheAlchemist
                 {
                     var pos = room.freePositions[Game.Random.Next(0, room.freePositions.Count)];
                     var name = Util.PickRandomElement(names);
-                    PlaceCharacter(pos, GameData.Instance.CreateEnemy(name));
+                    PlaceCharacter(pos, GameData.Instance.CreateCharacter(name));
                     //Log.Data(DescriptionSystem.GetDebugInfoEntity(GetCharacter(pos)));
                     room.freePositions.Remove(pos);
                 }
@@ -990,13 +990,20 @@ namespace TheAlchemist
             Position to = connection.Item2[pathIndex];
             var path = GetRandomLineNonDiagonal(from, to);
 
+            // carve path
             foreach (Position pos in path)
             {
-                RemoveTerrain(pos);
+                var tile = GetTile(pos);
+                if (tile.Terrain != 0)
+                {
+                    EntityManager.RemoveEntity(tile.Terrain);
+                    tile.Terrain = 0;
+                }
                 //PlaceTerrain(pos, GameData.Instance.CreateTerrain("floor"));
                 roomNrs[pos.X, pos.Y] = roomNr1;
             }
 
+            //RemoveTerrain(from);
             PlaceTerrain(from, CreateDoor());
             PlaceTerrain(to, CreateDoor());
         }
@@ -1442,24 +1449,6 @@ namespace TheAlchemist
             GetTile(pos).Structure = 0; 
         }
 
-        /* public void MoveCharacter(Position oldPos, Position newPos)
-        {
-            if(IsOutOfBounds(oldPos) || IsOutOfBounds(newPos))
-            {
-                Log.Error("Movement from " + oldPos + " to " + newPos + " not possible; out of bounds!");
-                return;
-            }
-
-            if (characters[(int)newPos.X, (int)newPos.Y] != 0)
-            {
-                Log.Error("Can't move there; occupied! " + newPos);
-                return;
-            }
-
-            characters[(int)newPos.X, (int)newPos.Y] = characters[(int)oldPos.X, (int)oldPos.Y];
-            characters[(int)oldPos.X, (int)oldPos.Y] = 0;
-        } */
-
         public void RemoveItems(Position pos)
         {
             if (IsOutOfBounds(pos))
@@ -1854,12 +1843,14 @@ namespace TheAlchemist
 
         public static int CreatePlayer()
         {
-            int player = EntityManager.CreateEntity();
-            int playerWeapon = EntityManager.CreateEntity();
-            int playerArmor = EntityManager.CreateEntity();
+            int player = EntityManager.CreateEntity(EntityType.Character);
+            int playerWeapon = EntityManager.CreateEntity(EntityType.Item);
+            int playerArmor = EntityManager.CreateEntity(EntityType.Item);
 
             EntityManager.AddComponent(playerWeapon, new WeaponComponent() { Damage = 5 });
+            EntityManager.AddComponent(playerWeapon, new DescriptionComponent() { Name = "PlayerWeapon" });
             EntityManager.AddComponent(playerArmor, new ArmorComponent() { PercentMitigation = 0, FlatMitigation = 0 });
+            EntityManager.AddComponent(playerArmor, new DescriptionComponent() { Name = "PlayerArmor" });
 
             List<IComponent> playerComponents = new List<IComponent>()
             {
@@ -1894,7 +1885,7 @@ namespace TheAlchemist
                 new DescriptionComponent() { Name = "Wall", Description = "A solid wall" }
             };
 
-            return EntityManager.CreateEntity(wallComponents);
+            return EntityManager.CreateEntity(wallComponents, EntityType.Terrain);
         }
 
         public static int CreateGold(int amount)
@@ -1904,7 +1895,7 @@ namespace TheAlchemist
                 new DescriptionComponent() { Name = "Gold", Description = "Ohhh, shiny!" },
                 new ItemComponent() { MaxCount = 999, Count = amount, Value = 1, Weight = 0.1f },
                 new RenderableSpriteComponent() { Texture = "gold" }
-            });
+            }, EntityType.Item);
         }
 
         public int CreateDoor()

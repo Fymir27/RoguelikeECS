@@ -71,6 +71,23 @@ namespace TheAlchemist.Systems
                 }
             }
 
+            int structure = floor.GetStructure(newPos);
+
+            if(structure != 0 && EntityManager.GetComponent<ColliderComponent>(structure) != null)
+            {
+                bool solid = RaiseCollisionEvent(entity, structure);
+
+                // check if interactable
+                var interactable = EntityManager.GetComponent<InteractableComponent>(structure);
+
+                // only interact with structures right away if they're solid ("bumping" into them)
+                if (interactable != null && solid)
+                {
+                    RaiseInteractionEvent(entity, structure);
+                    return;
+                }
+            }
+
             int terrain = floor.GetTerrain(newPos);
 
             // check if collidable with

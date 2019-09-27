@@ -18,25 +18,24 @@ namespace TheAlchemist
     {
         public static GameData Instance = null;
 
-        public Dictionary<string, string> Enemies { get; private set; }
-        public Dictionary<string, string> Items { get; private set; }
-        public Dictionary<string, string> Terrain { get; private set; }
-        //public Dictionary<Craftable, >
-
+        // string json = Entities[type][name]
+        public Dictionary<EntityType, Dictionary<string, string>> Entities = new Dictionary<EntityType, Dictionary<string, string>>();
 
         public void Load(string basePath)
         {
             try
             {
+                Log.Message("Loading terrain...");
+                Entities[EntityType.Terrain] = LoadEntities(basePath + "/terrain.json");
 
-                Log.Message("Loading enemies...");
-                Enemies = LoadEntities(basePath + "/enemies.json");
+                Log.Message("Loading structures...");
+                Entities[EntityType.Structure] = LoadEntities(basePath + "/structures.json");
 
                 Log.Message("Loading items...");
-                Items = LoadEntities(basePath + "/items.json");
+                Entities[EntityType.Item] = LoadEntities(basePath + "/items.json");
 
-                Log.Message("Loading terrain...");
-                Terrain = LoadEntities(basePath + "/terrain.json");
+                Log.Message("Loading characters...");
+                Entities[EntityType.Character] = LoadEntities(basePath + "/characters.json");                          
             }
             catch (JsonException e)
             {
@@ -45,49 +44,58 @@ namespace TheAlchemist
         }
 
 
-        public List<string> GetEnemyNames()
+        public List<string> GetCharacterNames()
         {
-            return Enemies.Keys.ToList();
+            return Entities[EntityType.Character].Keys.ToList();
         }
 
         public List<string> GetItemNames()
         {
-            return Items.Keys.ToList();
+            return Entities[EntityType.Item].Keys.ToList();
         }
 
         public List<string> GetTerrainNames()
         {
-            return Terrain.Keys.ToList();
+            return Entities[EntityType.Terrain].Keys.ToList();
         }
 
-        public int TryCreateEntity(Dictionary<string, string> dict, string name)
+        public List<string> GetStructureNames()
+        {
+            return Entities[EntityType.Structure].Keys.ToList();
+        }
+
+        public int TryCreateEntity(Dictionary<string, string> dict, string name, EntityType type)
         {
             try
             {
-                return EntityManager.CreateEntity(dict[name]);
+                return EntityManager.CreateEntity(dict[name], type);
             }
-            catch (KeyNotFoundException e)
+            catch (KeyNotFoundException)
             {
                 Log.Error("GameData.CreateEntity: This entity doesn't exist! ->" + name);
                 return 0;
             }
         }
 
-        public int CreateEnemy(string name)
+        public int CreateCharacter(string name)
         {
-            return TryCreateEntity(Enemies, name);
+            return TryCreateEntity(Entities[EntityType.Character], name, EntityType.Character);
         }
 
         public int CreateItem(string name)
         {
-            return TryCreateEntity(Items, name);
+            return TryCreateEntity(Entities[EntityType.Item], name, EntityType.Item);
         }
 
         public int CreateTerrain(string name)
         {
-            return TryCreateEntity(Terrain, name);
+            return TryCreateEntity(Entities[EntityType.Terrain], name, EntityType.Terrain);
         }
 
+        public int CreateStructure(string name)
+        {
+            return TryCreateEntity(Entities[EntityType.Structure], name, EntityType.Structure);
+        }
 
         private Dictionary<string, string> LoadEntities(string path)
         {
@@ -100,8 +108,6 @@ namespace TheAlchemist
             {
                 dict.Add(entity.Key, entity.Value.ToString());
             }
-
-            //var dict = new Dictionary<string, List<IComponent>>();
 
             return dict; //Util.DeserializeObject<Dictionary<string, string>>(rawText);
         }

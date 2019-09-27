@@ -68,6 +68,9 @@
 /processorParam:TextureFormat=Color
 /build:bushHarvested.png
 
+#begin characters.json
+/copy:characters.json
+
 #begin default.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -98,9 +101,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:doorOpen.png
-
-#begin enemies.json
-/copy:enemies.json
 
 #begin enemy.png
 /importer:TextureImporter
@@ -256,6 +256,9 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:square.png
+
+#begin structures.json
+/copy:structures.json
 
 #begin targetIndicator.png
 /importer:TextureImporter

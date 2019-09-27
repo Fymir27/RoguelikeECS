@@ -118,17 +118,21 @@ namespace TheAlchemist.Systems
             }
 
             // TODO: other crafting than alchemy
-            int newItem = Alchemy();
+            int newItem = Alchemy();        
 
             if (newItem == 0)
             {
-                // problems should be displayed 
-                // the crafting functions
+                // something went wrong before and 
+                // should have already been handled
                 return;
             }
 
             UISystem.Message("You just crafted something!");
 
+            foreach (var item in items)
+            {
+                EntityManager.RemoveEntity(item);
+            }
             items.Clear();
             ingredients.Clear();
             var description = EntityManager.GetComponent<DescriptionComponent>(newItem);
@@ -218,11 +222,11 @@ namespace TheAlchemist.Systems
 
         public int CreatePotion(IEnumerable<UsableItemComponent.ItemEffect> effects)
         {
-            int potion = GameData.Instance.CreateItem("templatePotion");
+            int potion = GameData.Instance.CreateItem("templatePotion");           
             var usableComponent = EntityManager.GetComponent<UsableItemComponent>(potion);
             usableComponent.Effects.AddRange(effects);
             var craftingComponent = EntityManager.GetComponent<CraftingMaterialComponent>(potion);
-            craftingComponent.Effects.AddRange(effects);
+            craftingComponent.Effects.AddRange(effects);          
             return potion;
         }
 

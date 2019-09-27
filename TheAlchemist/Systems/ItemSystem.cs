@@ -298,6 +298,8 @@ namespace TheAlchemist.Systems
 
             inventory.Items.Remove(item);
 
+            EntityManager.RemoveEntity(item);
+
             UI.InventoryCursorPosition = 1;
         }
 

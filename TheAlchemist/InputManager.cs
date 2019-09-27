@@ -187,6 +187,12 @@ namespace TheAlchemist
 
             foreach (var keyPressed in curKeyState.GetPressedKeys())
             {
+                if(keyPressed == Keys.F1)
+                {
+                    EntityManager.Dump();
+                    continue;
+                }
+
                 // TODO: implement modifiers 
                 if (keyBindings.ContainsKey(keyPressed))
                 {
@@ -504,7 +510,7 @@ namespace TheAlchemist
                 Util.TargetIndicatorID = EntityManager.CreateEntity(new List<IComponent>()
                 {
                     new TransformComponent() { Position = new Position(1, 1) },
-                });
+                }, EntityType.None);
             }
 
             if (domainHistory.Peek() == CommandDomain.Targeting)

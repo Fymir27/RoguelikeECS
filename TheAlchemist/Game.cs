@@ -81,6 +81,9 @@ namespace TheAlchemist
             Util.CurrentFloor = testFloor;
             Util.CurrentFloor.CalculateTileVisibility();
 
+            // Delete entities that were removed during generation
+            EntityManager.CleanUpEntities();
+
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(Util.PlayerID));
 
             InputManager input = InputManager.Instance;
@@ -157,9 +160,13 @@ namespace TheAlchemist
 
             });
 
-            int testBush = GameData.Instance.CreateTerrain("bush");
+            
+            int testBush = GameData.Instance.CreateStructure("bush");
             testFloor.PlaceStructure(Util.GetPlayerPos() + Position.Left, testBush);
-            //testFloor.Plac
+            //EntityManager.Dump();
+            //EntityManager.RemoveEntity(testBush);
+            //EntityManager.CleanUpEntities();
+            //EntityManager.Dump();
 
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(Util.GetPlayerInventory().Items[0]));
         }

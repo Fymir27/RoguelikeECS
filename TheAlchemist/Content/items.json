@@ -37,7 +37,6 @@
       "Effects": []
     }
   ],
-
   "healthPotion": [
     {
       "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",

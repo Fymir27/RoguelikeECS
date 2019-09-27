@@ -15,7 +15,7 @@ namespace TheAlchemist
         {
             logFile = new StreamWriter(path /*new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Read)*/);
             logFile.WriteLine("<head><title> Logfile </title></head><body>");
-            logFile.WriteLine("<meta http-equiv=\"refresh\" content=\"1\"/>"); // automatic refresh after 1 sec
+            //logFile.WriteLine("<meta http-equiv=\"refresh\" content=\"3\"/>"); // automatic refresh after 3 sec
             logFile.WriteLine("<h1>" + DateTime.Now.ToLongDateString() + ", " + DateTime.Now.ToShortTimeString() + "</h1>");
             logFile.Flush();
         }

@@ -24,8 +24,8 @@ namespace TheAlchemist.Systems
                 return false;
             }
 
-            Log.Message("Interaction between " + DescriptionSystem.GetNameWithID(actor) + " and " + DescriptionSystem.GetNameWithID(other));
-            Log.Data(DescriptionSystem.GetDebugInfoEntity(other));
+            //Log.Message("Interaction between " + DescriptionSystem.GetNameWithID(actor) + " and " + DescriptionSystem.GetNameWithID(other));
+            //Log.Data(DescriptionSystem.GetDebugInfoEntity(other));
 
             if(interactable.ChangeSolidity)
             {

@@ -35,8 +35,12 @@ namespace TheAlchemist.Components
                 if (hasFixedPosition)
                     return fixedPosition;
 
+                if (!Visible)
+                    return Vector2.Zero;
+
+                // try to calculate render position from world pos
                 try
-                {
+                {                  
                     Position worldPos = EntityManager
                         .GetComponent<TransformComponent>(entityID)
                         .Position;

@@ -9,10 +9,23 @@ using TheAlchemist.Components;
 
 namespace TheAlchemist
 {
+    public enum EntityType
+    {
+        None,
+        All,
+        Terrain,
+        Structure,
+        Item,
+        Character
+    }
+
     // keeps track of all entities and their components attached
     // an entity is just an int (ID) and is not a concrete object
     class EntityManager
     {
+        [JsonProperty]
+        static Dictionary<int, EntityType> entityType = new Dictionary<int, EntityType>();
+
         [JsonProperty]
         // maps from component Type ID to List of entities that have that specific component attached
         static Dictionary<int, List<int>> entitiesWithComponent = new Dictionary<int, List<int>>();
@@ -89,7 +102,7 @@ namespace TheAlchemist
             }
             catch (KeyNotFoundException)
             {
-                Log.Error("No such entity! (" + entityID + ")");
+                
                 throw;
             }
         }
@@ -118,30 +131,45 @@ namespace TheAlchemist
             }
         }
 
+        public static EntityType GetEntityType(int entityID)
+        {
+            try
+            {
+                return entityType[entityID];
+            }
+            catch (KeyNotFoundException)
+            {
+                Log.Error("No such entity! (" + entityID + ")");
+                throw;
+            }
+        }
+
         // creates new Entity with an empty list of components and returns its ID
-        public static int CreateEntity()
+        public static int CreateEntity(EntityType type)
         {
             int entityID = entityIDCounter++;
 
             componentsOfEntity.Add(entityID, new List<IComponent>());
 
+            entityType[entityID] = type;
+
             return entityID;
         }
 
         // creates new Entity with list of components and returns its ID
-        public static int CreateEntity(List<IComponent> components)
+        public static int CreateEntity(List<IComponent> components, EntityType type)
         {
-            int entityID = CreateEntity();
+            int entityID = CreateEntity(type);
             AddComponents(entityID, components);
             return entityID;
         }
 
         // creates new Entity from json template
         // expects string that contains a list of components
-        public static int CreateEntity(string json)
+        public static int CreateEntity(string json, EntityType type)
         {
             var components = Util.DeserializeObject<List<IComponent>>(json);
-            return CreateEntity(components);
+            return CreateEntity(components, type);
         }
 
         // adds multiple components to an entity
@@ -245,26 +273,56 @@ namespace TheAlchemist
                     entitiesWithComponent[key].Remove(entityID);
                 }
 
+                var floor = Util.CurrentFloor;
+                TransformComponent transform = null;
+
                 foreach (var component in componentsOfEntity[entityID])
                 {
                     if (component.TypeID == TransformComponent.TypeID)
                     {
-                        var transform = (TransformComponent)component;
-                        var pos = transform.Position;
-                        var floor = Util.CurrentFloor;
-
-                        // check if entity was character/tile/item
-                        if (floor.GetCharacter(pos) == entityID)
-                            floor.RemoveCharacter(pos);
-                        else if (floor.GetTerrain(pos) == entityID)
-                            floor.RemoveTerrain(pos);
-                        else if (floor.GetItems(pos).Contains(entityID))
-                            floor.RemoveItem(pos, entityID);
+                        transform = (TransformComponent)component;                       
                     }
                     componentsOfType[component.TypeID].Remove(component);
                 }
 
                 componentsOfEntity.Remove(entityID);
+
+                if (transform != null && !floor.IsOutOfBounds(transform.Position))
+                {
+                    var pos = transform.Position;
+                    var tile = floor.GetTile(pos);
+
+                    switch (entityType[entityID])
+                    {
+                        case EntityType.None:
+                            break;
+
+                        case EntityType.All:
+                            break;
+
+                        case EntityType.Terrain:
+                            if (tile.Terrain == entityID)
+                                tile.Terrain = 0;
+                            break;
+
+                        case EntityType.Structure:
+                            if (tile.Structure == entityID)
+                                tile.Structure = 0;
+                            break;
+
+                        case EntityType.Item:
+                            if (tile.Items.Contains(entityID))
+                                tile.Items.Remove(entityID);
+                            break;
+
+                        case EntityType.Character:
+                            if (tile.Character == entityID)
+                                tile.Character = 0;
+                            break;
+                    }
+                }
+
+                entityType.Remove(entityID);
             }
             catch (KeyNotFoundException)
             {
@@ -274,49 +332,63 @@ namespace TheAlchemist
         }
 
         // debug
-        public static void Dump()
+        public static void Dump(bool ignoreTerrain = true)
         {
-            string s = "";
+            StringBuilder s = new StringBuilder();          
 
             Log.Message("----- Dump of all entities: -----");
 
             Log.Message("Entities: ");
             foreach (var key in componentsOfEntity.Keys)
             {
-                s += key + ": [";
+                if (ignoreTerrain && entityType[key] == EntityType.Terrain)
+                    continue;
+
+                s.Append(Systems.DescriptionSystem.GetNameWithID(key) + "[" + entityType[key].ToString() + "]: [");
                 foreach (var item in componentsOfEntity[key])
                 {
-                    s += item.ComponentID + ", ";
+                    s.Append(item.ComponentID + ", ");
                 }
-                s += "]\n";
+                s.Append("]\n");
             }
-            Log.Data(s);
+            Log.Data(s.ToString());
 
-            s = "";
+            s.Clear();
+
+            Log.Message("ComponentTypes:");
+            foreach (var typeID in componentsOfType.Keys)
+            {
+                s.AppendLine(typeID + " -> " + componentsOfType[typeID].ElementAt(0).GetType().ToString());
+            }
+            Log.Data(s.ToString());
+
+            s.Clear();
+
             Log.Message("EntitiesWithComponent ");
             foreach (var key in entitiesWithComponent.Keys)
             {
-                s += key + ": [";
+                s.Append(key + ": [");
                 foreach (var item in entitiesWithComponent[key])
                 {
-                    s += item + ", ";
+                    s.Append(item + ", ");
                 }
-                s += "]\n";
+                s.Append("]\n");
             }
-            Log.Data(s);
+            Log.Data(s.ToString());      
 
-            s = "";
+            s.Clear();
+
             Log.Message("ComponentsOfType ");
             foreach (var key in componentsOfType.Keys)
             {
-                s += key + ": [";
+                s.Append(key + ": [");
                 foreach (var item in componentsOfType[key])
                 {
-                    s += item.ComponentID + ", ";
+                    s.Append(item.ComponentID + ", ");
                 }
-                s += "]\n";
+                s.Append("]\n");
             }
-            Log.Data(s);
+            Log.Data(s.ToString());
 
             Log.Message("----- End of dump -----");
         }

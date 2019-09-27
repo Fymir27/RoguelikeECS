@@ -158,6 +158,7 @@
     <None Include="Content\keybindings.json" />
     <None Include="Content\monospace.spritefont" />
     <None Include="Content\small.spritefont" />
+    <None Include="Content\structures.json" />
     <None Include="Content\terrain.json" />
     <None Include="Meta\the_alchemist_design.md" />
     <None Include="Meta\todo.md" />
@@ -168,7 +169,7 @@
     <Folder Include="Events\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Content\enemies.json" />
+    <None Include="Content\characters.json" />
     <Content Include="Content\map.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

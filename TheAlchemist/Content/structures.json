@@ -1,0 +1,24 @@
+﻿{
+  "bush": [
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Bush",
+      "Description": "Maybe it could be harvested?",
+      "EntityID": 0
+    },
+    {
+      "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+      "Texture": "bush",
+      "Visible": true,
+      "Layer": 0,
+      "EntityID": 0
+    },
+    {
+      "$type": "TheAlchemist.Components.InteractableComponent, TheAlchemist",
+      "ChangeTexture": true,
+      "AlternateTexture": "square",
+      "GrantsItems": true,
+      "Items": []
+    }
+  ]
+}
