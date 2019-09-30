@@ -13,10 +13,10 @@ namespace TheAlchemist.Components
             get => count;
             set
             {
-                if(value > MaxCount)
+                if (value > MaxCount)
                 {
-                    Log.Error("Item failed stacking!");
-                    throw new ArgumentException("Item failed stacking!", "ItemComponent.Count");
+                    Log.Error("Item failed stacking! (Maybe you've set Count before MaxCount?) -" + Systems.DescriptionSystem.GetNameWithID(EntityID));
+                    new ArgumentException("Count bigger than MaxCount!");
                 }
                 count = value;
             }

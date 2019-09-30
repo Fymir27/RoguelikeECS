@@ -17,7 +17,7 @@ namespace TheAlchemist.Components
             public static readonly int Terrain = 0;
             public static readonly int Structure = 1;
             public static readonly int Item = 2;
-            public static readonly int Character = 3;            
+            public static readonly int Character = 3;
         }
 
         public bool Visible { get; set; } = true;
@@ -40,7 +40,7 @@ namespace TheAlchemist.Components
 
                 // try to calculate render position from world pos
                 try
-                {                  
+                {
                     Position worldPos = EntityManager
                         .GetComponent<TransformComponent>(entityID)
                         .Position;
@@ -48,7 +48,7 @@ namespace TheAlchemist.Components
                 }
                 catch (NullReferenceException)
                 {
-                    Log.Warning("RenderableComponent has neither a fixed Position nor can it find a TransformComponent!" + DescriptionSystem.GetName(EntityID) + " (Entity " + EntityID + ", Component " + componentID + ")");
+                    Log.Warning("RenderableComponent has neither a fixed Position nor can it find a TransformComponent! " + DescriptionSystem.GetName(EntityID) + " (Entity " + EntityID + ", Component " + componentID + ")");
                     //Log.Data(DescriptionSystem.GetDebugInfoEntity(EntityID));
                     return Vector2.Zero;
                     //throw;

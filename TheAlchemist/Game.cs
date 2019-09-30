@@ -146,24 +146,33 @@ namespace TheAlchemist
             base.Initialize();
             Log.Message("Initialization completed!");
 
-            CraftableComponent.foo();
+            //CraftableComponent.foo();
 
+            int testRock = EntityManager.CreateEntity(new List<IComponent>()
+            {
+                new DescriptionComponent() { Name = "Rock", Description = "You can't stop the rock!"},
+                new ItemComponent() { MaxCount = 5, Count = 3, Value = 1, Weight = 10 }
+            }, EntityType.Item);
+
+
+            // fill inventory with test items
             Util.GetPlayerInventory().Items.AddRange(new List<int>()
-                {
+            {
+                testRock,
                 GameData.Instance.CreateItem("healthPotion"),
                 GameData.Instance.CreateItem("healthPotion"),
                 GameData.Instance.CreateItem("healthPotion"),
                 GameData.Instance.CreateItem("poisonPotion"),
                 GameData.Instance.CreateItem("dexterityPotion"),
                 GameData.Instance.CreateItem("intelligencePotion"),
-                GameData.Instance.CreateItem("strengthPotion")
+                GameData.Instance.CreateItem("strengthPotion"),
             });
 
             int testBush = GameData.Instance.CreateStructure("bush");
             testFloor.PlaceStructure(Util.GetPlayerPos() + Position.Left, testBush);
 
             int berries = GameData.Instance.CreateItem("testBerries");
-            Log.Data(DescriptionSystem.GetDebugInfoEntity(berries));
+            //Log.Data(DescriptionSystem.GetDebugInfoEntity(berries));
             Util.GetPlayerInventory().Items.Add(berries);
 
             //EntityManager.Dump();
