@@ -25,11 +25,12 @@ namespace TheAlchemist
 
         public event MovementEventHandler MovementEvent;
         public event InteractionHandler InteractionEvent;
-        public event ItemPickupHandler PickupItemEvent;
 
+        public event ItemPickupHandler PickupItemEvent;
         public event InventoryToggledHandler InventoryToggledEvent;
         public event InventoryCursorMovedHandler InventoryCursorMovedEvent;
         public event ItemUsedHandler ItemUsedEvent;
+        public event ItemConsumedHandler ItemConsumedEvent;
 
         public event AddCraftingIngredientHandler AddItemAsIngredientEvent;
         public event ResetCraftingHandler ResetCraftingEvent;
@@ -187,7 +188,7 @@ namespace TheAlchemist
 
             foreach (var keyPressed in curKeyState.GetPressedKeys())
             {
-                if(keyPressed == Keys.F1)
+                if (keyPressed == Keys.F1)
                 {
                     EntityManager.Dump();
                     continue;
@@ -278,7 +279,7 @@ namespace TheAlchemist
                     TryUseItem();
                     break;
                 case Command.ConsumeItem:
-                    UseItem(ItemUsage.Consume);
+                    ConsumeItem();
                     break;
                 case Command.DropItem:
                     break;
@@ -435,16 +436,16 @@ namespace TheAlchemist
         {
             var tile = Util.CurrentFloor.GetTile(Util.GetPlayerPos());
 
-            if(tile.Structure != 0)
+            if (tile.Structure != 0)
             {
                 var interactableStructure = EntityManager.GetComponent<InteractableComponent>(tile.Structure);
 
-                if(interactableStructure != null)
+                if (interactableStructure != null)
                 {
                     InteractionEvent?.Invoke(Util.PlayerID, tile.Structure);
                     return;
                 }
-            }          
+            }
 
             PickupItemEvent?.Invoke(ControlledEntity);
         }
@@ -456,6 +457,10 @@ namespace TheAlchemist
         private void TryUseItem()
         {
             var item = Util.GetCurrentItem();
+
+            // TODO: resolve other uses
+            ConsumeItem();
+            return;
 
             var usableItem = EntityManager.GetComponent<UsableItemComponent>(item);
 
@@ -497,6 +502,21 @@ namespace TheAlchemist
             var item = Util.GetCurrentItem();
             ItemUsedEvent?.Invoke(ControlledEntity, item, usage);
             //ToggleInventory();
+        }
+
+        private void ConsumeItem()
+        {
+            var item = Util.GetCurrentItem();
+
+            var consumable = EntityManager.GetComponent<ConsumableComponent>(item);
+
+            if (consumable == null)
+            {
+                UISystem.Message("I can't consume that!");
+                return;
+            }
+
+            ItemConsumedEvent?.Invoke(ControlledEntity, item);
         }
 
         /// <summary>

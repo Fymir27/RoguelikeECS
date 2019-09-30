@@ -14,12 +14,7 @@
       "Description": "Quaff it!"
     },
     {
-      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
-      "Effects": [],
-      "Usages": [
-        "Consume",
-        "Throw"
-      ]
+      "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"
     },
     {
       "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
@@ -32,9 +27,8 @@
       }
     },
     {
-      "$type": "TheAlchemist.Components.CraftingMaterialComponent, TheAlchemist",
-      "MaterialType": "Potion",
-      "Effects": []
+      "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
+      "Properties": {}
     }
   ],
   "healthPotion": [
@@ -52,18 +46,7 @@
       "Description": "Quaff it to regain some health!"
     },
     {
-      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
-      "Effects": [
-        {
-          "Type": "Health",
-          "Harmful": false,
-          "Potency": 50
-        }
-      ],
-      "Usages": [
-        "Consume",
-        "Throw"
-      ]
+      "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"
     },
     {
       "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
@@ -76,15 +59,10 @@
       }
     },
     {
-      "$type": "TheAlchemist.Components.CraftingMaterialComponent, TheAlchemist",
-      "MaterialType": "Potion",
-      "Effects": [
-        {
-          "Type": "Health",
-          "Harmful": false,
-          "Potency": 50
-        }
-      ]
+      "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
+      "Properties": {
+        "Health": 25
+      }
     }
   ],
   "poisonPotion": [
@@ -102,18 +80,7 @@
       "Description": "Bad for your health."
     },
     {
-      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
-      "Effects": [
-        {
-          "Type": "Health",
-          "Harmful": true,
-          "Potency": 50
-        }
-      ],
-      "Usages": [
-        "Consume",
-        "Throw"
-      ]
+      "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"
     },
     {
       "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
@@ -126,15 +93,10 @@
       }
     },
     {
-      "$type": "TheAlchemist.Components.CraftingMaterialComponent, TheAlchemist",
-      "MaterialType": "Potion",
-      "Effects": [
-        {
-          "Type": "Health",
-          "Harmful": true,
-          "Potency": 50
-        }
-      ]
+      "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
+      "Properties": {
+        "Health": -25
+      }
     }
   ],
   "strengthPotion": [
@@ -152,18 +114,7 @@
       "Description": "Quite a STRONG brew!"
     },
     {
-      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
-      "Effects": [
-        {
-          "Type": "Str",
-          "Harmful": false,
-          "Potency": 50
-        }
-      ],
-      "Usages": [
-        "Consume",
-        "Throw"
-      ]
+      "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"
     },
     {
       "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
@@ -176,15 +127,10 @@
       }
     },
     {
-      "$type": "TheAlchemist.Components.CraftingMaterialComponent, TheAlchemist",
-      "MaterialType": "Potion",
-      "Effects": [
-        {
-          "Type": "Str",
-          "Harmful": false,
-          "Potency": 50
-        }
-      ]
+      "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
+      "Properties": {
+        "Str": 5
+      }
     }
   ],
   "dexterityPotion": [
@@ -202,18 +148,7 @@
       "Description": "In case you ever want to try knitting."
     },
     {
-      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
-      "Effects": [
-        {
-          "Type": "Dex",
-          "Harmful": false,
-          "Potency": 50
-        }
-      ],
-      "Usages": [
-        "Consume",
-        "Throw"
-      ]
+      "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"
     },
     {
       "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
@@ -226,15 +161,10 @@
       }
     },
     {
-      "$type": "TheAlchemist.Components.CraftingMaterialComponent, TheAlchemist",
-      "MaterialType": "Potion",
-      "Effects": [
-        {
-          "Type": "Dex",
-          "Harmful": false,
-          "Potency": 50
-        }
-      ]
+      "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
+      "Properties": {
+        "Dex": 5
+      }
     }
   ],
   "intelligencePotion": [
@@ -252,18 +182,7 @@
       "Description": "Won't help you with your test if you didn't study!"
     },
     {
-      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
-      "Effects": [
-        {
-          "Type": "Int",
-          "Harmful": false,
-          "Potency": 50
-        }
-      ],
-      "Usages": [
-        "Consume",
-        "Throw"
-      ]
+      "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"
     },
     {
       "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
@@ -276,15 +195,46 @@
       }
     },
     {
-      "$type": "TheAlchemist.Components.CraftingMaterialComponent, TheAlchemist",
-      "MaterialType": "Potion",
-      "Effects": [
-        {
-          "Type": "Int",
-          "Harmful": false,
-          "Potency": 50
-        }
-      ]
+      "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
+      "Properties": {
+        "Int": 5
+      }
+    }
+  ],
+  "testBerries": [
+    {
+      "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
+      "Count": 1,
+      "MaxCount": 1,
+      "Value": 0,
+      "Weight": 0.0,
+      "OnGround": true
+    },
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Weird Berries",
+      "Description": "Are they edible?"
+    },
+    {
+      "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+      "Texture": "potion",
+      "Tint": {
+        "B": 255,
+        "G": 255,
+        "R": 255,
+        "A": 255
+      }
+    },
+    {
+      "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
+      "Properties": {
+        "Health": 10,
+        "Mana": -10,
+        "Earth": 10
+      }
+    },
+    {
+      "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"
     }
   ]
 }

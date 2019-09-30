@@ -35,4 +35,14 @@ namespace TheAlchemist.Components
 
         public bool BreakOnThrow { get; set; } = true;
     }
+
+    class ConsumableItemComponent : UsableItemComponent
+    {
+
+    }
+
+    class ThrowableItemComponent : UsableItemComponent
+    {
+
+    }
 }

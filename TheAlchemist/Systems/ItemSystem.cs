@@ -21,6 +21,7 @@ namespace TheAlchemist.Systems
 
     public delegate void ItemPickupHandler(int character);
     public delegate void ItemUsedHandler(int character, int item, ItemUsage usage);
+    public delegate void ItemConsumedHandler(int character, int item);
 
     class ItemSystem
     {
@@ -184,33 +185,81 @@ namespace TheAlchemist.Systems
 
         public void ConsumeItem(int character, int item)
         {
-            var itemEffects = EntityManager.GetComponent<UsableItemComponent>(item).Effects;
+            UISystem.Message(String.Format("{0} consumes {1}", DescriptionSystem.GetNameWithID(character), DescriptionSystem.GetNameWithID(item)));
 
-            foreach (var effect in itemEffects)
+            var substance = EntityManager.GetComponent<SubstanceComponent>(item);
+
+            Dictionary<Property, int> properties = null;
+
+            if (substance == null)
             {
-                switch (effect.Type)
+                Log.Warning("Consumable Item does not have SubstanceComponent attached!");
+            }
+            else
+            {
+                properties = substance.Properties;
+            }
+
+            if (properties == null || properties.Count == 0)
+            {
+                UISystem.Message("That had no effect...");
+                DecreaseItemCount(character, item);
+                Util.TurnOver(character);
+                return;
+            }
+
+            foreach (var prop in properties)
+            {
+                switch (prop.Key)
                 {
-                    case EffectType.Health:
-                        if (effect.Harmful)
-                            HealthLostEvent?.Invoke(character, effect.Potency * 0.5f);
+                    // --- Resource --- //
+                    case Property.Health:
+                        if (prop.Value < 0)
+                            HealthLostEvent?.Invoke(character, -prop.Value);
                         else
-                            HealthGainedEvent?.Invoke(character, effect.Potency * 0.5f);
+                            HealthGainedEvent?.Invoke(character, prop.Value);
                         break;
 
-                    case EffectType.Str:
-                    case EffectType.Dex:
-                    case EffectType.Int:
-                        int amount = (int)Math.Round(effect.Potency * 0.1f) * Util.Sign(!effect.Harmful);
-                        Stat stat = GetStatFromEffectType(effect.Type);
-                        int duration = 7 * (int)Math.Round(effect.Potency * 0.1f);
-                        StatChangedEvent?.Invoke(character, stat, amount, duration);
+                    // --- Stat --- //
+                    case Property.Str:
+                    case Property.Dex:
+                    case Property.Int:
+                        Stat stat = GetStatFromItemProperty(prop.Key);
+                        StatChangedEvent?.Invoke(character, stat, prop.Value, prop.Value * 2);
                         break;
 
                     default:
-                        UISystem.Message("Consume: " + effect.Type + " not implemented!");
+                        UISystem.Message(String.Format("Item effect not implemented: {0} ({1})", prop.Key.ToString(), prop.Value));
                         break;
                 }
             }
+            //var itemEffects = EntityManager.GetComponent<UsableItemComponent>(item).Effects;
+
+            //foreach (var effect in itemEffects)
+            //{
+            //    switch (effect.Type)
+            //    {
+            //        case EffectType.Health:
+            //            if (effect.Harmful)
+            //                HealthLostEvent?.Invoke(character, effect.Potency * 0.5f);
+            //            else
+            //                HealthGainedEvent?.Invoke(character, effect.Potency * 0.5f);
+            //            break;
+
+            //        case EffectType.Str:
+            //        case EffectType.Dex:
+            //        case EffectType.Int:
+            //            int amount = (int)Math.Round(effect.Potency * 0.1f) * Util.Sign(!effect.Harmful);
+            //            Stat stat = GetStatFromEffectType(effect.Type);
+            //            int duration = 7 * (int)Math.Round(effect.Potency * 0.1f);
+            //            StatChangedEvent?.Invoke(character, stat, amount, duration);
+            //            break;
+
+            //        default:
+            //            UISystem.Message("Consume: " + effect.Type + " not implemented!");
+            //            break;
+            //    }
+            //}
 
             DecreaseItemCount(character, item);
             Util.TurnOver(character);
@@ -316,6 +365,17 @@ namespace TheAlchemist.Systems
                 default:
                     Log.Error("Can't get Stat from this Item Effect Type: " + effect);
                     return Stat.Strength;
+            }
+        }
+
+        private Stat GetStatFromItemProperty(Property prop)
+        {
+            switch (prop)
+            {
+                case Property.Str: return Stat.Strength;
+                case Property.Dex: return Stat.Dexterity;
+                case Property.Int: return Stat.Intelligence;
+                default: throw new ArgumentException("Can't get Stat from this Item Property: " + prop.ToString(), "prop");
             }
         }
     }

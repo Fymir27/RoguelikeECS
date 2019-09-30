@@ -35,11 +35,12 @@ namespace TheAlchemist
                 Entities[EntityType.Item] = LoadEntities(basePath + "/items.json");
 
                 Log.Message("Loading characters...");
-                Entities[EntityType.Character] = LoadEntities(basePath + "/characters.json");                          
+                Entities[EntityType.Character] = LoadEntities(basePath + "/characters.json");
             }
             catch (JsonException e)
             {
                 Log.Error("GameData failed to load: " + e.ToString());
+                throw e;
             }
         }
 

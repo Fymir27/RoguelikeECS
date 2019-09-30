@@ -115,6 +115,7 @@ namespace TheAlchemist
             input.PickupItemEvent += itemSystem.PickUpItem;
             input.InteractionEvent += interactionSystem.HandleInteraction;
             input.ItemUsedEvent += itemSystem.UseItem;
+            input.ItemConsumedEvent += itemSystem.ConsumeItem;
 
             // crafting
             input.AddItemAsIngredientEvent += craftingSystem.AddIngredient;
@@ -155,14 +156,16 @@ namespace TheAlchemist
                 GameData.Instance.CreateItem("poisonPotion"),
                 GameData.Instance.CreateItem("dexterityPotion"),
                 GameData.Instance.CreateItem("intelligencePotion"),
-                GameData.Instance.CreateItem("strengthPotion"),
-                GameData.Instance.CreateItem("poisonPotion")
-
+                GameData.Instance.CreateItem("strengthPotion")
             });
 
-            
             int testBush = GameData.Instance.CreateStructure("bush");
             testFloor.PlaceStructure(Util.GetPlayerPos() + Position.Left, testBush);
+
+            int berries = GameData.Instance.CreateItem("testBerries");
+            Log.Data(DescriptionSystem.GetDebugInfoEntity(berries));
+            Util.GetPlayerInventory().Items.Add(berries);
+
             //EntityManager.Dump();
             //EntityManager.RemoveEntity(testBush);
             //EntityManager.CleanUpEntities();

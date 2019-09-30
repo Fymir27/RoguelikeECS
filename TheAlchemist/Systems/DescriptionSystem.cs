@@ -41,11 +41,27 @@ namespace TheAlchemist.Systems
             var components = EntityManager.GetComponents(entity);
             foreach (var component in components)
             {
+                sb.AppendLine(component.GetType().ToString());
                 if (typeof(StatComponent).IsInstanceOfType(component))
                 {
+                    sb.AppendLine("NOT IMPLEMENTED");
                     continue; // doesnt work!
                 }
-                sb.AppendLine(component.GetType().ToString());
+
+                switch (component)
+                {
+                    case StatComponent stats:
+                        sb.AppendLine("NOT IMPLEMENTED");
+                        continue;
+
+                    case SubstanceComponent substance:
+                        sb.AppendLine(substance.ToString());
+                        continue;
+
+                    default:
+                        break;
+                }
+
 
                 foreach (var propertyInfo in component.GetType().GetProperties())
                 {
