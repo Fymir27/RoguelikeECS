@@ -129,11 +129,15 @@ namespace TheAlchemist
         // function that gets called when user selects target
         Action<Position> targetConfirmationCallback = null;
 
+        // remembers the current command that's supposed to be executed next
+        Command curCommand;
+
         /// <summary>
         /// Checks for user input and executes corresponding command if input is present
         /// </summary>
         /// <param name="gameTime"></param>
-        public void CheckInput(GameTime gameTime)
+        /// <returns>wether input/command is available</returns>
+        public bool CheckInput(GameTime gameTime)
         {
             KeyboardState curKeyState = Keyboard.GetState();
 
@@ -141,14 +145,14 @@ namespace TheAlchemist
             {
                 if (curKeyState == noKeyPressed)
                 {
-                    return;
+                    return false;
                 }
 
                 keyHeldDownFor += gameTime.ElapsedGameTime.Milliseconds;
 
                 if (keyHeldDownFor < keyHoldDelay)
                 {
-                    return;
+                    return false;
                 }
             }
             else
@@ -165,7 +169,7 @@ namespace TheAlchemist
 
             if (curKeyState == noKeyPressed)
             {
-                return;
+                return false;
             }
 
             CommandDomain curDomain = domainHistory.Peek();
@@ -173,7 +177,7 @@ namespace TheAlchemist
             if (!keyToCommand.ContainsKey(curDomain))
             {
                 Log.Error("Command domain not present: " + curDomain);
-                return;
+                return false;
             }
 
             var keyBindings = keyToCommand[curDomain];
@@ -181,7 +185,7 @@ namespace TheAlchemist
             if (keyBindings == null)
             {
                 Log.Error("Key bindings missing for " + curDomain);
-                return;
+                return false;
             }
 
             Command command = Command.None;
@@ -206,10 +210,17 @@ namespace TheAlchemist
             {
                 // TODO: remove
                 UISystem.Message("No command for " + Util.GetStringFromEnumerable(curKeyState.GetPressedKeys()));
-                return;
+                return false;
             }
 
-            ExecuteCommand(command);
+            //ExecuteCommand(command);
+            curCommand = command;
+            return true;
+        }
+
+        public void ExecuteCurrentCommand()
+        {
+            ExecuteCommand(curCommand);
         }
 
         public void ExecuteCommand(Command command)

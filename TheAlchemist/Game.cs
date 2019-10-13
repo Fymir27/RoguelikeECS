@@ -251,23 +251,20 @@ namespace TheAlchemist
                 }
             }
 
-            if (Util.PlayerTurnOver)
+            // check for input
+            if(InputManager.Instance.CheckInput(gameTime))
             {
+                InputManager.Instance.ExecuteCurrentCommand();
+             
                 npcBehaviourSystem.EnemyTurn();
-                Util.PlayerTurnOver = false;
-            }
-            else
-            {
-                InputManager.Instance.CheckInput(gameTime);
-            }
 
-            float playerHealth = EntityManager.GetComponent<HealthComponent>(Util.PlayerID).Amount;
+                // remove all entities that died this turn
+                EntityManager.CleanUpEntities();
 
-            // remove all entities that died this turn
-            EntityManager.CleanUpEntities();
-
-            if (playerHealth <= 0)
-                Exit(); // TODO: do something
+                float playerHealth = EntityManager.GetComponent<HealthComponent>(Util.PlayerID).Amount;
+                if (playerHealth <= 0)
+                    Exit(); // TODO: do something
+            }          
 
             base.Update(gameTime);
         }
