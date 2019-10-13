@@ -200,6 +200,7 @@ namespace TheAlchemist
             Util.BigFont = Content.Load<SpriteFont>("big");
             Util.MonospaceFont = Content.Load<SpriteFont>("monospace");
 
+            /*
             string[] textures =
             {
                 "player", "box", "wall", "targetIndicator",
@@ -213,11 +214,13 @@ namespace TheAlchemist
                 "inventory", "inventoryOpen",
                 "messageLogBox", "tooltip",
                 // other stuff:
-                "bush"
+                "bush", "Sprites/bushHarvested"
             };
+            */
 
             TextureManager.Init(Content);
-            TextureManager.LoadTextures(textures);
+            //TextureManager.LoadTextures(textures);
+            TextureManager.LoadAllTextures("Sprites");
 
             Util.CurrentFloor.GenerateImage("./floor.png", GraphicsDevice);
         }

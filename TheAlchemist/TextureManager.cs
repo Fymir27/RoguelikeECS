@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using System.IO;
+
 namespace TheAlchemist
 {
     static class TextureManager
@@ -18,12 +20,11 @@ namespace TheAlchemist
             TextureManager.contentManager = contentManager;
         }
 
-        public static void AddTexture(Texture2D texture)
+        public static void AddTexture(Texture2D texture, string name)
         {
-            string name = texture.Name;
             if(texture == null)
             {
-                Console.WriteLine("Texture wasn't loaded correctly! => " + name);
+                Log.Error("Texture wasn't loaded correctly! => " + name);
                 return;
             }
             textures.Add(name, texture);
@@ -33,8 +34,36 @@ namespace TheAlchemist
         {
             foreach (var texture in textures)
             {
-                AddTexture(contentManager.Load<Texture2D>(texture));
+                AddTexture(contentManager.Load<Texture2D>(texture), texture);
             }
+        }
+
+        public static void LoadAllTextures(string directory)
+        {
+            Log.Message("Loading Textures...");
+
+            IEnumerable<string> pngFiles = Directory.GetFiles(@".\Content\" + directory + "\\");
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var file in pngFiles)
+            {
+                string name = Path.GetFileName(file);
+                name = name.Substring(0, name.Length - 4); // remove file extension
+
+                // add directory to name
+                sb.Append(directory)
+                  .Append("\\")
+                  .Append(name);
+
+                //Log.Data(sb.ToString());
+
+                AddTexture(contentManager.Load<Texture2D>(sb.ToString()), name);
+
+                sb.Clear();
+            }
+
+            //Log.Data(Util.GetStringFromEnumerable(textures.Keys));                             
         }
 
         public static Texture2D GetTexture(string name)
@@ -52,10 +81,11 @@ namespace TheAlchemist
 
         public static void PrintLoadedTextures()
         {
-            foreach(var item in textures)
-            {
-                Console.WriteLine(item.Key);
-            }
+            Log.Data("Textures loaded: " + Util.GetStringFromCollection(textures));
+            //foreach(var item in textures)
+            //{
+            //    Console.WriteLine(item.Key);
+            //}
         }
     }
 }

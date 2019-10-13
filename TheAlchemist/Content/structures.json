@@ -16,7 +16,7 @@
     {
       "$type": "TheAlchemist.Components.InteractableComponent, TheAlchemist",
       "ChangeTexture": true,
-      "AlternateTexture": "square",
+      "AlternateTexture": "bushHarvested",
       "GrantsItems": true,
       "Items": []
     }
