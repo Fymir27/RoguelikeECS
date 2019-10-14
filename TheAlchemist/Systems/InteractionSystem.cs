@@ -13,6 +13,8 @@ namespace TheAlchemist.Systems
 
     class InteractionSystem
     {
+        public ItemAddedHandler ItemAddedEvent;
+
         public bool HandleInteraction(int actor, int other)
         {          
             var interactable = EntityManager.GetComponent<InteractableComponent>(other);
@@ -71,14 +73,44 @@ namespace TheAlchemist.Systems
 
             if(interactable.GrantsItems)
             {
-                if(interactable.Items == null || interactable.Items.Count == 0)
+                if(interactable.Items == null)
                 {
                     Log.Warning("Interactable has GrantItems set but does not define Items! " + DescriptionSystem.GetNameWithID(other));
                     Log.Data(DescriptionSystem.GetDebugInfoEntity(other));
                 }
+                else if (interactable.Items.Count == 0)
+                {
+                    UISystem.Message("Nothing here to be picked up!");
+                    return false;
+                }
                 else
                 {
-                    //TODO: pick up item(s)
+                    var inventory = EntityManager.GetComponent<InventoryComponent>(actor);
+                    if (inventory == null)
+                    {
+                        Log.Warning("Pick up failed. Character has no inventory! " + DescriptionSystem.GetNameWithID(actor));
+                        return false;
+                    }
+                    else
+                    {
+                        if(ItemAddedEvent == null)
+                        {
+                            Log.Error("InteractionSystem->ItemAddedEvent is null!");
+                            return false;
+                        }
+
+                        bool success = ItemAddedEvent.Invoke(actor, interactable.Items[0]);
+
+                        if(success)
+                        {
+                            interactable.Items.RemoveAt(0);
+                        }
+                        else
+                        {
+                            // Failed to add to inventory (should already be handled)
+                            return false;
+                        }
+                    }
                 }
             }                 
 

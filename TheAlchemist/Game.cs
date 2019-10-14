@@ -122,6 +122,8 @@ namespace TheAlchemist
             input.CraftItemEvent += craftingSystem.CraftItem;
             input.ResetCraftingEvent += craftingSystem.ResetCrafting;
 
+            interactionSystem.ItemAddedEvent += itemSystem.AddItem;
+
             itemSystem.HealthGainedEvent += healthSystem.HandleGainedHealth;
             itemSystem.HealthLostEvent += healthSystem.HandleLostHealth;
             itemSystem.StatChangedEvent += statSystem.ChangeStat;
@@ -168,12 +170,12 @@ namespace TheAlchemist
                 GameData.Instance.CreateItem("strengthPotion"),
             });
 
-            int testBush = GameData.Instance.CreateStructure("bush");
-            testFloor.PlaceStructure(Util.GetPlayerPos() + Position.Left, testBush);
+            //int testBush = GameData.Instance.CreateStructure("bush");
+            //testFloor.PlaceStructure(Util.GetPlayerPos() + Position.Left, testBush);
 
-            int berries = GameData.Instance.CreateItem("testBerries");
+            //int berries = GameData.Instance.CreateItem("testBerries");
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(berries));
-            Util.GetPlayerInventory().Items.Add(berries);
+            //Util.GetPlayerInventory().Items.Add(berries);
 
             //EntityManager.Dump();
             //EntityManager.RemoveEntity(testBush);
@@ -255,8 +257,12 @@ namespace TheAlchemist
             if(InputManager.Instance.CheckInput(gameTime))
             {
                 InputManager.Instance.ExecuteCurrentCommand();
-             
-                npcBehaviourSystem.EnemyTurn();
+
+                if (Util.PlayerTurnOver)
+                {
+                    npcBehaviourSystem.EnemyTurn();
+                    Util.PlayerTurnOver = false;
+                }
 
                 // remove all entities that died this turn
                 EntityManager.CleanUpEntities();

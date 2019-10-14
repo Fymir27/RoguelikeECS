@@ -20,6 +20,7 @@ namespace TheAlchemist.Systems
     }
 
     public delegate void ItemPickupHandler(int character);
+    public delegate bool ItemAddedHandler(int character, int item);
     public delegate void ItemUsedHandler(int character, int item, ItemUsage usage);
     public delegate void ItemConsumedHandler(int character, int item);
 
@@ -63,27 +64,45 @@ namespace TheAlchemist.Systems
                 return;
             }
 
+            bool success = AddItem(character, pickupItemID);
+
+            if(!success)
+                return;
+
+            // post message to player
+            UISystem.Message(DescriptionSystem.GetNameWithID(character) + " picked up " + DescriptionSystem.GetNameWithID(pickupItemID));
+
+            Util.CurrentFloor.RemoveItem(position, pickupItemID);        
+
+            Util.TurnOver(character);
+        }
+
+        /// <summary>
+        /// tries to add an item to the character's inventory
+        /// </summary>
+        /// <param name="character"></param>
+        /// <param name="item"></param>
+        /// <returns>true on success</returns>
+        public bool AddItem(int character, int item)
+        {
             var inventory = EntityManager.GetComponent<InventoryComponent>(character);
 
             if (inventory == null)
             {
                 Log.Warning("Character does not have an inventory! -> " + DescriptionSystem.GetNameWithID(character));
-                return;
+                return false;
             }
 
             if (inventory.Full)
             {
                 UISystem.Message("Inventory is full! -> " + DescriptionSystem.GetNameWithID(character));
-                return;
+                return false;
             }
-
-            // post message to player
-            UISystem.Message(DescriptionSystem.GetNameWithID(character) + " picked up " + DescriptionSystem.GetNameWithID(pickupItemID));
-
-            Util.CurrentFloor.RemoveItem(position, pickupItemID);
+          
 
             #region ItemStacking
-            var pickupComponentTypeIDs = EntityManager.GetComponentTypeIDs(pickupItemID);
+            /*
+            var pickupComponentTypeIDs = EntityManager.GetComponentTypeIDs(item);
 
             bool match = false; // can item can be stacked here
 
@@ -107,14 +126,14 @@ namespace TheAlchemist.Systems
 
                 if (match)
                 {
-                    var pickedUpItemInfo = EntityManager.GetComponent<ItemComponent>(pickupItemID);
+                    var pickedUpItemInfo = EntityManager.GetComponent<ItemComponent>(item);
 
                     // cumulative count doesnt exceed max -> just increase count 
                     // in inventory and remove picked up item
                     if (invItemInfo.Count + pickedUpItemInfo.Count <= invItemInfo.MaxCount)
                     {
                         invItemInfo.Count += pickedUpItemInfo.Count;
-                        EntityManager.RemoveEntity(pickupItemID);
+                        EntityManager.RemoveEntity(item);
                     }
 
                     // cumulative count exceeds max ->
@@ -123,19 +142,20 @@ namespace TheAlchemist.Systems
                     {
                         pickedUpItemInfo.Count -= invItemInfo.MaxCount - invItemInfo.Count; // remove difference used to max out inventory item
                         invItemInfo.Count = invItemInfo.MaxCount;
-                        inventory.Items.Add(pickupItemID);
+                        inventory.Items.Add(item);
                     }
                     break;
                 }
             }
+            */
 
-            if (!match)
+            //if (!match)
             {
-                inventory.Items.Add(pickupItemID);
+                inventory.Items.Add(item);
             }
             #endregion
 
-            Util.TurnOver(character);
+            return true;
         }
 
         public void UseItem(int character, int item, ItemUsage usage)

@@ -201,11 +201,11 @@
       }
     }
   ],
-  "testBerries": [
+  "uselessBerry": [
     {
       "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
       "Count": 1,
-      "MaxCount": 1,
+      "MaxCount": 10,
       "Value": 0,
       "Weight": 0.0,
       "OnGround": true
@@ -227,11 +227,7 @@
     },
     {
       "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
-      "Properties": {
-        "Health": 10,
-        "Mana": -10,
-        "Earth": 10
-      }
+      "Properties": {}
     },
     {
       "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"

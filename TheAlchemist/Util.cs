@@ -98,7 +98,7 @@ namespace TheAlchemist
 
         public static bool ErrorOccured = false;
         // ignores errors when on
-        public static bool BrutalModeOn = true;
+        public static bool BrutalModeOn = false;
 
         public static SpriteFont DefaultFont { get; set; } = null;
         public static SpriteFont SmallFont { get; set; } = null;

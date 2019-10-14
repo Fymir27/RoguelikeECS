@@ -146,6 +146,38 @@ namespace TheAlchemist
             return IsOutOfBounds(pos.X, pos.Y);
         }
 
+        public bool IsTileBlocked(int x, int y)
+        {
+            Tile tile = GetTile(x, y);
+
+            if (tile.Terrain != 0)
+            {
+                var terrainCollider = EntityManager.GetComponent<ColliderComponent>(tile.Terrain);
+
+                if (terrainCollider != null && terrainCollider.Solid)
+                {
+                    return true;
+                }
+            }
+
+            if (tile.Structure != 0)
+            { 
+                var structureCollider = EntityManager.GetComponent<ColliderComponent>(tile.Structure);
+
+                if (structureCollider != null && structureCollider.Solid)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool IsTileBlocked(Position pos)
+        {
+            return IsTileBlocked(pos.X, pos.Y);
+        }
+
         // -------------------------------------------------
 
         private int SecondaryRay(Position pos, Position offset, int power)
@@ -735,8 +767,10 @@ namespace TheAlchemist
             // find possible connections between rooms
             FindConnectionPoints();
             ConnectRoomsRDFS();
-            SpawnEnemies();
+            CreateStructures();
+            SpawnEnemies();           
             SpawnItems();
+            
 
             var riverFrom = new Position(Width / 2 + 3, 1);
             var riverTo = new Position(Width / 2 - 3, Height - 2);
@@ -935,6 +969,59 @@ namespace TheAlchemist
                 }            
             }
             */
+        }
+
+        void CreateStructures()
+        {
+            GameData data = GameData.Instance;
+
+            // place random berry bushes
+            int bushCount = (int)Math.Round(rooms.Count * 1.5);
+
+            for (int i = 0; i < bushCount; i++)
+            {
+                int roomIndex = Game.Random.Next(rooms.Count);
+                var freePositions = rooms[roomIndex].freePositions;
+                var spawnPos = Position.Zero;
+
+                do
+                {
+                    spawnPos = freePositions[Game.Random.Next(freePositions.Count)];
+                } while (IsTileBlocked(spawnPos));
+
+                int bush = data.CreateStructure("bush");
+
+                PlaceStructure(spawnPos, bush);
+
+                // create berries to grow on bush
+                int berries = data.CreateItem("uselessBerry");
+
+                // add to bush
+                var interactable = EntityManager.GetComponent<InteractableComponent>(bush);
+                interactable.Items.Add(berries);
+
+                // create random properties for berries
+                var substance = EntityManager.GetComponent<SubstanceComponent>(berries);
+                int propertyCount = Enum.GetValues(typeof(Property)).Length;
+
+                for (int j = 0; j < 2; j++)
+                {
+                    Property prop = (Property)Game.Random.Next(propertyCount);
+                    int potency = Game.Random.Next(-30, 30);
+
+                    if (substance.Properties.ContainsKey(prop))
+                    {
+                        substance.Properties[prop] += potency;
+                    }
+                    else
+                    {
+                        substance.Properties.Add(prop, potency);
+                    }
+                }
+
+                // randomize amount
+                EntityManager.GetComponent<ItemComponent>(berries).Count = Game.Random.Next(1, 4);
+            }
         }
 
         void SpawnEnemies()
