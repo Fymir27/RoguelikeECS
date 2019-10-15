@@ -111,17 +111,9 @@ namespace TheAlchemist
                 }
                 else
                 {
-                    var descriptionC = EntityManager.GetComponent<DescriptionComponent>(items[InventoryCursorPosition - 1]);
-                    if (descriptionC == null)
-                    {
-                        name = "???";
-                        description = "???";
-                    }
-                    else
-                    {
-                        name = descriptionC.Name;
-                        description = descriptionC.Description;
-                    }
+                    int item = items[InventoryCursorPosition - 1];
+                    name = DescriptionSystem.GetName(item);
+                    description = DescriptionSystem.GetItemTooltip(item);
                 }
             }
             else if (curDomain == InputManager.CommandDomain.Targeting)

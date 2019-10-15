@@ -1953,7 +1953,11 @@ namespace TheAlchemist
                     { Stat.Strength, 10 },
                     { Stat.Dexterity, 11 },
                     { Stat.Intelligence, 13 }
-                })
+                }),
+                new SubstanceKnowledgeComponent()
+                {
+
+                }
             };
 
             EntityManager.AddComponents(player, playerComponents);

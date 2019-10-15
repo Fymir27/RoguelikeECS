@@ -1,5 +1,5 @@
 {
-  "templatePotion": [
+  "water": [
     {
       "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
       "Count": 1,
@@ -28,7 +28,8 @@
     },
     {
       "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
-      "Properties": {}
+      "Properties": {},
+      "PropertiesKnown": false
     }
   ],
   "healthPotion": [
@@ -62,7 +63,8 @@
       "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
       "Properties": {
         "Health": 25
-      }
+      },
+      "PropertiesKnown": true
     }
   ],
   "poisonPotion": [
@@ -96,7 +98,8 @@
       "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
       "Properties": {
         "Health": -25
-      }
+      },
+      "PropertiesKnown": true
     }
   ],
   "strengthPotion": [
@@ -130,7 +133,8 @@
       "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
       "Properties": {
         "Str": 5
-      }
+      },
+      "PropertiesKnown": true
     }
   ],
   "dexterityPotion": [
@@ -164,7 +168,8 @@
       "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
       "Properties": {
         "Dex": 5
-      }
+      },
+      "PropertiesKnown": true
     }
   ],
   "intelligencePotion": [
@@ -198,7 +203,8 @@
       "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
       "Properties": {
         "Int": 5
-      }
+      },
+      "PropertiesKnown": true
     }
   ],
   "uselessBerry": [
@@ -227,7 +233,8 @@
     },
     {
       "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
-      "Properties": {}
+      "Properties": {},
+      "PropertiesKnown": false
     },
     {
       "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"

@@ -107,9 +107,9 @@ namespace TheAlchemist.Systems
         /// returns the characters tooltip as a string
         /// only displayed correctly if using monspace font
         /// </summary>
-        /// <param name="entity">ID of entity</param>
+        /// <param name="characterID">ID of entity</param>
         /// <returns>tooltip as string</returns>
-        public static string GetCharacterTooltip(int entity)
+        public static string GetCharacterTooltip(int characterID)
         {
             StringBuilder tooltip = new StringBuilder();
 
@@ -117,7 +117,7 @@ namespace TheAlchemist.Systems
 
             tooltip.Append("Health ");
 
-            var hp = EntityManager.GetComponent<HealthComponent>(entity);
+            var hp = EntityManager.GetComponent<HealthComponent>(characterID);
 
             if (hp != null)
             {
@@ -137,7 +137,7 @@ namespace TheAlchemist.Systems
             tooltip.Append(GetAsciiBar(maxBars, maxBars));
             tooltip.Append('\n');
 
-            var stats = EntityManager.GetComponent<StatComponent>(entity);
+            var stats = EntityManager.GetComponent<StatComponent>(characterID);
 
             if (stats != null)
             {
@@ -162,6 +162,66 @@ namespace TheAlchemist.Systems
             sb.Append(new string('=', cur));
             sb.Append(new string(' ', max - cur));
             sb.Append(']');
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// returns the item's tooltip as a string
+        /// substance information will depend on players substance knowledge
+        /// </summary>
+        /// <param name="itemID">ID of entity</param>
+        /// <returns>tooltip as string</returns>
+        public static string GetItemTooltip(int itemID)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            // normal description
+            var descriptionC = EntityManager.GetComponent<DescriptionComponent>(itemID);
+
+            if (descriptionC == null)
+            {
+                sb.AppendLine("No description available...");
+            }
+            else
+            {
+                sb.AppendLine(descriptionC.Description);
+            }
+
+            // item properties
+            var substance = EntityManager.GetComponent<SubstanceComponent>(itemID);
+            var substanceKnowledge = EntityManager.GetComponent<SubstanceKnowledgeComponent>(Util.PlayerID);
+
+            if(substance == null)
+            {
+                return sb.ToString();
+            }
+
+            sb.AppendLine();
+
+            foreach (var prop in substance.Properties)
+            {
+                // compute total knowledge by adding property and propertyType knowledge
+                int knowledge = substanceKnowledge.PropertyKnowledge[prop.Key] + substanceKnowledge.TypeKnowledge[prop.Key.GetPropType()];
+
+                if(knowledge >= 66 || substance.PropertiesKnown)
+                {
+                    sb.Append("- ")
+                        .Append(prop.Key.ToString())
+                        .Append(": ")
+                        .AppendLine(prop.Value.ToString());
+                }
+                else if (knowledge >= 33)
+                {
+                    sb.Append("- ")
+                        .Append(prop.Key.ToString())
+                        .AppendLine(": ???");
+                }
+                else
+                {
+                    sb.AppendLine("- Unknown Property");
+                }                       
+            }
+
             return sb.ToString();
         }
     }

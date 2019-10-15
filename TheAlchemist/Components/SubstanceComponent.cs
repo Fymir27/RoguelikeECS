@@ -75,6 +75,9 @@ namespace TheAlchemist.Components
         // contains actual values of properties      
         public Dictionary<Property, int> Properties { get; set; }
 
+        // determines if properties should be known to the player from the beginning
+        public bool PropertiesKnown = false;
+
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();

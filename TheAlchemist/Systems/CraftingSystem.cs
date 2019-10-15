@@ -197,7 +197,21 @@ namespace TheAlchemist.Systems
                 }
             }
 
-            return CreatePotion(accumulatedProperties);
+            int potion = CreatePotion(accumulatedProperties);
+
+            // let the player learn about the created potion's properties
+            var knowledge = EntityManager.GetComponent<SubstanceKnowledgeComponent>(Util.PlayerID);
+
+            foreach (var prop in accumulatedProperties.Keys)
+            {
+                knowledge.PropertyKnowledge[prop] += 20;
+                knowledge.TypeKnowledge[prop.GetPropType()] += 10;
+            }
+
+            // make sure the properties of the created potion aren't displayed by default
+            EntityManager.GetComponent<SubstanceComponent>(potion).PropertiesKnown = false;
+
+            return potion;
 
             //MaterialType[] possibleIngredients =
             //{
@@ -288,7 +302,7 @@ namespace TheAlchemist.Systems
 
         public int CreatePotion(Dictionary<Property, int> properties)
         {
-            int potion = GameData.Instance.CreateItem("templatePotion");
+            int potion = GameData.Instance.CreateItem("water");
             var substance = EntityManager.GetComponent<SubstanceComponent>(potion);
             substance.Properties = properties;
 

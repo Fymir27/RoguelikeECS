@@ -263,13 +263,13 @@ namespace TheAlchemist
                     npcBehaviourSystem.EnemyTurn();
                     Util.PlayerTurnOver = false;
                 }
-
-                // remove all entities that died this turn
-                EntityManager.CleanUpEntities();
-
+              
                 float playerHealth = EntityManager.GetComponent<HealthComponent>(Util.PlayerID).Amount;
                 if (playerHealth <= 0)
                     Exit(); // TODO: do something
+
+                // remove all entities that died this turn
+                EntityManager.CleanUpEntities();
             }          
 
             base.Update(gameTime);
