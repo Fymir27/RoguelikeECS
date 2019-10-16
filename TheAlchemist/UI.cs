@@ -101,7 +101,7 @@ namespace TheAlchemist
                 description = DescriptionSystem.GetCharacterTooltip(Util.PlayerID);
                 //description = "HP: " + EntityManager.GetComponent<HealthComponent>(Util.PlayerID).GetString();
             }
-            else if (curDomain == InputManager.CommandDomain.Inventory)
+            else if (curDomain == InputManager.CommandDomain.Inventory || curDomain == InputManager.CommandDomain.Crafting)
             {
                 if (items.Count == 0)
                 {

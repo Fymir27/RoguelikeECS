@@ -465,6 +465,12 @@ namespace TheAlchemist
         {
             var tile = Util.CurrentFloor.GetTile(Util.GetPlayerPos());
 
+            if(tile.Items != null || tile.Items.Count > 0)
+            {
+                PickupItemEvent?.Invoke(ControlledEntity);
+                return;
+            }
+
             if (tile.Structure != 0)
             {
                 var interactableStructure = EntityManager.GetComponent<InteractableComponent>(tile.Structure);
@@ -474,9 +480,7 @@ namespace TheAlchemist
                     InteractionEvent?.Invoke(Util.PlayerID, tile.Structure);
                     return;
                 }
-            }
-
-            PickupItemEvent?.Invoke(ControlledEntity);
+            }           
         }
 
         /// <summary>
