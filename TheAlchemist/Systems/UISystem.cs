@@ -77,6 +77,8 @@ namespace TheAlchemist.Systems
         {
             if (message == lastMessage)
             {
+                Log.RepeatUIMessage();
+
                 if (sameMessageCount > 3)
                     return;
 
@@ -95,6 +97,7 @@ namespace TheAlchemist.Systems
             }
 
             UI.MessageLog[UI.MessageLogLineCount - 1] = message;
+            Log.SaveUIMessage(message);
         }
 
         public static void ToggleCrafting()

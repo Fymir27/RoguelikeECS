@@ -16,8 +16,7 @@ namespace TheAlchemist
 {
     using Components;
     using Systems;
-
-
+  
     public interface IVisionGrid
     {
         bool IsOpaque(Position pos);
@@ -591,10 +590,13 @@ namespace TheAlchemist
         // discovered by the player
         // bool[,] discovered;      
 
-        public Floor(string path)
-        {
-            //TODO: generate floor procedurally
 
+        /// <summary>
+        /// Creates floor from file 
+        /// </summary>
+        /// <param name="path">string of path to file</param>
+        public Floor(string path)
+        {        
             StreamReader file = new StreamReader(path);
 
 

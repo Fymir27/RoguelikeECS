@@ -9,49 +9,9 @@ namespace TheAlchemist.Systems
     using Components;
     using static TheAlchemist.Components.CraftingMaterialComponent;
 
-    //public enum CraftingType
-    //{
-    //    Alchemy,
-    //    Engineering
-    //}
-
-    //public enum Craftable
-    //{
-    //    Potion,
-    //    Weapon
-    //    //...
-    //}
-
     public delegate void AddCraftingIngredientHandler(int item);
     public delegate bool CraftItemHandler();
     public delegate void ResetCraftingHandler();
-
-    //struct Ingredient
-    //{
-    //    public int Min;
-    //    public int Max;
-    //    public MaterialType Type;
-    //    public MaterialType[] Types;
-
-    //    public Ingredient(int min, int max, MaterialType type, MaterialType[] types = null)
-    //    {
-    //        Min = min;
-    //        Max = max;
-    //        Type = type;
-    //        Types = types;
-    //    }
-    //}
-
-    //struct CraftingData
-    //{
-
-    //}
-
-    //struct CraftingRecipe
-    //{
-    //    MaterialType[] coreIngredients;
-    //    MaterialType[] optionalIngredients;
-    //}
 
     class CraftingSystem : Singleton<CraftingSystem>
     {
@@ -59,18 +19,6 @@ namespace TheAlchemist.Systems
         //List<CraftingMaterialComponent> ingredients;
         List<SubstanceComponent> substances;
         int maxSlots;
-
-        //Dictionary<Craftable, List<Ingredient>> recipes = new Dictionary<Craftable, List<Ingredient>>()
-        //{
-        //    {
-        //        Craftable.Potion, new List<Ingredient>()
-        //        {
-        //            new Ingredient(1, 0, MaterialType.Potion),
-        //            new Ingredient(1, 0, MaterialType.Potion, new MaterialType[] { }),
-        //            new Ingredient() { Types = new MaterialType[] { MaterialType.Plant, MaterialType.Mineral } }
-        //        }
-        //    }
-        //};
 
         public CraftingSystem(int slots = 5)
         {
@@ -107,23 +55,6 @@ namespace TheAlchemist.Systems
             items.Add(item);
             var inv = Util.GetPlayerInventory();
             inv.Items.Remove(item);
-
-            //ingredients.Add(craftingMaterial);
-
-            //var craftingMaterial = EntityManager.GetComponent<CraftingMaterialComponent>(item);
-
-            //if (craftingMaterial == null)
-            //{
-            //    UISystem.Message("This item can't be used for crafting!");
-            //    return;
-            //}
-
-            //// remember item and remove it from player inventory
-            //items.Add(item);
-            //var inv = Util.GetPlayerInventory();
-            //inv.Items.Remove(item);
-
-            //ingredients.Add(craftingMaterial);
         }
 
         /// <summary>
@@ -204,77 +135,14 @@ namespace TheAlchemist.Systems
 
             foreach (var prop in accumulatedProperties.Keys)
             {
-                knowledge.PropertyKnowledge[prop] += 20;
-                knowledge.TypeKnowledge[prop.GetPropType()] += 10;
+                knowledge.PropertyKnowledge[prop] += 10;
+                knowledge.TypeKnowledge[prop.GetPropType()] += 5;
             }
 
             // make sure the properties of the created potion aren't displayed by default
             EntityManager.GetComponent<SubstanceComponent>(potion).PropertiesKnown = false;
 
-            return potion;
-
-            //MaterialType[] possibleIngredients =
-            //{
-            //    MaterialType.Potion,
-            //    MaterialType.Plant,
-            //    MaterialType.Mineral
-            //};
-
-            //foreach (var ing in ingredients)
-            //{
-            //    if (!possibleIngredients.Contains(ing.Type))
-            //    {
-            //        UISystem.Message("You can't use that ingredient: " + DescriptionSystem.GetName(ing.EntityID));
-            //        return 0;
-            //    }
-            //}
-
-            //List<UsableItemComponent.ItemEffect> resultEffects = new List<UsableItemComponent.ItemEffect>();
-            //List<UsableItemComponent.ItemEffect> ingredientEffects = new List<UsableItemComponent.ItemEffect>();
-
-            //// extract all the item effects form ingredients
-            //foreach (var ing in ingredients)
-            //{
-            //    foreach (var effect in ing.Effects)
-            //    {
-            //        ingredientEffects.Add(effect);
-            //    }
-            //}
-
-            //// mix all effects together
-            //while (ingredientEffects.Any())
-            //{
-            //    var curEffectType = ingredientEffects[0].Type;
-
-            //    var effectsOfSameType = ingredientEffects.Where(e => e.Type == curEffectType).ToArray();
-
-            //    int combinedPotency = 0;
-
-            //    foreach (var effect in effectsOfSameType)
-            //    {
-            //        // how much each individual ingredient changes the potency
-            //        float individualMultiplier = 1.0f;
-
-            //        // add individual potency if effect is beneficial
-            //        // subtract individual potency if effect is harmful
-            //        combinedPotency += (int)Math.Round(effect.Potency * Util.Sign(!effect.Harmful) * individualMultiplier);
-            //    }
-
-            //    // remove effects because they are now already accounted for
-            //    ingredientEffects.RemoveAll(e => e.Type == curEffectType);
-
-            //    UsableItemComponent.ItemEffect combinedEffect = new UsableItemComponent.ItemEffect()
-            //    {
-            //        Type = curEffectType,
-            //        Harmful = combinedPotency < 0,
-            //        Potency = Math.Abs(combinedPotency)
-            //    };
-
-            //    resultEffects.Add(combinedEffect);
-            //}
-
-            //// TODO: craft other alchemy items?
-            //return CreatePotion(resultEffects);
+            return potion;          
         }
 
         /// <summary>
@@ -289,16 +157,6 @@ namespace TheAlchemist.Systems
                 substances.Add(EntityManager.GetComponent<SubstanceComponent>(item));
             }
         }
-
-        //public int CreatePotion(IEnumerable<UsableItemComponent.ItemEffect> effects)
-        //{
-        //    int potion = GameData.Instance.CreateItem("templatePotion");
-        //    var usableComponent = EntityManager.GetComponent<UsableItemComponent>(potion);
-        //    usableComponent.Effects.AddRange(effects);
-        //    var craftingComponent = EntityManager.GetComponent<CraftingMaterialComponent>(potion);
-        //    craftingComponent.Effects.AddRange(effects);
-        //    return potion;
-        //}
 
         public int CreatePotion(Dictionary<Property, int> properties)
         {

@@ -207,15 +207,33 @@ namespace TheAlchemist
             }
 
             if (command == Command.None)
-            {
-                // TODO: remove
-                UISystem.Message("No command for " + Util.GetStringFromEnumerable(curKeyState.GetPressedKeys()));
+            {               
+                UISystem.Message("Unkown Command!");
                 return false;
             }
 
             //ExecuteCommand(command);
             curCommand = command;
             return true;
+        }
+
+        /// <summary>
+        /// returns wether any key is pressed down
+        /// </summary>
+        /// <returns>true if at least one key is pressed</returns>
+        public bool AnyKey()
+        {
+            return Keyboard.GetState().GetPressedKeys().Length > 0;
+        }
+
+        /// <summary>
+        /// checks wether a specific key is down
+        /// </summary>
+        /// <param name="key">key to check</param>
+        /// <returns>true if key is down</returns>
+        public bool CheckKey(Keys key)
+        {
+            return Keyboard.GetState().IsKeyDown(key);
         }
 
         public void ExecuteCurrentCommand()
@@ -309,7 +327,7 @@ namespace TheAlchemist
                     break;
                 case Command.CraftItem:
                     CraftItemEvent?.Invoke();
-                    ToggleCrafting(); // TODO: leave crafting open?
+                    ToggleCrafting();
                     break;
 
                 default:
@@ -481,7 +499,6 @@ namespace TheAlchemist
                 return;
             }
 
-            // TODO: is this even good?
             if (usableItem.Usages.Count == 1) // only one possible usage
             {
                 UseItem(usableItem.Usages[0]);
@@ -588,10 +605,7 @@ namespace TheAlchemist
             {
                 UI.CraftingMode = false;
                 LeaveCurrentDomain();
-                if (GetCurrentDomain() == CommandDomain.Inventory)
-                {
-                    ToggleInventory(); // TODO: leave inventory open?
-                }
+                // leave inventory open
             }
             else
             {

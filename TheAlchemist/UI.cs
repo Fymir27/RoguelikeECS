@@ -21,7 +21,6 @@ namespace TheAlchemist
 
         public static bool CraftingMode = false;
 
-        // TODO: save older messages
         public static int MessageLogLineCount { get; set; } = 11;
         public static string[] MessageLog { get; set; } = new string[MessageLogLineCount];
 

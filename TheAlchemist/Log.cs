@@ -10,14 +10,29 @@ namespace TheAlchemist
     static class Log
     {
         static StreamWriter logFile;
+        static StreamWriter UIMessageLog;
+
+        static string lastUIMessage;
+        static int lastUIMessageCount = 1;
 
         public static void Init(string path)
         {
-            logFile = new StreamWriter(path /*new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Read)*/);
+            if(path[path.Length - 1] != '\\')
+            {
+                path += '\\';
+            }
+
+            logFile = new StreamWriter(path + "Log.html");
             logFile.WriteLine("<head><title> Logfile </title></head><body>");
             //logFile.WriteLine("<meta http-equiv=\"refresh\" content=\"3\"/>"); // automatic refresh after 3 sec
-            logFile.WriteLine("<h1>" + DateTime.Now.ToLongDateString() + ", " + DateTime.Now.ToShortTimeString() + "</h1>");
+            string dateTime = DateTime.Now.ToLongDateString() + ", " + DateTime.Now.ToShortTimeString();
+            logFile.WriteLine("<h1>" + dateTime + "</h1>");
             logFile.Flush();
+
+            UIMessageLog = new StreamWriter(path + "MessageLog.txt");
+            UIMessageLog.WriteLine("Run startet at: " + dateTime);
+            lastUIMessage = "---";
+            UIMessageLog.Flush();
         }
 
         public static void Message(string message)
@@ -87,5 +102,48 @@ namespace TheAlchemist
             logFile.WriteLine("</br>");
         }
 
+        /// <summary>
+        /// This method is lazy
+        /// It only writes the last message to file (unless close is set), 
+        /// because it waits if the current message gets repeated
+        /// </summary>
+        /// <param name="message">message to save (will be saved on next call to this function)</param>
+        /// <param name="close">wether to flush and close the filestream</param>
+        public static void SaveUIMessage(string message, bool close = false)
+        {
+            try
+            {
+                if (lastUIMessageCount > 1)
+                {
+                    UIMessageLog.WriteLine(String.Format("{0} (x{1})", lastUIMessage, lastUIMessageCount));
+                }
+                else
+                {
+                    UIMessageLog.WriteLine(lastUIMessage);
+                }
+
+                lastUIMessage = message;
+                lastUIMessageCount = 1;
+            }
+            catch(IOException e)
+            {
+                Log.Error("Failed to write to MessageLog!\n" + e.ToString());
+            }
+
+            if(close)
+            {
+                UIMessageLog.WriteLine(message);
+                UIMessageLog.Flush();
+                UIMessageLog.Close();
+            }
+        }
+
+        /// <summary>
+        /// increases the counter of repetitions for the last message
+        /// </summary>
+        public static void RepeatUIMessage()
+        {
+            lastUIMessageCount++;
+        }
     }
 }

@@ -10,7 +10,6 @@ namespace TheAlchemist.Systems
 
     public delegate void HealthLostHandler(int entity, float amountLost);
     public delegate void HealthGainedHandler(int entity, float amountGained);
-    // TODO: Health regeneration event
 
     // responsible for registering damage taken by entities
     // and health regeneration

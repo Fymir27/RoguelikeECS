@@ -246,6 +246,12 @@ namespace TheAlchemist
         // marks entity for later deletion
         public static void RemoveEntity(int entityID)
         {
+            if(entityID == Util.PlayerID)
+            {
+                // never fully remove player or everything breaks
+                return;
+            }
+
             if (toBeRemoved.Contains(entityID))
             {
                 return;

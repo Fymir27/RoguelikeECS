@@ -17,6 +17,8 @@ namespace TheAlchemist
     /// </summary>
     public class Game : Microsoft.Xna.Framework.Game
     {
+        bool gameOver = false;
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         RenderTarget2D virtualScreen;
@@ -67,7 +69,7 @@ namespace TheAlchemist
         {
             Util.ContentPath = Content.RootDirectory;
 
-            Log.Init(AppDomain.CurrentDomain.BaseDirectory + "/log.html");
+            Log.Init(AppDomain.CurrentDomain.BaseDirectory);
             Log.Message("Seed: " + Seed);
 
             var gameData = GameData.Instance = new GameData();
@@ -233,7 +235,7 @@ namespace TheAlchemist
         /// </summary>
         protected override void UnloadContent()
         {
-            // TODO: Unload any non ContentManager content here
+            Log.SaveUIMessage("---", true);
             Log.End();
         }
 
@@ -248,9 +250,21 @@ namespace TheAlchemist
             {
                 if (!Util.BrutalModeOn)
                 {
-                    UISystem.Message("A CRITICAL ERROR HAS OCCURED!");
+                    UISystem.Message("A CRITICAL ERROR HAS OCCURED!");                   
                     Exit();
                 }
+            }
+           
+            if(gameOver)
+            {
+                if (InputManager.Instance.CheckKey(Keys.Escape))
+                {
+                    Exit();
+                }
+
+                // ignore all other input
+                base.Update(gameTime);
+                return;
             }
 
             // check for input
@@ -266,7 +280,14 @@ namespace TheAlchemist
               
                 float playerHealth = EntityManager.GetComponent<HealthComponent>(Util.PlayerID).Amount;
                 if (playerHealth <= 0)
-                    Exit(); // TODO: do something
+                {
+                    UISystem.Message("---");
+                    UISystem.Message("You died.");
+                    UISystem.Message("");
+                    UISystem.Message("Press ESC to exit...");
+
+                    gameOver = true;
+                }
 
                 // remove all entities that died this turn
                 EntityManager.CleanUpEntities();
