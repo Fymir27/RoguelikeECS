@@ -465,7 +465,7 @@ namespace TheAlchemist
         {
             var tile = Util.CurrentFloor.GetTile(Util.GetPlayerPos());
 
-            if(tile.Items != null || tile.Items.Count > 0)
+            if(tile.Items != null && tile.Items.Count > 0)
             {
                 PickupItemEvent?.Invoke(ControlledEntity);
                 return;

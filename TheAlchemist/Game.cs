@@ -162,7 +162,7 @@ namespace TheAlchemist
             // fill inventory with test items
             Util.GetPlayerInventory().Items.AddRange(new List<int>()
             {
-                testRock,
+                //testRock,
                 GameData.Instance.CreateItem("healthPotion"),
                 GameData.Instance.CreateItem("healthPotion"),
                 GameData.Instance.CreateItem("healthPotion"),

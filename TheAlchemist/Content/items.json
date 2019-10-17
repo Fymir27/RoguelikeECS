@@ -10,8 +10,8 @@
     },
     {
       "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
-      "Name": "Potion",
-      "Description": "Quaff it!"
+      "Name": "Water",
+      "Description": "Still waters run deep!"
     },
     {
       "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"
@@ -21,8 +21,8 @@
       "Texture": "potion",
       "Tint": {
         "B": 255,
-        "G": 255,
-        "R": 255,
+        "G": 200,
+        "R": 135,
         "A": 255
       }
     },

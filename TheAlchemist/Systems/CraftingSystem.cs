@@ -91,8 +91,8 @@ namespace TheAlchemist.Systems
             }
             items.Clear();
             substances.Clear();
-            var description = EntityManager.GetComponent<DescriptionComponent>(newItem);
-            description.Name = "Crafted " + description.Name;
+            //var description = EntityManager.GetComponent<DescriptionComponent>(newItem);
+            //description.Name = "Crafted " + description.Name;
             Util.GetPlayerInventory().Items.Add(newItem);
 
             string info = DescriptionSystem.GetDebugInfoEntity(newItem);
@@ -166,6 +166,11 @@ namespace TheAlchemist.Systems
 
             // to suppress warning of rendersystem (default is true)
             EntityManager.GetComponent<RenderableSpriteComponent>(potion).Visible = false;
+
+            var descriptionC = EntityManager.GetComponent<DescriptionComponent>(potion);
+
+            descriptionC.Name = "Crafted Potion";
+            descriptionC.Description = "What have you brewed up this time?";
 
             return potion;
         }
