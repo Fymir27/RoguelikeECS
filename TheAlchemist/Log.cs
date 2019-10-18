@@ -14,10 +14,11 @@ namespace TheAlchemist
 
         static string lastUIMessage;
         static int lastUIMessageCount = 1;
+        static int unflushedMessageCount = 0;
 
         public static void Init(string path)
         {
-            if(path[path.Length - 1] != '\\')
+            if (path[path.Length - 1] != '\\')
             {
                 path += '\\';
             }
@@ -30,9 +31,10 @@ namespace TheAlchemist
             logFile.Flush();
 
             UIMessageLog = new StreamWriter(path + "MessageLog.txt");
+            UIMessageLog.AutoFlush = true;
             UIMessageLog.WriteLine("Run startet at: " + dateTime);
             lastUIMessage = "---";
-            UIMessageLog.Flush();
+
         }
 
         public static void Message(string message)
@@ -124,13 +126,18 @@ namespace TheAlchemist
 
                 lastUIMessage = message;
                 lastUIMessageCount = 1;
+
+                //if (unflushedMessageCount++ >= 5)
+                //{
+                //    UIMessageLog.Flush();
+                //}
             }
-            catch(IOException e)
+            catch (IOException e)
             {
                 Log.Error("Failed to write to MessageLog!\n" + e.ToString());
             }
 
-            if(close)
+            if (close)
             {
                 UIMessageLog.WriteLine(message);
                 UIMessageLog.Flush();

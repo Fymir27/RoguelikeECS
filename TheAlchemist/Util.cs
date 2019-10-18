@@ -350,16 +350,32 @@ namespace TheAlchemist
         {
             UI.SyncInventoryCursor();
             int cursorPos = UI.InventoryCursorPosition;
-            int item = 0;
+            var inventory = EntityManager.GetComponent<InventoryComponent>(InputManager.Instance.ControlledEntity);
+
+            if (inventory.Items.Count == 0)
+            {
+                UISystem.Message("Your inventory is empty!");
+                return 0;
+            }
+
             try
             {
-                item = EntityManager.GetComponent<InventoryComponent>(InputManager.Instance.ControlledEntity).Items[cursorPos - 1];
+                return inventory.Items[cursorPos - 1];
             }
             catch (ArgumentOutOfRangeException)
             {
-                Log.Warning("Inventory is empty! " + DescriptionSystem.GetNameWithID(InputManager.Instance.ControlledEntity));
+                Log.Error("Inventory cursor position corrupted!" + DescriptionSystem.GetNameWithID(InputManager.Instance.ControlledEntity));
+                return 0;
             }
-            return item;
+        }
+
+        public static T Clamp<T>(T value, T min, T max) where T : IComparable
+        {
+            if (value.CompareTo(max) > 0)
+                return max;
+            if (value.CompareTo(min) < 0)
+                return min;
+            return value;
         }
     }
 }

@@ -207,7 +207,7 @@ namespace TheAlchemist
             }
 
             if (command == Command.None)
-            {               
+            {
                 UISystem.Message("Unkown Command!");
                 return false;
             }
@@ -465,7 +465,7 @@ namespace TheAlchemist
         {
             var tile = Util.CurrentFloor.GetTile(Util.GetPlayerPos());
 
-            if(tile.Items != null && tile.Items.Count > 0)
+            if (tile.Items != null && tile.Items.Count > 0)
             {
                 PickupItemEvent?.Invoke(ControlledEntity);
                 return;
@@ -480,7 +480,7 @@ namespace TheAlchemist
                     InteractionEvent?.Invoke(Util.PlayerID, tile.Structure);
                     return;
                 }
-            }           
+            }
         }
 
         /// <summary>
@@ -539,6 +539,11 @@ namespace TheAlchemist
         private void ConsumeItem()
         {
             var item = Util.GetCurrentItem();
+
+            if (item == 0)
+            {
+                return;
+            }
 
             var consumable = EntityManager.GetComponent<ConsumableComponent>(item);
 

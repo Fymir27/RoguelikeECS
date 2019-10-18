@@ -157,6 +157,7 @@ namespace TheAlchemist.Systems
         /// <returns></returns>
         public static string GetAsciiBar(int cur, int max)
         {
+            cur = Util.Clamp(cur, 0, max);
             StringBuilder sb = new StringBuilder();
             sb.Append('[');
             sb.Append(new string('=', cur));
@@ -191,7 +192,7 @@ namespace TheAlchemist.Systems
             var substance = EntityManager.GetComponent<SubstanceComponent>(itemID);
             var substanceKnowledge = EntityManager.GetComponent<SubstanceKnowledgeComponent>(Util.PlayerID);
 
-            if(substance == null)
+            if (substance == null)
             {
                 return sb.ToString();
             }
@@ -203,7 +204,7 @@ namespace TheAlchemist.Systems
                 // compute total knowledge by adding property and propertyType knowledge
                 int knowledge = substanceKnowledge.PropertyKnowledge[prop.Key] + substanceKnowledge.TypeKnowledge[prop.Key.GetPropType()];
 
-                if(knowledge >= 66 || substance.PropertiesKnown)
+                if (knowledge >= 66 || substance.PropertiesKnown)
                 {
                     sb.Append("- ")
                         .Append(prop.Key.ToString())
@@ -219,7 +220,7 @@ namespace TheAlchemist.Systems
                 else
                 {
                     sb.AppendLine("- Unknown Property");
-                }                       
+                }
             }
 
             return sb.ToString();
