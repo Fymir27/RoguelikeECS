@@ -189,7 +189,7 @@ namespace TheAlchemist.Systems
             }
         }
 
-        public void DecreaseItemCount(int character, int item)
+        public static void DecreaseItemCount(int character, int item)
         {
             var itemComponent = EntityManager.GetComponent<ItemComponent>(item);
 
@@ -354,7 +354,7 @@ namespace TheAlchemist.Systems
             Util.TurnOver(character);
         }
 
-        public void RemoveFromInventory(int item, int character)
+        public static void RemoveFromInventory(int item, int character)
         {
             var inventory = EntityManager.GetComponent<InventoryComponent>(character);
 

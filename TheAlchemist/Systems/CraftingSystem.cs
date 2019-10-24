@@ -53,8 +53,7 @@ namespace TheAlchemist.Systems
 
             // remember item and remove it from player inventory
             items.Add(item);
-            var inv = Util.GetPlayerInventory();
-            inv.Items.Remove(item);
+            ItemSystem.DecreaseItemCount(Util.PlayerID, item);
         }
 
         /// <summary>
@@ -110,6 +109,12 @@ namespace TheAlchemist.Systems
         public int Alchemy()
         {
             // TODO: check if there's at least some liquid in the recipe or something
+
+            if(!substances.Any(s => s.MaterialType == Components.MaterialType.Potion))
+            {
+                UISystem.Message("You need at least one Potion!");
+                return 0;
+            }
 
             Dictionary<Property, int> accumulatedProperties = new Dictionary<Property, int>();
 

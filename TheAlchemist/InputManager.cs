@@ -491,6 +491,12 @@ namespace TheAlchemist
         {
             var item = Util.GetCurrentItem();
 
+            if(item == 0)
+            {
+                UISystem.Message("Your inventory is empty!");
+                return;
+            }
+
             // TODO: resolve other uses
             ConsumeItem();
             return;

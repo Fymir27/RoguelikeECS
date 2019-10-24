@@ -29,7 +29,8 @@
     {
       "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
       "Properties": {},
-      "PropertiesKnown": false
+      "PropertiesKnown": false,
+      "MaterialType": "Potion"
     }
   ],
   "healthPotion": [
@@ -64,7 +65,8 @@
       "Properties": {
         "Health": 25
       },
-      "PropertiesKnown": true
+      "PropertiesKnown": true,
+      "MaterialType": "Potion"
     }
   ],
   "poisonPotion": [
@@ -99,7 +101,8 @@
       "Properties": {
         "Health": -25
       },
-      "PropertiesKnown": true
+      "PropertiesKnown": true,
+      "MaterialType": "Potion"
     }
   ],
   "strengthPotion": [
@@ -134,7 +137,8 @@
       "Properties": {
         "Str": 5
       },
-      "PropertiesKnown": true
+      "PropertiesKnown": true,
+      "MaterialType": "Potion"
     }
   ],
   "dexterityPotion": [
@@ -169,7 +173,8 @@
       "Properties": {
         "Dex": 5
       },
-      "PropertiesKnown": true
+      "PropertiesKnown": true,
+      "MaterialType": "Potion"
     }
   ],
   "intelligencePotion": [
@@ -204,7 +209,8 @@
       "Properties": {
         "Int": 5
       },
-      "PropertiesKnown": true
+      "PropertiesKnown": true,
+      "MaterialType": "Potion"
     }
   ],
   "uselessBerry": [

@@ -354,7 +354,7 @@ namespace TheAlchemist
 
             if (inventory.Items.Count == 0)
             {
-                UISystem.Message("Your inventory is empty!");
+                //UISystem.Message("Your inventory is empty!");
                 return 0;
             }
 

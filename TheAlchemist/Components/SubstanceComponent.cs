@@ -73,6 +73,7 @@ namespace TheAlchemist.Components
 
     public enum MaterialType
     {
+        None,
         Potion,
         Plant,
         Mineral
@@ -87,7 +88,7 @@ namespace TheAlchemist.Components
         // determines if properties should be known to the player from the beginning
         public bool PropertiesKnown { get; set; } = false;
 
-        MaterialType MaterialType { get; set; }
+        public MaterialType MaterialType { get; set; }
 
         public override string ToString()
         {
