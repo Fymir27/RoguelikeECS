@@ -70,13 +70,24 @@ namespace TheAlchemist.Components
         }
     }
 
+
+    public enum MaterialType
+    {
+        Potion,
+        Plant,
+        Mineral
+        //...
+    }
+
     class SubstanceComponent : Component<SubstanceComponent>
     {
         // contains actual values of properties      
         public Dictionary<Property, int> Properties { get; set; }
 
         // determines if properties should be known to the player from the beginning
-        public bool PropertiesKnown = false;
+        public bool PropertiesKnown { get; set; } = false;
+
+        MaterialType MaterialType { get; set; }
 
         public override string ToString()
         {
