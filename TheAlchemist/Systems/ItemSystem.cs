@@ -93,6 +93,15 @@ namespace TheAlchemist.Systems
                 return false;
             }
 
+            var itemInfo = EntityManager.GetComponent<ItemComponent>(item);
+
+            // "Re-Stacking" - item gets handed back from e.g. crafting reset
+            if (inventory.Items.Contains(item))
+            {              
+                itemInfo.Count++;
+                return true;
+            }
+
             if (inventory.Full)
             {
                 UISystem.Message("Inventory is full! -> " + DescriptionSystem.GetNameWithID(character));
@@ -152,6 +161,10 @@ namespace TheAlchemist.Systems
             //if (!match)
             {
                 inventory.Items.Add(item);
+                if(itemInfo.Count == 0) // happens if item comes back from e.g. crafting reset
+                {
+                    itemInfo.Count = 1;
+                }
             }
             #endregion
 

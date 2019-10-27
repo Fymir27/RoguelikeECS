@@ -15,6 +15,8 @@ namespace TheAlchemist.Systems
 
     class CraftingSystem : Singleton<CraftingSystem>
     {
+        public ItemAddedHandler ItemAddedEvent;
+
         List<int> items;
         //List<CraftingMaterialComponent> ingredients;
         List<SubstanceComponent> substances;
@@ -30,7 +32,10 @@ namespace TheAlchemist.Systems
 
         public void ResetCrafting()
         {
-            Util.GetPlayerInventory().Items.AddRange(items);
+            foreach (var item in items)
+            {
+                ItemAddedEvent?.Invoke(Util.PlayerID, item);           
+            }
             items.Clear();
             substances.Clear();
         }
@@ -91,11 +96,11 @@ namespace TheAlchemist.Systems
                 ItemSystem.TryDeleteItem(itemID);
             }
 
-            items.Clear();                       
+            items.Clear();
 
             //var description = EntityManager.GetComponent<DescriptionComponent>(newItem);
             //description.Name = "Crafted " + description.Name;
-            Util.GetPlayerInventory().Items.Add(newItem);
+            ItemAddedEvent?.Invoke(Util.PlayerID, newItem);
 
             string info = DescriptionSystem.GetDebugInfoEntity(newItem);
             Log.Message("Crafting successful:");

@@ -136,6 +136,8 @@ namespace TheAlchemist
             movementSystem.BasicAttackEvent += combatSystem.HandleBasicAttack;
             movementSystem.InteractionEvent += interactionSystem.HandleInteraction;
 
+            craftingSystem.ItemAddedEvent += itemSystem.AddItem;
+
             Util.TurnOverEvent += healthSystem.RegenerateEntity;
             Util.TurnOverEvent += statSystem.TurnOver;
 
