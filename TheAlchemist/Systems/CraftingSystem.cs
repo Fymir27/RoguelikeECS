@@ -84,12 +84,13 @@ namespace TheAlchemist.Systems
 
             UISystem.Message("You just crafted something!");
 
-            foreach (var item in items)
-            {
-                EntityManager.RemoveEntity(item);
-            }
+            //foreach (var item in items)
+            //{
+            //    EntityManager.RemoveEntity(item);
+            //}
             items.Clear();
             substances.Clear();
+            // TODO: delete item entity
             //var description = EntityManager.GetComponent<DescriptionComponent>(newItem);
             //description.Name = "Crafted " + description.Name;
             Util.GetPlayerInventory().Items.Add(newItem);
@@ -147,7 +148,7 @@ namespace TheAlchemist.Systems
             // make sure the properties of the created potion aren't displayed by default
             EntityManager.GetComponent<SubstanceComponent>(potion).PropertiesKnown = false;
 
-            return potion;          
+            return potion;
         }
 
         /// <summary>

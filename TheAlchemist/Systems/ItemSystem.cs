@@ -72,7 +72,7 @@ namespace TheAlchemist.Systems
             // post message to player
             UISystem.Message(DescriptionSystem.GetNameWithID(character) + " picked up " + DescriptionSystem.GetNameWithID(pickupItemID));
 
-            Util.CurrentFloor.RemoveItem(position, pickupItemID);        
+            Util.CurrentFloor.RemoveItem(position, pickupItemID);
 
             Util.TurnOver(character);
         }
@@ -98,7 +98,7 @@ namespace TheAlchemist.Systems
                 UISystem.Message("Inventory is full! -> " + DescriptionSystem.GetNameWithID(character));
                 return false;
             }
-          
+
 
             #region ItemStacking
             /*
@@ -189,6 +189,11 @@ namespace TheAlchemist.Systems
             }
         }
 
+        /// <summary>
+        /// Decreases item count in character inventory
+        /// </summary>
+        /// <param name="item">ID of item</param>
+        /// <param name="character">ID of character</param>
         public static void DecreaseItemCount(int character, int item)
         {
             var itemComponent = EntityManager.GetComponent<ItemComponent>(item);
@@ -282,6 +287,7 @@ namespace TheAlchemist.Systems
             //}
 
             DecreaseItemCount(character, item);
+            IdentifyItem(item);
             Util.TurnOver(character);
         }
 
@@ -354,6 +360,11 @@ namespace TheAlchemist.Systems
             Util.TurnOver(character);
         }
 
+        /// <summary>
+        /// Removes item from charachter inventory
+        /// </summary>
+        /// <param name="item">ID of item</param>
+        /// <param name="character">ID of character</param>
         public static void RemoveFromInventory(int item, int character)
         {
             var inventory = EntityManager.GetComponent<InventoryComponent>(character);
@@ -366,8 +377,6 @@ namespace TheAlchemist.Systems
             }
 
             inventory.Items.Remove(item);
-
-            EntityManager.RemoveEntity(item);
 
             UI.InventoryCursorPosition = 1;
         }
@@ -397,6 +406,77 @@ namespace TheAlchemist.Systems
                 case Property.Int: return Stat.Intelligence;
                 default: throw new ArgumentException("Can't get Stat from this Item Property: " + prop.ToString(), "prop");
             }
+        }
+
+        /// <summary>
+        /// Generates random properties for items (substances)
+        /// if "allowStacking" is set, count and min/max values might not be correct 
+        /// due to same properties beeing added together
+        /// </summary>
+        /// <param name="count">count properties generated</param>
+        /// <param name="min">minimum value of generated properties</param>
+        /// <param name="max">maximum value of generated properties</param>
+        /// <param name="allowStacking">allows one type of property to be generated multiple times (added together)</param>
+        /// <returns></returns>
+        public static Dictionary<Property, int> GenerateRandomProperties(int count, int min, int max, bool allowStacking = false)
+        {
+            Dictionary<Property, int> generatedProperties = new Dictionary<Property, int>();
+
+            if (min > max)
+            {
+                Log.Error("ItemSystem.GenerateRandomProperties: min > max!");
+                return generatedProperties;
+            }
+
+            int possibilityCount = Enum.GetValues(typeof(Property)).Length;
+
+            if (!allowStacking && count > possibilityCount)
+            {
+                Log.Warning("ItemSystem.GenerateRandomProperties: count > possibilites! Can't generate that many different properties! Did you mean to allow stacking?");
+                count = possibilityCount;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                Property prop = (Property)Game.Random.Next(possibilityCount);
+                int potency = Game.Random.Next(min, max);
+
+                if (generatedProperties.ContainsKey(prop))
+                {
+                    if (allowStacking)
+                    {
+                        generatedProperties[prop] += potency;
+                    }
+                    else
+                    {
+                        i--;
+                        continue;
+                    }
+                }
+                else
+                {
+                    generatedProperties.Add(prop, potency);
+                }
+            }
+
+            return generatedProperties;
+        }
+
+        /// <summary>
+        /// sets item properties to known
+        /// </summary>
+        /// <param name="item">ID of item</param>
+        public static void IdentifyItem(int item)
+        {
+            var substance = EntityManager.GetComponent<SubstanceComponent>(item);
+
+            if (substance == null)
+            {
+                Log.Warning(String.Format("ItemSystem.IdentifyItem: {0} doesn't have SubstanceComponent attached!", DescriptionSystem.GetNameWithID(item)));
+                return;
+            }
+
+            substance.PropertiesKnown = true;
         }
     }
 }

@@ -498,6 +498,7 @@ namespace TheAlchemist
             }
 
             // TODO: resolve other uses
+            // TODO: delete item entity
             ConsumeItem();
             return;
 
@@ -618,6 +619,7 @@ namespace TheAlchemist
         {
             if (UI.CraftingMode)
             {
+                ResetCraftingEvent?.Invoke();
                 UI.CraftingMode = false;
                 LeaveCurrentDomain();
                 // leave inventory open

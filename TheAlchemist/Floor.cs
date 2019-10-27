@@ -16,7 +16,7 @@ namespace TheAlchemist
 {
     using Components;
     using Systems;
-  
+
     public interface IVisionGrid
     {
         bool IsOpaque(Position pos);
@@ -160,7 +160,7 @@ namespace TheAlchemist
             }
 
             if (tile.Structure != 0)
-            { 
+            {
                 var structureCollider = EntityManager.GetComponent<ColliderComponent>(tile.Structure);
 
                 if (structureCollider != null && structureCollider.Solid)
@@ -596,7 +596,7 @@ namespace TheAlchemist
         /// </summary>
         /// <param name="path">string of path to file</param>
         public Floor(string path)
-        {        
+        {
             StreamReader file = new StreamReader(path);
 
 
@@ -770,9 +770,9 @@ namespace TheAlchemist
             FindConnectionPoints();
             ConnectRoomsRDFS();
             CreateStructures();
-            SpawnEnemies();           
+            SpawnEnemies();
             SpawnItems();
-            
+
 
             var riverFrom = new Position(Width / 2 + 3, 1);
             var riverTo = new Position(Width / 2 - 3, Height - 2);
@@ -1004,22 +1004,7 @@ namespace TheAlchemist
 
                 // create random properties for berries
                 var substance = EntityManager.GetComponent<SubstanceComponent>(berries);
-                int propertyCount = Enum.GetValues(typeof(Property)).Length;
-
-                for (int j = 0; j < 2; j++)
-                {
-                    Property prop = (Property)Game.Random.Next(propertyCount);
-                    int potency = Game.Random.Next(-30, 30);
-
-                    if (substance.Properties.ContainsKey(prop))
-                    {
-                        substance.Properties[prop] += potency;
-                    }
-                    else
-                    {
-                        substance.Properties.Add(prop, potency);
-                    }
-                }
+                substance.Properties = ItemSystem.GenerateRandomProperties(2, -30, 30, true);
 
                 // randomize amount
                 EntityManager.GetComponent<ItemComponent>(berries).Count = Game.Random.Next(1, 4);
@@ -1535,7 +1520,7 @@ namespace TheAlchemist
                 return;
             }
 
-            GetTile(pos).Structure = 0; 
+            GetTile(pos).Structure = 0;
         }
 
         public void RemoveItems(Position pos)
