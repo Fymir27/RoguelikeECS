@@ -198,11 +198,9 @@ namespace TheAlchemist.Systems
         {
             var itemComponent = EntityManager.GetComponent<ItemComponent>(item);
 
-            if (itemComponent.Count > 1)
-            {
-                itemComponent.Count--;
-            }
-            else
+            itemComponent.Count--;
+
+            if (itemComponent.Count == 0)
             {
                 RemoveFromInventory(item, character);
             }
@@ -286,8 +284,9 @@ namespace TheAlchemist.Systems
             //    }
             //}
 
-            DecreaseItemCount(character, item);
             IdentifyItem(item);
+            DecreaseItemCount(character, item);
+            TryDeleteItem(item);
             Util.TurnOver(character);
         }
 
@@ -477,6 +476,19 @@ namespace TheAlchemist.Systems
             }
 
             substance.PropertiesKnown = true;
+        }
+
+        /// <summary>
+        /// deletes item if it's count is zero
+        /// </summary>
+        ///  /// <param name="item">ID of item</param>
+        public static void TryDeleteItem(int item)
+        {
+            var info = EntityManager.GetComponent<ItemComponent>(item);
+            if (info.Count == 0)
+            {
+                EntityManager.RemoveEntity(item);
+            }
         }
     }
 }

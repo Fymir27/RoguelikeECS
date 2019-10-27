@@ -84,13 +84,15 @@ namespace TheAlchemist.Systems
 
             UISystem.Message("You just crafted something!");
 
-            //foreach (var item in items)
-            //{
-            //    EntityManager.RemoveEntity(item);
-            //}
-            items.Clear();
             substances.Clear();
-            // TODO: delete item entity
+
+            foreach (var itemID in items)
+            {
+                ItemSystem.TryDeleteItem(itemID);
+            }
+
+            items.Clear();                       
+
             //var description = EntityManager.GetComponent<DescriptionComponent>(newItem);
             //description.Name = "Crafted " + description.Name;
             Util.GetPlayerInventory().Items.Add(newItem);
