@@ -103,6 +103,31 @@ namespace TheAlchemist.Components
             return sb.ToString();
         }
 
+        public override bool Equals(object obj)
+        {
+            if(!base.Equals(obj))
+            {
+                return false;
+            }
+
+            SubstanceComponent other = obj as SubstanceComponent;
+
+            if(this.MaterialType != other.MaterialType)
+            {
+                return false;
+            }
+
+            foreach (var prop in other.Properties.Keys)
+            {
+                if(!this.Properties.Keys.Contains(prop) ||
+                   this.Properties[prop] != other.Properties[prop])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
         /*
         interface PropertyGroup
         {

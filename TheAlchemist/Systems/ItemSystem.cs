@@ -95,21 +95,82 @@ namespace TheAlchemist.Systems
 
             var itemInfo = EntityManager.GetComponent<ItemComponent>(item);
 
+            if (itemInfo.Count == 0) // happens if item comes back from e.g. crafting reset
+            {
+                itemInfo.Count = 1;
+            }
+
             // "Re-Stacking" - item gets handed back from e.g. crafting reset
             if (inventory.Items.Contains(item))
             {              
                 itemInfo.Count++;
                 return true;
+            }        
+
+            #region ItemStacking
+                        
+            IEnumerable<IComponent> newItem = EntityManager.GetComponents(item);
+
+            foreach (var inventoryItemID in inventory.Items)
+            {
+                var inventoryItem = EntityManager.GetComponents(inventoryItemID);
+                bool itemMatch = true;
+                foreach (var newItemComponent in newItem)
+                {
+                    bool componentMatch = false;
+
+                    if (newItemComponent.TypeID == Component<TransformComponent>.TypeID)
+                    {
+                        continue;
+                    }
+
+                    foreach (var inventoryItemComponent in inventoryItem)
+                    {
+                        if(newItemComponent.Equals(inventoryItemComponent))
+                        {
+                            componentMatch = true;
+                            break;
+                        }
+                    }
+
+                    if(!componentMatch)
+                    {
+                        itemMatch = false;
+                        break;
+                    }
+                }
+
+                if(itemMatch == true)
+                {
+                    var invItemInfo = EntityManager.GetComponent<ItemComponent>(inventoryItemID);
+                    int newCount = invItemInfo.Count + itemInfo.Count;
+                    invItemInfo.Count = Math.Min(newCount, invItemInfo.MaxCount);
+                    int itemsLeft = Math.Max(0, newCount - invItemInfo.MaxCount);
+                    // TODO: implement overflow
+                    if (itemsLeft > 0)
+                    {
+                        UISystem.Message(String.Format("{0} x{1} was lost in the void...", DescriptionSystem.GetName(item), itemsLeft));
+                    }
+
+                    EntityManager.RemoveEntity(item);
+                    return true;
+                }
             }
+
+            // at this point, no matching item was found
 
             if (inventory.Full)
             {
                 UISystem.Message("Inventory is full! -> " + DescriptionSystem.GetNameWithID(character));
                 return false;
             }
+            inventory.Items.Add(item);
+            return true;
+
+            #endregion
 
 
-            #region ItemStacking
+
             /*
             var pickupComponentTypeIDs = EntityManager.GetComponentTypeIDs(item);
 
@@ -159,16 +220,9 @@ namespace TheAlchemist.Systems
             */
 
             //if (!match)
-            {
-                inventory.Items.Add(item);
-                if(itemInfo.Count == 0) // happens if item comes back from e.g. crafting reset
-                {
-                    itemInfo.Count = 1;
-                }
-            }
-            #endregion
+            //{
 
-            return true;
+            //}
         }
 
         public void UseItem(int character, int item, ItemUsage usage)

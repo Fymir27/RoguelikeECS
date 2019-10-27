@@ -36,6 +36,23 @@ namespace TheAlchemist.Components
 
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            var otherC = obj as IComponent;
+
+            if (otherC == null)
+            {
+                return false;
+            }
+
+            return otherC.TypeID == TypeID;
+        }
+
         /*
         public override string ToString()
         {

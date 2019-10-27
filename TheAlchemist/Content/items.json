@@ -3,7 +3,7 @@
     {
       "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
       "Count": 1,
-      "MaxCount": 1,
+      "MaxCount": 10,
       "Value": 0,
       "Weight": 0.0,
       "OnGround": true
@@ -37,7 +37,7 @@
     {
       "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
       "Count": 1,
-      "MaxCount": 1,
+      "MaxCount": 5,
       "Value": 0,
       "Weight": 0.0,
       "OnGround": true
@@ -73,7 +73,7 @@
     {
       "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
       "Count": 1,
-      "MaxCount": 1,
+      "MaxCount": 5,
       "Value": 0,
       "Weight": 0.0,
       "OnGround": true
@@ -109,7 +109,7 @@
     {
       "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
       "Count": 1,
-      "MaxCount": 1,
+      "MaxCount": 5,
       "Value": 0,
       "Weight": 0.0,
       "OnGround": true
@@ -145,7 +145,7 @@
     {
       "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
       "Count": 1,
-      "MaxCount": 1,
+      "MaxCount": 5,
       "Value": 0,
       "Weight": 0.0,
       "OnGround": true
@@ -181,7 +181,7 @@
     {
       "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
       "Count": 1,
-      "MaxCount": 1,
+      "MaxCount": 5,
       "Value": 0,
       "Weight": 0.0,
       "OnGround": true
