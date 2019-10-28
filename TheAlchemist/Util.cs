@@ -49,6 +49,16 @@ namespace TheAlchemist
         public static readonly Position Down = new Position(0, -1);
         public static readonly Position Left = new Position(-1, 0);
 
+        public Position[] GetNeighbours()
+        {
+            Position[] result = new Position[4];
+            result[0] = this + Up;
+            result[1] = this + Right;
+            result[2] = this + Down;
+            result[3] = this + Left;
+            return result;
+        }
+
         public static implicit operator Position(Vector2 other) { return new Position((int)other.X, (int)other.Y); }
 
         public static Position operator +(Position first, Position second)

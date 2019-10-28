@@ -50,6 +50,7 @@
     <Compile Include="Components\DescriptionComponent.cs" />
     <Compile Include="Components\DoorComponent.cs" />
     <Compile Include="Components\EqupimentComponent.cs" />
+    <Compile Include="Components\FindableComponent.cs" />
     <Compile Include="Components\HealthComponent.cs" />
     <Compile Include="Components\IComponent.cs" />
     <Compile Include="Components\InteractableComponent.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\InteractionSystem.cs" />
     <Compile Include="Systems\ItemSystem.cs" />
+    <Compile Include="Systems\LocationSystem.cs" />
     <Compile Include="Systems\MovementSystem.cs" />
     <Compile Include="Systems\NPCBehaviourSystem.cs" />
     <Compile Include="Systems\RenderSystem.cs" />
