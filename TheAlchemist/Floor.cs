@@ -28,21 +28,7 @@ namespace TheAlchemist
 
         public bool IsOpaque(Position pos)
         {
-            int terrain = GetTile(pos).Terrain;
-
-            if (terrain == 0)
-            {
-                return false;
-            }
-
-            var collider = EntityManager.GetComponent<ColliderComponent>(terrain);
-
-            if (collider != null)
-            {
-                return collider.Solid;
-            }
-
-            return false;
+            return IsTileBlocked(pos);
         }
 
         public void SetSeen(Position pos)
@@ -175,6 +161,37 @@ namespace TheAlchemist
         public bool IsTileBlocked(Position pos)
         {
             return IsTileBlocked(pos.X, pos.Y);
+        }
+
+        public bool IsBlockingMovement(int entity)
+        {
+            if(entity == 0)
+            {
+                return false;
+            }
+
+            var collider = EntityManager.GetComponent<ColliderComponent>(entity);
+
+            if (collider != null && collider.Solid)
+            {
+                var interactable = EntityManager.GetComponent<InteractableComponent>(entity);
+
+                if (interactable != null)
+                {
+                    return !interactable.ChangeSolidity;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool IsWalkable(Position pos)
+        {
+            Tile tile = GetTile(pos);
+
+            return !(IsBlockingMovement(tile.Terrain) || IsBlockingMovement(tile.Structure));
         }
 
         // -------------------------------------------------
@@ -1078,8 +1095,8 @@ namespace TheAlchemist
             }
 
             //RemoveTerrain(from);
-            PlaceTerrain(from, CreateDoor());
-            PlaceTerrain(to, CreateDoor());
+            PlaceStructure(from, CreateDoor());
+            PlaceStructure(to, CreateDoor());
         }
 
         void ConnectRooms(Room room1, Room room2)
@@ -1121,7 +1138,7 @@ namespace TheAlchemist
 
             foreach (var doorPos in doors)
             {
-                PlaceTerrain(doorPos, CreateDoor());
+                PlaceStructure(doorPos, CreateDoor());
             }
         }
 
@@ -1845,7 +1862,7 @@ namespace TheAlchemist
 
             var line = new List<Position>() { from };
 
-            Position verticalStep = from.Y < to.Y ? Position.Up : Position.Down;
+            Position verticalStep = from.Y > to.Y ? Position.Up : Position.Down;
             Position horizontalStep = from.X < to.X ? Position.Right : Position.Left;
 
             int deltaX = Math.Abs(to.X - from.X);
@@ -1886,7 +1903,7 @@ namespace TheAlchemist
         {
             List<Position> line = new List<Position>() { from };
 
-            Position verticalStep = from.Y < to.Y ? Position.Up : Position.Down;
+            Position verticalStep = from.Y > to.Y ? Position.Up : Position.Down;
             Position horizontalStep = from.X < to.X ? Position.Right : Position.Left;
 
             Position pos = from;
@@ -1941,10 +1958,8 @@ namespace TheAlchemist
                     { Stat.Dexterity, 11 },
                     { Stat.Intelligence, 13 }
                 }),
-                new SubstanceKnowledgeComponent()
-                {
-
-                }
+                new SubstanceKnowledgeComponent(),
+                new FindableComponent()
             };
 
             EntityManager.AddComponents(player, playerComponents);
@@ -1978,7 +1993,7 @@ namespace TheAlchemist
 
         public int CreateDoor()
         {
-            return GameData.Instance.CreateTerrain("door");
+            return GameData.Instance.CreateStructure("door");
         }
 
         public void CreateRiver(Position from, Position to, int width)

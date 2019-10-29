@@ -187,6 +187,8 @@ namespace TheAlchemist
             //EntityManager.Dump();
 
             //Log.Data(DescriptionSystem.GetDebugInfoEntity(Util.GetPlayerInventory().Items[0]));
+
+            LocationSystem.UpdateDistanceMap(Util.PlayerID);
         }
 
         /// <summary>

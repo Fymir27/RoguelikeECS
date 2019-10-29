@@ -77,6 +77,7 @@ namespace TheAlchemist.Systems
                 int distance = findable.DistanceMap[pos.X, pos.Y];
                 if(distance < minDistance)
                 {
+                    minDistance = distance;
                     result = pos;
                 }
                 // if two tiles are the same distance, randomly decide between them
@@ -117,24 +118,52 @@ namespace TheAlchemist.Systems
                 findable.DistanceMap = new int[Util.CurrentFloor.Width, Util.CurrentFloor.Height];
             }
 
-            // fill array
-
-            for (int i = 0; i < findable.DistanceMap.Length; i++)
-            {
-                findable.DistanceMap.GetValue(i);
-            }
+            Util.FillArray2D(findable.DistanceMap, int.MaxValue);
+            bool[,] visited = new bool[Util.CurrentFloor.Width, Util.CurrentFloor.Height];
 
             Queue<Position> todo = new Queue<Position>();
             todo.Enqueue(curPos);
-            int curDistance = 0;
+            visited[curPos.X, curPos.Y] = true;
+            findable.DistanceMap[curPos.X, curPos.Y] = 0;
 
-            while(true)
+            while (todo.Count > 0)
             {
-                foreach (var pos in todo)
+                var pos = todo.Dequeue();
+                //Console.WriteLine(pos.ToString());
+                
+                foreach (var neighbourPos in pos.GetNeighbours())
                 {
-                    findable.DistanceMap[pos.X, pos.Y] = curDistance;
+                    if (!(Util.CurrentFloor.IsOutOfBounds(neighbourPos) || 
+                        visited[neighbourPos.X, neighbourPos.Y] || 
+                        !Util.CurrentFloor.IsWalkable(neighbourPos)))
+                    {
+                        todo.Enqueue(neighbourPos);
+                        visited[neighbourPos.X, neighbourPos.Y] = true;
+                        findable.DistanceMap[neighbourPos.X, neighbourPos.Y] = findable.DistanceMap[pos.X, pos.Y] + 1;
+                    }
                 }
-            }
+            }          
+
+            //StringBuilder sb = new StringBuilder();
+
+            //for (int y = 0; y < findable.DistanceMap.GetLength(1); y++)
+            //{
+            //    for (int x = 0; x < findable.DistanceMap.GetLength(0); x++)                  
+            //    {
+            //        int value = findable.DistanceMap[x, y];
+            //        if(value == int.MaxValue)
+            //        {
+            //            sb.Append("#####");
+            //        }
+            //        else
+            //        {
+            //            sb.Append(String.Format("{0,4} ", value));
+            //        }                    
+            //    }
+            //    sb.AppendLine();
+            //}
+
+            //Log.Data("distance:\n" + sb.ToString());
 
             findable.LastKnownPosition = curPos;
         }

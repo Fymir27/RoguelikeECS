@@ -44,9 +44,9 @@ namespace TheAlchemist
 
         public static readonly Position Zero = new Position(0, 0);
 
-        public static readonly Position Up = new Position(0, 1);
+        public static readonly Position Up = new Position(0, -1);
         public static readonly Position Right = new Position(1, 0);
-        public static readonly Position Down = new Position(0, -1);
+        public static readonly Position Down = new Position(0, 1);
         public static readonly Position Left = new Position(-1, 0);
 
         public Position[] GetNeighbours()
@@ -94,6 +94,21 @@ namespace TheAlchemist
         public override string ToString()
         {
             return "(" + X + "|" + Y + ")";
+        }
+
+        public Direction ToDirection()
+        {
+            if (this == Up)
+                return Direction.North;
+            if (this == Right)
+                return Direction.East;
+            if (this == Down)
+                return Direction.South;
+            if (this == Left)
+                return Direction.West;
+
+            Log.Error("Could not transform Position to Direction: " + this.ToString());
+            return Direction.North;
         }
     }
 
@@ -248,6 +263,7 @@ namespace TheAlchemist
             if (entity == PlayerID)
             {
                 CurrentFloor.CalculateTileVisibility();
+                LocationSystem.UpdateDistanceMap(PlayerID);
                 PlayerTurnOver = true;
                 TurnCount++;
             }
@@ -386,6 +402,17 @@ namespace TheAlchemist
             if (value.CompareTo(min) < 0)
                 return min;
             return value;
+        }
+
+        public static void FillArray2D<T>(T[,] array, T value)
+        {
+            for (int x = 0; x < array.GetLength(0); x++)
+            {
+                for (int y = 0; y < array.GetLength(1); y++)
+                {
+                    array[x, y] = value;
+                }
+            }
         }
     }
 }

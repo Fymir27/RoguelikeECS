@@ -1,41 +1,4 @@
 {
-  "door": [
-    {
-      "$type": "TheAlchemist.Components.InteractableComponent, TheAlchemist",
-      "ChangeSolidity": true,
-      "ChangeTexture": true,
-      "AlternateTexture": "doorOpen"
-    },
-    {
-      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
-      "Name": "Door",
-      "Description": "What may be behind this one?",
-      "SpecialMessages": null,
-      "EntityID": 7038
-    },
-    {
-      "$type": "TheAlchemist.Components.InteractableComponent, TheAlchemist",
-      "EntityID": 7038
-    },
-    {
-      "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
-      "Texture": "doorClosed",
-      "Tint": {
-        "B": 255,
-        "G": 255,
-        "R": 255,
-        "A": 255
-      },
-      "Visible": true,
-      "Layer": 0,
-      "EntityID": 7038
-    },
-    {
-      "$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
-      "Solid": true,
-      "EntityID": 7038
-    }
-  ],
   "wall": [
     {
       "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
