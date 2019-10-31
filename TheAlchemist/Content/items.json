@@ -14,7 +14,11 @@
       "Description": "Still waters run deep!"
     },
     {
-      "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"
+      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
+      "Usages": [
+        "Consume",
+        "Throw"
+      ]
     },
     {
       "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
@@ -48,7 +52,11 @@
       "Description": "Quaff it to regain some health!"
     },
     {
-      "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"
+      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
+      "Usages": [
+        "Consume",
+        "Throw"
+      ]
     },
     {
       "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
@@ -84,7 +92,11 @@
       "Description": "Bad for your health."
     },
     {
-      "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"
+      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
+      "Usages": [
+        "Consume",
+        "Throw"
+      ]
     },
     {
       "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
@@ -120,7 +132,11 @@
       "Description": "Quite a STRONG brew!"
     },
     {
-      "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"
+      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
+      "Usages": [
+        "Consume",
+        "Throw"
+      ]
     },
     {
       "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
@@ -156,7 +172,11 @@
       "Description": "In case you ever want to try knitting."
     },
     {
-      "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"
+      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
+      "Usages": [
+        "Consume",
+        "Throw"
+      ]
     },
     {
       "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
@@ -192,7 +212,11 @@
       "Description": "Won't help you with your test if you didn't study!"
     },
     {
-      "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"
+      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
+      "Usages": [
+        "Consume",
+        "Throw"
+      ]
     },
     {
       "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
@@ -243,7 +267,10 @@
       "PropertiesKnown": false
     },
     {
-      "$type": "TheAlchemist.Components.ConsumableComponent, TheAlchemist"
+      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
+      "Usages": [
+        "Consume",
+      ]
     }
   ]
 }

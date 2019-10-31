@@ -305,10 +305,10 @@ namespace TheAlchemist
                     ConfirmTarget();
                     break;
                 case Command.UseItem:
-                    TryUseItem();
+                    UseItem(ItemUsage.None);
                     break;
                 case Command.ConsumeItem:
-                    ConsumeItem();
+                    UseItem(ItemUsage.Consume);
                     break;
                 case Command.DropItem:
                     break;
@@ -484,63 +484,62 @@ namespace TheAlchemist
         }
 
         /// <summary>
-        /// uses item if item only has one possible usage
-        /// otherwise prints usage information
+        /// checks if item is usable
+        /// prints problems to player if any
         /// </summary>
-        private void TryUseItem()
+        /// <returns> wether item is usable </returns>
+        private bool ItemUsable(int item, ItemUsage usage)
         {
-            var item = Util.GetCurrentItem();
-
-            if(item == 0)
+            if (item == 0)
             {
                 UISystem.Message("Your inventory is empty!");
-                return;
+                return false;
             }
-
-            // TODO: resolve other uses
-            // TODO: delete item entity
-            ConsumeItem();
-            return;
 
             var usableItem = EntityManager.GetComponent<UsableItemComponent>(item);
 
             if (usableItem == null)
             {
                 UISystem.Message("You can't use that!");
-                return;
+                return false;
             }
 
-            if (usableItem.Usages.Count == 1) // only one possible usage
+            if(!usableItem.Usages.Contains(usage))
             {
-                UseItem(usableItem.Usages[0]);
-                return;
-            }
-
-            UISystem.Message("What do you want to do with this item?");
-
-            foreach (var action in usableItem.Usages)
-            {
-                Keys key = Keys.None;
-                switch (action)
+                UISystem.Message("Item usage:");
+                foreach (var action in usableItem.Usages)
                 {
-                    case ItemUsage.Consume:
-                        key = GetKeybinding(Command.ConsumeItem, CommandDomain.Inventory);
-                        break;
+                    Keys key = Keys.None;
+                    switch (action)
+                    {
+                        case ItemUsage.Consume:
+                            key = GetKeybinding(Command.ConsumeItem, CommandDomain.Inventory);
+                            break;
 
-                    case ItemUsage.Throw:
-                        key = GetKeybinding(Command.ThrowItem, CommandDomain.Inventory);
-                        break;
+                        case ItemUsage.Throw:
+                            key = GetKeybinding(Command.ThrowItem, CommandDomain.Inventory);
+                            break;
+                    }
+                    UISystem.Message(key + " -> " + action);
                 }
-                UISystem.Message(key + " -> " + action);
+                return false;
             }
+            return true;
         }
+        
 
         private void UseItem(ItemUsage usage)
         {
-
             var item = Util.GetCurrentItem();
+
+            if(!ItemUsable(item, usage))
+            {
+                return;
+            }
+
+            var usableItem = EntityManager.GetComponent<UsableItemComponent>(item);
+
             ItemUsedEvent?.Invoke(ControlledEntity, item, usage);
-            //ToggleInventory();
         }
 
         private void ConsumeItem()
@@ -561,6 +560,11 @@ namespace TheAlchemist
             }
 
             ItemConsumedEvent?.Invoke(ControlledEntity, item);
+        }
+
+        private void ThrowItem()
+        {
+
         }
 
         /// <summary>

@@ -59,6 +59,7 @@
     <Compile Include="Components\CraftableComponent.cs" />
     <Compile Include="Components\SubstanceComponent.cs" />
     <Compile Include="Components\SubstanceKnowledgeComponent.cs" />
+    <Compile Include="Components\ThrowableComponent.cs" />
     <Compile Include="Components\UsableItemComponent.cs" />
     <Compile Include="Components\NPCComponent.cs" />
     <Compile Include="Components\PlayerComponent.cs" />

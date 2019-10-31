@@ -12,13 +12,6 @@ namespace TheAlchemist.Systems
 {
     using Components;
 
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum ItemUsage
-    {
-        Consume,
-        Throw
-    }
-
     public delegate void ItemPickupHandler(int character);
     public delegate bool ItemAddedHandler(int character, int item);
     public delegate void ItemUsedHandler(int character, int item, ItemUsage usage);
@@ -250,8 +243,8 @@ namespace TheAlchemist.Systems
                     break;
 
                 case ItemUsage.Throw:
+                    // TODO: throwing range
                     InputManager.Instance.InitiateTargeting((pos) => ThrowItem(character, item, pos));
-                    //UISystem.Message("Throwing items is not yet implemented");
                     break;
             }
         }
@@ -277,79 +270,7 @@ namespace TheAlchemist.Systems
         {
             UISystem.Message(String.Format("{0} consumes {1}", DescriptionSystem.GetNameWithID(character), DescriptionSystem.GetNameWithID(item)));
 
-            var substance = EntityManager.GetComponent<SubstanceComponent>(item);
-
-            Dictionary<Property, int> properties = null;
-
-            if (substance == null)
-            {
-                Log.Warning("Consumable Item does not have SubstanceComponent attached!");
-            }
-            else
-            {
-                properties = substance.Properties;
-            }
-
-            if (properties == null || properties.Count == 0)
-            {
-                UISystem.Message("That had no effect...");
-                DecreaseItemCount(character, item);
-                Util.TurnOver(character);
-                return;
-            }
-
-            foreach (var prop in properties)
-            {
-                switch (prop.Key)
-                {
-                    // --- Resource --- //
-                    case Property.Health:
-                        if (prop.Value < 0)
-                            HealthLostEvent?.Invoke(character, -prop.Value);
-                        else
-                            HealthGainedEvent?.Invoke(character, prop.Value);
-                        break;
-
-                    // --- Stat --- //
-                    case Property.Str:
-                    case Property.Dex:
-                    case Property.Int:
-                        Stat stat = GetStatFromItemProperty(prop.Key);
-                        StatChangedEvent?.Invoke(character, stat, prop.Value, prop.Value * 2);
-                        break;
-
-                    default:
-                        UISystem.Message(String.Format("Item effect not implemented: {0} ({1})", prop.Key.ToString(), prop.Value));
-                        break;
-                }
-            }
-            //var itemEffects = EntityManager.GetComponent<UsableItemComponent>(item).Effects;
-
-            //foreach (var effect in itemEffects)
-            //{
-            //    switch (effect.Type)
-            //    {
-            //        case EffectType.Health:
-            //            if (effect.Harmful)
-            //                HealthLostEvent?.Invoke(character, effect.Potency * 0.5f);
-            //            else
-            //                HealthGainedEvent?.Invoke(character, effect.Potency * 0.5f);
-            //            break;
-
-            //        case EffectType.Str:
-            //        case EffectType.Dex:
-            //        case EffectType.Int:
-            //            int amount = (int)Math.Round(effect.Potency * 0.1f) * Util.Sign(!effect.Harmful);
-            //            Stat stat = GetStatFromEffectType(effect.Type);
-            //            int duration = 7 * (int)Math.Round(effect.Potency * 0.1f);
-            //            StatChangedEvent?.Invoke(character, stat, amount, duration);
-            //            break;
-
-            //        default:
-            //            UISystem.Message("Consume: " + effect.Type + " not implemented!");
-            //            break;
-            //    }
-            //}
+            ApplySubstance(character, item, 1f);
 
             IdentifyItem(item);
             DecreaseItemCount(character, item);
@@ -360,70 +281,85 @@ namespace TheAlchemist.Systems
         public void ThrowItem(int character, int item, Position pos)
         {
             //UISystem.Message(DescriptionSystem.GetNameWithID(character) + " throws " + DescriptionSystem.GetNameWithID(item) + " at " + pos);
-            UISystem.Message(DescriptionSystem.GetName(character) + " throws " + DescriptionSystem.GetName(item));
+            UISystem.Message(DescriptionSystem.GetName(character) + " throws " + DescriptionSystem.GetName(item));                      
 
-            var usableComponent = EntityManager.GetComponent<UsableItemComponent>(item);
+            if (Util.CurrentFloor.IsTileBlocked(pos))
+            {
+                UISystem.Message("You can't throw that there!");
+                return;
+            }
+
             int targetCharacter = Util.CurrentFloor.GetCharacter(pos);
-            int targetTerrain = Util.CurrentFloor.GetTerrain(pos);
 
             if (targetCharacter == 0)
             {
-                if (usableComponent.BreakOnThrow)
-                {
-                    UISystem.Message("The item breaks!");
-                }
-                else
-                {
-                    bool solid = false;
-
-                    var collider = EntityManager.GetComponent<ColliderComponent>(targetTerrain);
-                    if (collider != null)
-                    {
-                        solid = collider.Solid;
-                    }
-
-                    if (solid)
-                    {
-                        // TODO: bounce off wall
-                        UISystem.Message("You can't throw that there!");
-                        return;
-                    }
-
-                    Util.CurrentFloor.PlaceItem(pos, item);
-                }
+                Util.CurrentFloor.PlaceItem(pos, item);
             }
             else
             {
                 UISystem.Message("It hits " + DescriptionSystem.GetName(targetCharacter) + "!");
-                foreach (var effect in usableComponent.Effects)
-                {
-                    switch (effect.Type)
-                    {
-                        case EffectType.Health:
-                            if (effect.Harmful)
-                                HealthLostEvent?.Invoke(targetCharacter, effect.Potency * 0.2f);
-                            else
-                                HealthGainedEvent?.Invoke(targetCharacter, effect.Potency * 0.2f);
-                            break;
 
-                        case EffectType.Str:
-                        case EffectType.Dex:
-                        case EffectType.Int:
-                            int amount = (int)Math.Round(effect.Potency * 0.1f * 0.5f) * Util.Sign(!effect.Harmful);
-                            Stat stat = GetStatFromEffectType(effect.Type);
-                            int duration = 7 * (int)Math.Round(effect.Potency * 0.1f * 0.5f);
-                            StatChangedEvent?.Invoke(targetCharacter, stat, amount, duration);
-                            break;
+                // TODO: actually calulate the modifier for effects of thrown items
+                float modifier = 0.5f; 
 
-                        default:
-                            UISystem.Message("Throw: " + effect.Type + " not implemented!");
-                            return;
-                    }
-                }
+                ApplySubstance(targetCharacter, item, modifier);
+
+                IdentifyItem(item);
+                DecreaseItemCount(character, item);
+                TryDeleteItem(item);
+            }
+            
+            Util.TurnOver(character);
+        }
+
+        void ResolveProperty(Property prop, int value, int target)
+        {
+            switch (prop)
+            {
+                // --- Resource --- //
+                case Property.Health:
+                    if (value < 0)
+                        HealthLostEvent?.Invoke(target, -value);
+                    else
+                        HealthGainedEvent?.Invoke(target, value);
+                    break;
+
+                // --- Stat --- //
+                case Property.Str:
+                case Property.Dex:
+                case Property.Int:
+                    Stat stat = GetStatFromItemProperty(prop);
+                    StatChangedEvent?.Invoke(target, stat, value, value * 2);
+                    break;
+
+                default:
+                    UISystem.Message(String.Format("Item effect not implemented: {0} ({1})", prop.ToString(), value));
+                    break;
+            }
+        }
+
+        void ApplySubstance(int target, int item, float modifier)
+        {
+            var substance = EntityManager.GetComponent<SubstanceComponent>(item);
+
+            if (substance == null)
+            {
+                Log.Warning("Usable Item does not have SubstanceComponent attached!");
+                return;
             }
 
-            DecreaseItemCount(character, item);
-            Util.TurnOver(character);
+            Dictionary<Property, int> properties = substance.Properties;           
+
+            if (properties == null || properties.Count == 0)
+            {
+                UISystem.Message("That had no effect...");               
+                return;
+            }
+
+            foreach (var prop in properties)
+            {
+                ResolveProperty(prop.Key, (int)Math.Round(prop.Value * modifier), target);
+            }
         }
 
         /// <summary>
