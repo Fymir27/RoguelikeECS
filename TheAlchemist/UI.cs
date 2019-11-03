@@ -120,6 +120,7 @@ namespace TheAlchemist
                 var pos = EntityManager.GetComponent<TransformComponent>(Util.TargetIndicatorID).Position;
                 int character = Util.CurrentFloor.GetCharacter(pos);
                 int item = Util.CurrentFloor.GetFirstItem(pos);
+                int structure = Util.CurrentFloor.GetStructure(pos);
                 int terrain = Util.CurrentFloor.GetTerrain(pos);
 
                 int descrEntity = 0;
@@ -131,6 +132,10 @@ namespace TheAlchemist
                 else if (item != 0)
                 {
                     descrEntity = item;
+                }
+                else if(structure != 0)
+                {
+                    descrEntity = structure;
                 }
                 else if (terrain != 0)
                 {
