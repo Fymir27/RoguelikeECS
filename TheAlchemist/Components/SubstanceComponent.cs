@@ -27,7 +27,7 @@ namespace TheAlchemist.Components
         // Elemental
         Fire,
         Water,
-        Earth,
+        Nature,
         Wind
     }
 
@@ -51,7 +51,7 @@ namespace TheAlchemist.Components
             {
                 PropertyType.Elemental, new Property[]
                 {
-                    Property.Fire, Property.Water, Property.Earth, Property.Wind
+                    Property.Fire, Property.Water, Property.Nature, Property.Wind
                 }
             }
         };

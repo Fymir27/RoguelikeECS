@@ -141,9 +141,9 @@ namespace TheAlchemist.Systems
 
             if (stats != null)
             {
-                tooltip.Append("Strength:     " + stats[Stat.Strength] + '\n');
-                tooltip.Append("Dexterity:    " + stats[Stat.Dexterity] + '\n');
-                tooltip.Append("Intelligence: " + stats[Stat.Intelligence] + '\n');
+                tooltip.Append("Strength:     " + stats.BaseStats[BaseStat.Strength] + '\n');
+                tooltip.Append("Dexterity:    " + stats.BaseStats[BaseStat.Dexterity] + '\n');
+                tooltip.Append("Intelligence: " + stats.BaseStats[BaseStat.Intelligence] + '\n');
             }
 
             return tooltip.ToString();

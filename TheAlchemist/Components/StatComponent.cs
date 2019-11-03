@@ -6,38 +6,51 @@ using System.Threading.Tasks;
 
 namespace TheAlchemist.Components
 {
-    public enum Stat
+    public enum BaseStat
     {
         Strength,
         Intelligence,
         Dexterity
     }
 
+    public enum ElementalResistance
+    {
+        Fire,
+        Water,
+        Nature,
+        Wind
+    }
+
     class StatComponent : Component<StatComponent>
     {
         public StatComponent()
         {
-            stats = new Dictionary<Stat, int>();
-        }
+            int baseStatCount = Enum.GetValues(typeof(BaseStat)).Length;
 
-        public StatComponent(Dictionary<Stat, int> initStats)
-        {
-            stats = initStats;
-        }
+            BaseStats = new Dictionary<BaseStat, int>(baseStatCount);
 
-        Dictionary<Stat, int> stats;
-        public int this[Stat stat]
-        {
-            get
+            for (int i = 0; i < baseStatCount; i++)
             {
-                int val = 0;
-                stats.TryGetValue(stat, out val);
-                return val;
+                BaseStats[(BaseStat)i] = 0;
             }
-            set
+
+            int resistanceStatCount = Enum.GetValues(typeof(ElementalResistance)).Length;
+
+            ResistanceStats = new Dictionary<ElementalResistance, int>(resistanceStatCount);
+
+            for (int i = 0; i < resistanceStatCount; i++)
             {
-                stats[stat] = value;
+                ResistanceStats[(ElementalResistance)i] = 0;
             }
         }
+
+        public StatComponent(Dictionary<BaseStat, int> baseStats, Dictionary<ElementalResistance, int> resistanceStats)
+        {
+            this.BaseStats = baseStats;
+            this.ResistanceStats = resistanceStats;
+        }
+
+        public Dictionary<BaseStat, int> BaseStats { get; set; }
+        public Dictionary<ElementalResistance, int> ResistanceStats { get; set; }
     }
 }

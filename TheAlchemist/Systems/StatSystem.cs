@@ -14,18 +14,18 @@ namespace TheAlchemist.Systems
     /// <param name="stat">affected stat</param>
     /// <param name="amount">amount of change</param>
     /// <param name="duration">duration (0 means permanent)</param>
-    public delegate void StatChangedHandler(int entity, Stat stat, int amount, int duration);
+    public delegate void StatChangedHandler(int entity, BaseStat stat, int amount, int duration);
 
     /// <summary>
     /// holds info about a stat modification for a certain entity
     /// </summary>
     class StatModification
     {
-        public Stat Stat;
+        public BaseStat Stat;
         public int Amount;
         public int Duration;
 
-        public StatModification(Stat stat, int amount, int duration)
+        public StatModification(BaseStat stat, int amount, int duration)
         {            
             Stat = stat;
             Amount = amount;
@@ -37,7 +37,7 @@ namespace TheAlchemist.Systems
     {
         Dictionary<int, List<StatModification>> modifications = new Dictionary<int, List<StatModification>>();
 
-        public void ChangeStat(int entity, Stat stat, int amount, int duration)
+        public void ChangeStat(int entity, BaseStat stat, int amount, int duration)
         {
             var stats = EntityManager.GetComponent<StatComponent>(entity);
 
@@ -47,6 +47,8 @@ namespace TheAlchemist.Systems
                 return;
             }
 
+            var baseStats = stats.BaseStats;
+
             if(duration < 0)
             {
                 Log.Warning("Stat modification duration can't be smaller than zero!");
@@ -55,14 +57,14 @@ namespace TheAlchemist.Systems
 
             if(duration == 0) // permanent!
             {
-                stats[stat] += amount;
+                baseStats[stat] += amount;
                 UISystem.Message("Some attributes of " + DescriptionSystem.GetName(entity) + " have changed! (permanent)");
                 return;
             }
 
             // add modifications to stats and add to dict for tracking
 
-            stats[stat] += amount;
+            baseStats[stat] += amount;
 
             var mod = new StatModification(stat, amount, duration + 1); // add one to duration to compensate for turn of use
 
@@ -94,6 +96,8 @@ namespace TheAlchemist.Systems
             // unless the entity got its stat component removed this should never be null
             var statsOfEntity = EntityManager.GetComponent<StatComponent>(entity);
 
+            var baseStats = statsOfEntity.BaseStats;
+
             bool effectRemoved = false;
             for (int i = 0; i < modsOfEntity.Count; i++)
             {
@@ -106,7 +110,7 @@ namespace TheAlchemist.Systems
                 if (mod.Duration == 0)
                 {
                     // reverse modification and remove from dict                 
-                    statsOfEntity[mod.Stat] -= mod.Amount;
+                    baseStats[mod.Stat] -= mod.Amount;
                     modifications[entity].Remove(mod);
                     effectRemoved = true;
                 }

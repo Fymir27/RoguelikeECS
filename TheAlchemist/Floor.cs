@@ -1952,12 +1952,21 @@ namespace TheAlchemist
                 new ColliderComponent() { Solid = false },
                 new EquipmentComponent() { Weapon = playerWeapon, Armor = playerArmor },
                 new InventoryComponent() { Capacity = 50 },
-                new StatComponent(new Dictionary<Stat, int>()
-                {
-                    { Stat.Strength, 10 },
-                    { Stat.Dexterity, 11 },
-                    { Stat.Intelligence, 13 }
-                }),
+                new StatComponent(
+                    new Dictionary<BaseStat, int>()
+                    {
+                        { BaseStat.Strength, 10 },
+                        { BaseStat.Dexterity, 11 },
+                        { BaseStat.Intelligence, 12 },
+                    },
+                    new Dictionary<ElementalResistance, int>()
+                    {
+                        { ElementalResistance.Fire, 0 },
+                        { ElementalResistance.Nature, 0 },
+                        { ElementalResistance.Water, 0 },
+                        { ElementalResistance.Wind, 0 }
+                    }
+                ),
                 new SubstanceKnowledgeComponent(),
                 new FindableComponent()
             };
