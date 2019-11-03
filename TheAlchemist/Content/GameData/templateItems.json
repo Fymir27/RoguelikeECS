@@ -1,0 +1,76 @@
+{
+  "potion": [
+    {
+      "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
+      "Count": 1,
+      "MaxCount": 10,
+      "Value": 0,
+      "Weight": 0.0,
+      "OnGround": true
+    },
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "TemplatePotion",
+      "Description": "DESCRIPTION"
+    },
+    {
+      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
+      "Usages": [
+        "Consume",
+        "Throw"
+      ]
+    },
+    {
+      "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+      "Texture": "potion",
+      "Tint": {
+        "B": 255,
+        "G": 255,
+        "R": 255,
+        "A": 255
+      }
+    },
+    {
+      "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
+      "Properties": {},
+      "PropertiesKnown": false,
+      "MaterialType": "Potion"
+    }
+  ],
+  "berry": [
+    {
+      "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
+      "Count": 1,
+      "MaxCount": 10,
+      "Value": 0,
+      "Weight": 0.0,
+      "OnGround": true
+    },
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Weird Berries",
+      "Description": "Are they edible?"
+    },
+    {
+      "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+      "Texture": "square",
+      "Tint": {
+        "B": 255,
+        "G": 255,
+        "R": 255,
+        "A": 255
+      }
+    },
+    {
+      "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
+      "Properties": {},
+      "PropertiesKnown": false
+    },
+    {
+      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
+      "Usages": [
+        "Consume"
+      ]
+    }
+  ]
+}

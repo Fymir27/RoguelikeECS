@@ -73,7 +73,7 @@ namespace TheAlchemist
             Log.Message("Seed: " + Seed);
 
             var gameData = GameData.Instance = new GameData();
-            gameData.Load(Util.ContentPath);
+            gameData.Load(Util.ContentPath + "/GameData");
 
             //Floor test = new Floor(Content.RootDirectory + "/map.txt");
             Floor testFloor = new Floor();

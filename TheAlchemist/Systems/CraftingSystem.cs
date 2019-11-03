@@ -173,7 +173,7 @@ namespace TheAlchemist.Systems
 
         public int CreatePotion(Dictionary<Property, int> properties)
         {
-            int potion = GameData.Instance.CreateItem("water");
+            int potion = GameData.Instance.CreateTemplateItem("potion");
             var substance = EntityManager.GetComponent<SubstanceComponent>(potion);
             substance.Properties = properties;
 

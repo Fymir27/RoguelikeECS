@@ -21,6 +21,8 @@ namespace TheAlchemist
         // string json = Entities[type][name]
         public Dictionary<EntityType, Dictionary<string, string>> Entities = new Dictionary<EntityType, Dictionary<string, string>>();
 
+        public Dictionary<string, string> TemplateItems = new Dictionary<string, string>();
+
         public void Load(string basePath)
         {
             try
@@ -33,6 +35,7 @@ namespace TheAlchemist
 
                 Log.Message("Loading items...");
                 Entities[EntityType.Item] = LoadEntities(basePath + "/items.json");
+                TemplateItems = LoadEntities(basePath + "/templateItems.json");
 
                 Log.Message("Loading characters...");
                 Entities[EntityType.Character] = LoadEntities(basePath + "/characters.json");
@@ -88,6 +91,11 @@ namespace TheAlchemist
             return TryCreateEntity(Entities[EntityType.Item], name, EntityType.Item);
         }
 
+        public int CreateTemplateItem(string name)
+        {
+            return TryCreateEntity(TemplateItems, name, EntityType.Item);
+        }
+
         public int CreateTerrain(string name)
         {
             return TryCreateEntity(Entities[EntityType.Terrain], name, EntityType.Terrain);
@@ -100,17 +108,26 @@ namespace TheAlchemist
 
         private Dictionary<string, string> LoadEntities(string path)
         {
-            string rawText = File.ReadAllText(path);
-            JObject entitiesJson = JObject.Parse(rawText);
-
-            var dict = new Dictionary<string, string>();
-
-            foreach (var entity in entitiesJson)
+            try
             {
-                dict.Add(entity.Key, entity.Value.ToString());
-            }
+                string rawText = File.ReadAllText(path);
+                JObject entitiesJson = JObject.Parse(rawText);
 
-            return dict; //Util.DeserializeObject<Dictionary<string, string>>(rawText);
+                var dict = new Dictionary<string, string>();
+
+                foreach (var entity in entitiesJson)
+                {
+                    dict.Add(entity.Key, entity.Value.ToString());
+                }
+
+                return dict; //Util.DeserializeObject<Dictionary<string, string>>(rawText);
+            }
+            catch(Exception e)
+            {
+                Log.Error("Failed to load entities from " + path);
+                Log.Data(e.Message);
+                throw e;
+            }
         }
     }
 }

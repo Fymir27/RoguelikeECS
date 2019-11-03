@@ -1013,7 +1013,7 @@ namespace TheAlchemist
                 PlaceStructure(spawnPos, bush);
 
                 // create berries to grow on bush
-                int berries = data.CreateItem("uselessBerry");
+                int berries = data.CreateTemplateItem("berry");
 
                 // add to bush
                 var interactable = EntityManager.GetComponent<InteractableComponent>(bush);

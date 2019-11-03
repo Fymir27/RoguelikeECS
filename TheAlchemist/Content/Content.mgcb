@@ -20,9 +20,6 @@
 /processorParam:TextureFormat=Compressed
 /build:big.spritefont
 
-#begin characters.json
-/copy:characters.json
-
 #begin default.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -30,11 +27,23 @@
 /processorParam:TextureFormat=Compressed
 /build:default.spritefont
 
-#begin items.json
-/copy:items.json
+#begin GameData/characters.json
+/copy:GameData/characters.json
 
-#begin keybindings.json
-/copy:keybindings.json
+#begin GameData/items.json
+/copy:GameData/items.json
+
+#begin GameData/keybindings.json
+/copy:GameData/keybindings.json
+
+#begin GameData/structures.json
+/copy:GameData/structures.json
+
+#begin GameData/templateItems.json
+/copy:GameData/templateItems.json
+
+#begin GameData/terrain.json
+/copy:GameData/terrain.json
 
 #begin map.txt
 /copy:map.txt
@@ -292,10 +301,4 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Sprites/wall.png
-
-#begin structures.json
-/copy:structures.json
-
-#begin terrain.json
-/copy:terrain.json
 

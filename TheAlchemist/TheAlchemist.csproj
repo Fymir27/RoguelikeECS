@@ -159,12 +159,14 @@
     <None Include="app.manifest" />
     <None Include="Content\big.spritefont" />
     <None Include="Content\default.spritefont" />
-    <None Include="Content\items.json" />
-    <None Include="Content\keybindings.json" />
+    <None Include="Content\GameData\characters.json" />
+    <None Include="Content\GameData\items.json" />
+    <None Include="Content\GameData\keybindings.json" />
+    <None Include="Content\GameData\structures.json" />
+    <None Include="Content\GameData\templateItems.json" />
+    <None Include="Content\GameData\terrain.json" />
     <None Include="Content\monospace.spritefont" />
     <None Include="Content\small.spritefont" />
-    <None Include="Content\structures.json" />
-    <None Include="Content\terrain.json" />
     <None Include="Meta\the_alchemist_design.md" />
     <None Include="Meta\todo.md" />
     <None Include="packages.config" />
@@ -174,7 +176,6 @@
     <Folder Include="Events\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Content\characters.json" />
     <Content Include="Content\map.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
