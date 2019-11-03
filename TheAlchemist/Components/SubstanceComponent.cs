@@ -117,6 +117,11 @@ namespace TheAlchemist.Components
                 return false;
             }
 
+            if(this.Properties.Count != other.Properties.Count)
+            {
+                return false;
+            }
+
             foreach (var prop in other.Properties.Keys)
             {
                 if(!this.Properties.Keys.Contains(prop) ||
