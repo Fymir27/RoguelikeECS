@@ -106,6 +106,7 @@ namespace TheAlchemist.Systems
             Log.Message("Crafting successful:");
             Log.Data(info);
 
+            Util.TurnOver(Util.PlayerID);
             return true;
         }
 

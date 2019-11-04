@@ -333,7 +333,7 @@ namespace TheAlchemist.Systems
                 case Property.Water:
                 case Property.Wind:
                     Stat stat = prop.ToStat();
-                    StatChangedEvent?.Invoke(target, stat, value, value * 2);
+                    StatChangedEvent?.Invoke(target, stat, value, Math.Abs(value * 2));
                     break;
 
                 default:
@@ -383,8 +383,6 @@ namespace TheAlchemist.Systems
             }
 
             inventory.Items.Remove(item);
-
-            UI.InventoryCursorPosition = 1;
         }
 
         private Stat GetStatFromEffectType(EffectType effect)
