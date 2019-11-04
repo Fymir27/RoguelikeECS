@@ -68,6 +68,27 @@ namespace TheAlchemist.Components
             Log.Warning("Property " + prop.ToString() + " does not have dedicated Property Type!");
             return PropertyType.None;
         }
+
+        public static Stat ToStat(this Property prop)
+        {          
+            switch (prop)
+            {
+                // base stats
+                case Property.Str: return Stat.Strength;
+                case Property.Dex: return Stat.Dexterity;
+                case Property.Int: return Stat.Intelligence;
+
+                // Resistance / Affinity
+                case Property.Fire: return Stat.Fire;
+                case Property.Water: return Stat.Water;
+                case Property.Nature: return Stat.Nature;
+                case Property.Wind: return Stat.Wind;
+
+                default:
+                    Log.Error(String.Format("Could not convert Property {0} to Stat!", prop.ToString()));
+                    return Stat.Strength;
+            }
+        }
     }
 
 

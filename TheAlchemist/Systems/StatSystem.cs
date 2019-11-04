@@ -14,18 +14,18 @@ namespace TheAlchemist.Systems
     /// <param name="stat">affected stat</param>
     /// <param name="amount">amount of change</param>
     /// <param name="duration">duration (0 means permanent)</param>
-    public delegate void StatChangedHandler(int entity, BaseStat stat, int amount, int duration);
+    public delegate void StatChangedHandler(int entity, Stat stat, int amount, int duration);
 
     /// <summary>
     /// holds info about a stat modification for a certain entity
     /// </summary>
     class StatModification
     {
-        public BaseStat Stat;
+        public Stat Stat;
         public int Amount;
         public int Duration;
 
-        public StatModification(BaseStat stat, int amount, int duration)
+        public StatModification(Stat stat, int amount, int duration)
         {            
             Stat = stat;
             Amount = amount;
@@ -37,7 +37,7 @@ namespace TheAlchemist.Systems
     {
         Dictionary<int, List<StatModification>> modifications = new Dictionary<int, List<StatModification>>();
 
-        public void ChangeStat(int entity, BaseStat stat, int amount, int duration)
+        public void ChangeStat(int entity, Stat stat, int amount, int duration)
         {
             var stats = EntityManager.GetComponent<StatComponent>(entity);
 
@@ -47,7 +47,7 @@ namespace TheAlchemist.Systems
                 return;
             }
 
-            var baseStats = stats.BaseStats;
+            var baseStats = stats.Values;
 
             if(duration < 0)
             {
@@ -96,9 +96,10 @@ namespace TheAlchemist.Systems
             // unless the entity got its stat component removed this should never be null
             var statsOfEntity = EntityManager.GetComponent<StatComponent>(entity);
 
-            var baseStats = statsOfEntity.BaseStats;
+            var stats = statsOfEntity.Values;
 
             bool effectRemoved = false;
+            List<StatModification> toBeRemoved = new List<StatModification>();
             for (int i = 0; i < modsOfEntity.Count; i++)
             {
                 var mod = modsOfEntity[i];
@@ -109,11 +110,16 @@ namespace TheAlchemist.Systems
 
                 if (mod.Duration == 0)
                 {
-                    // reverse modification and remove from dict                 
-                    baseStats[mod.Stat] -= mod.Amount;
-                    modifications[entity].Remove(mod);
+                    // reverse modification and mark for removal              
+                    stats[mod.Stat] -= mod.Amount;
+                    toBeRemoved.Add(mod);
                     effectRemoved = true;
                 }
+            }
+
+            foreach (var mod in toBeRemoved)
+            {
+                modsOfEntity.Remove(mod);
             }
 
             if(effectRemoved)

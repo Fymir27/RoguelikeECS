@@ -198,5 +198,48 @@
       "PropertiesKnown": true,
       "MaterialType": "Potion"
     }
+  ],
+  "elementalPotion": [
+    {
+      "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
+      "Count": 1,
+      "MaxCount": 5,
+      "Value": 0,
+      "Weight": 0.0,
+      "OnGround": true
+    },
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Potion of Elements",
+      "Description": "Elementary, my dear Alchemist!"
+    },
+    {
+      "$type": "TheAlchemist.Components.UsableItemComponent, TheAlchemist",
+      "Usages": [
+        "Consume",
+        "Throw"
+      ]
+    },
+    {
+      "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+      "Texture": "potion",
+      "Tint": {
+        "B": 255,
+        "G": 0,
+        "R": 255,
+        "A": 255
+      }
+    },
+    {
+      "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
+      "Properties": {
+        "Fire": 20,
+        "Wind": 20,
+        "Water": 20,
+        "Nature": 20
+      },
+      "PropertiesKnown": true,
+      "MaterialType": "Potion"
+    }
   ]
 }

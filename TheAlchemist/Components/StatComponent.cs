@@ -6,15 +6,13 @@ using System.Threading.Tasks;
 
 namespace TheAlchemist.Components
 {
-    public enum BaseStat
+    public enum Stat
     {
+        // Base
         Strength,
         Intelligence,
-        Dexterity
-    }
-
-    public enum ElementalResistance
-    {
+        Dexterity,
+        // Resistance / Affinity
         Fire,
         Water,
         Nature,
@@ -25,32 +23,24 @@ namespace TheAlchemist.Components
     {
         public StatComponent()
         {
-            int baseStatCount = Enum.GetValues(typeof(BaseStat)).Length;
+            int baseStatCount = Enum.GetValues(typeof(Stat)).Length;
 
-            BaseStats = new Dictionary<BaseStat, int>(baseStatCount);
+            Values = new Dictionary<Stat, int>(baseStatCount);
 
             for (int i = 0; i < baseStatCount; i++)
             {
-                BaseStats[(BaseStat)i] = 0;
-            }
-
-            int resistanceStatCount = Enum.GetValues(typeof(ElementalResistance)).Length;
-
-            ResistanceStats = new Dictionary<ElementalResistance, int>(resistanceStatCount);
-
-            for (int i = 0; i < resistanceStatCount; i++)
-            {
-                ResistanceStats[(ElementalResistance)i] = 0;
+                Values[(Stat)i] = 0;
             }
         }
 
-        public StatComponent(Dictionary<BaseStat, int> baseStats, Dictionary<ElementalResistance, int> resistanceStats)
+        public StatComponent(Dictionary<Stat, int> stats) : this()
         {
-            this.BaseStats = baseStats;
-            this.ResistanceStats = resistanceStats;
+            foreach (var tuple in stats)
+            {
+                Values[tuple.Key] = tuple.Value;
+            }
         }
 
-        public Dictionary<BaseStat, int> BaseStats { get; set; }
-        public Dictionary<ElementalResistance, int> ResistanceStats { get; set; }
+        public Dictionary<Stat, int> Values { get; set; }
     }
 }

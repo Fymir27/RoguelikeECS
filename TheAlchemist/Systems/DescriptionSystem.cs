@@ -141,9 +141,34 @@ namespace TheAlchemist.Systems
 
             if (stats != null)
             {
-                tooltip.Append("Strength:     " + stats.BaseStats[BaseStat.Strength] + '\n');
-                tooltip.Append("Dexterity:    " + stats.BaseStats[BaseStat.Dexterity] + '\n');
-                tooltip.Append("Intelligence: " + stats.BaseStats[BaseStat.Intelligence] + '\n');
+                tooltip.Append("Strength:     " + stats.Values[Stat.Strength] + '\n');     // 0
+                tooltip.Append("Intelligence: " + stats.Values[Stat.Intelligence] + '\n'); // 1
+                tooltip.Append("Dexterity:    " + stats.Values[Stat.Dexterity] + '\n');    // 2
+                tooltip.AppendLine("---");
+
+                int statCount = Enum.GetValues(typeof(Stat)).Length;
+
+                // iterate through remaining stats
+                int printed = 0;
+                for (int i = (int)Stat.Dexterity + 1; i < statCount; i++)
+                {
+                    Stat stat = (Stat)i;
+                    int value = stats.Values[stat];
+                    if (value != 0)
+                    {
+                        if (printed++ > 0)
+                        {
+                            tooltip.Append(", ");
+
+                            if ((printed - 1) % 3 == 0)
+                            {
+                                tooltip.AppendLine();
+                            }
+                        }
+
+                        tooltip.AppendFormat("{0}: {1}", stat, value);                                                 
+                    }
+                }
             }
 
             return tooltip.ToString();

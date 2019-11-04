@@ -1,2 +1,6 @@
 Input rework
 UI rework
+Player Sound/Stealth (Stealth potion?)
+Multi-Tile entities
+Elemental attacks/resistance
+Correct Stat stacking

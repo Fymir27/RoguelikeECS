@@ -328,17 +328,12 @@ namespace TheAlchemist.Systems
                 case Property.Str:
                 case Property.Dex:
                 case Property.Int:
-                    BaseStat stat = GetBaseStatFromItemProperty(prop);
-                    StatChangedEvent?.Invoke(target, stat, value, value * 2);
-                    break;
-
                 case Property.Fire:
                 case Property.Nature:
                 case Property.Water:
                 case Property.Wind:
-                    ElementalResistance res = GetResistanceStatFromItemProperty(prop);
-                    UISystem.Message("Your resistances shift!");
-                    // TODO: acutally implement resistances
+                    Stat stat = prop.ToStat();
+                    StatChangedEvent?.Invoke(target, stat, value, value * 2);
                     break;
 
                 default:
@@ -392,42 +387,30 @@ namespace TheAlchemist.Systems
             UI.InventoryCursorPosition = 1;
         }
 
-        private BaseStat GetStatFromEffectType(EffectType effect)
+        private Stat GetStatFromEffectType(EffectType effect)
         {
             switch (effect)
             {
-                case EffectType.Str: return BaseStat.Strength;
+                case EffectType.Str: return Stat.Strength;
 
-                case EffectType.Dex: return BaseStat.Dexterity;
+                case EffectType.Dex: return Stat.Dexterity;
 
-                case EffectType.Int: return BaseStat.Intelligence;
+                case EffectType.Int: return Stat.Intelligence;
 
                 default:
                     Log.Error("Can't get Stat from this Item Effect Type: " + effect);
-                    return BaseStat.Strength;
+                    return Stat.Strength;
             }
         }
 
-        private BaseStat GetBaseStatFromItemProperty(Property prop)
+        private Stat GetBaseStatFromItemProperty(Property prop)
         {
             switch (prop)
             {
-                case Property.Str: return BaseStat.Strength;
-                case Property.Dex: return BaseStat.Dexterity;
-                case Property.Int: return BaseStat.Intelligence;
+                case Property.Str: return Stat.Strength;
+                case Property.Dex: return Stat.Dexterity;
+                case Property.Int: return Stat.Intelligence;
                 default: throw new ArgumentException("Can't get Stat from this Item Property: " + prop.ToString(), "prop");
-            }
-        }
-
-        private ElementalResistance GetResistanceStatFromItemProperty(Property prop)
-        {
-            switch (prop)
-            {
-                case Property.Fire: return ElementalResistance.Fire;
-                case Property.Nature: return ElementalResistance.Nature;
-                case Property.Water: return ElementalResistance.Water;
-                case Property.Wind: return ElementalResistance.Wind;              
-                default: throw new ArgumentException("Can't get Resistance from this Item Property: " + prop.ToString(), "prop");
             }
         }
 
