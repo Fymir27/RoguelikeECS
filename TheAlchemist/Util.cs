@@ -414,5 +414,17 @@ namespace TheAlchemist
                 }
             }
         }
+
+        public static int ChangeValueByPercentage(int value, int percent)
+        {
+            if(percent == 0)
+            {
+                return value;
+            }
+
+            float ratio = 1f + percent / 100f;
+
+            return (int)Math.Round(value * ratio);
+        }
     }
 }

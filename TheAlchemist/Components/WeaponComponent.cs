@@ -8,6 +8,6 @@ namespace TheAlchemist.Components
 {
     class WeaponComponent : Component<WeaponComponent>
     {
-        public float Damage { get; set; }
+        public List<Systems.Damage> Damages { get; set; }
     }
 }

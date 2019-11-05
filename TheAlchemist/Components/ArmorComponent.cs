@@ -8,7 +8,7 @@ namespace TheAlchemist.Components
 {
     class ArmorComponent : Component<ArmorComponent>
     {
-        public float FlatMitigation { get; set; }
-        public float PercentMitigation { get; set; }
+        public int FlatMitigation { get; set; }
+        public int PercentMitigation { get; set; }
     }
 }

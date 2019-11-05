@@ -63,6 +63,7 @@
     },
     {
       "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
+      "MaterialType": "Plant",
       "Properties": {},
       "PropertiesKnown": false
     },
