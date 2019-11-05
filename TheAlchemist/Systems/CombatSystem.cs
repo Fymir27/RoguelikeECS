@@ -96,7 +96,7 @@ namespace TheAlchemist.Systems
             foreach (var damage in damages)
             {
                 // TODO: handle different damage types (separate events?)
-                RaiseHealthLostEvent(defender, Game.Random.Next(damage.Min, damage.Max));
+                RaiseHealthLostEvent(defender, Game.Random.Next(damage.Min, damage.Max + 1));
             }
 
             HandleAttackMessage(attacker, defender);

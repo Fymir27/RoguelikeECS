@@ -1941,7 +1941,7 @@ namespace TheAlchemist
             List<IComponent> playerComponents = new List<IComponent>()
             {
                 new DescriptionComponent() { Name = "Player", Description = "That's you!" },
-                new HealthComponent() { Amount = 30, Max = 30, RegenerationAmount = 0.3f },
+                new HealthComponent() { Amount = 30, Max = 30, RegenerationAmount = 0.1f },
                 new PlayerComponent(),
                 new RenderableSpriteComponent { Visible = true, Texture = "player" },
                 new ColliderComponent() { Solid = false },

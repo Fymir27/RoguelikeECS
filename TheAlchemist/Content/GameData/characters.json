@@ -25,8 +25,8 @@
 			"Visible": true
 		},
 		{
-			"$type": "TheAlchemist.Components.InventoryComponent, TheAlchemist",
-			"Capacity": 1
+			"$type": "TheAlchemist.Components.EquipmentComponent, TheAlchemist",
+			"weaponName": "ratBite"
 		}
 	],
 	"bat": [
@@ -55,8 +55,8 @@
 			"Visible": true
 		},
 		{
-			"$type": "TheAlchemist.Components.InventoryComponent, TheAlchemist",
-			"Capacity": 1
+			"$type": "TheAlchemist.Components.EquipmentComponent, TheAlchemist",
+			"weaponName": "batBite"
 		}
 	],
 	"spider": [
@@ -85,8 +85,8 @@
 			"Visible": true
 		},
 		{
-			"$type": "TheAlchemist.Components.InventoryComponent, TheAlchemist",
-			"Capacity": 1
+			"$type": "TheAlchemist.Components.EquipmentComponent, TheAlchemist",
+			"weaponName": "spiderBite"
 		}
 	]
 }

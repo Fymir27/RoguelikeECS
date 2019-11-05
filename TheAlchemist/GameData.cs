@@ -30,12 +30,12 @@ namespace TheAlchemist
                 Log.Message("Loading terrain...");
                 Entities[EntityType.Terrain] = LoadEntities(basePath + "/terrain.json");
 
-                Log.Message("Loading structures...");
-                Entities[EntityType.Structure] = LoadEntities(basePath + "/structures.json");
-
                 Log.Message("Loading items...");
                 Entities[EntityType.Item] = LoadEntities(basePath + "/items.json");
                 TemplateItems = LoadEntities(basePath + "/templateItems.json");
+
+                Log.Message("Loading structures...");
+                Entities[EntityType.Structure] = LoadEntities(basePath + "/structures.json");             
 
                 Log.Message("Loading characters...");
                 Entities[EntityType.Character] = LoadEntities(basePath + "/characters.json");

@@ -118,5 +118,61 @@
         }
       ]
     }
+  ],
+  "spiderBite": [
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Spider Bite",
+      "Description": "-"
+    },
+    {
+      "$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+      "Damages": [
+        {
+          "Type": "Piercing",
+          "Min": 2,
+          "Max": 5
+        },
+        {
+          "Type": "Nature",
+          "Min": 2,
+          "Max": 5
+        }
+      ]
+    }
+  ],
+  "batBite": [
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Bat Bite",
+      "Description": "-"
+    },
+    {
+      "$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+      "Damages": [
+        {
+          "Type": "Piercing",
+          "Min": 2,
+          "Max": 5
+        }
+      ]
+    }
+  ],
+  "ratBite": [
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Spider Bite",
+      "Description": "-"
+    },
+    {
+      "$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+      "Damages": [
+        {
+          "Type": "Piercing",
+          "Min": 3,
+          "Max": 7
+        }
+      ]
+    }
   ]
 }
