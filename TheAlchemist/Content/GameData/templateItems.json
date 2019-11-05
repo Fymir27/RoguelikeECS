@@ -73,5 +73,50 @@
         "Consume"
       ]
     }
+  ],
+  "lightArmor": [
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Light Armor",
+      "Description": "Only offers a little bit of protection"
+    },
+    {
+      "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
+      "Count": 1,
+      "MaxCount": 1,
+      "Value": 0,
+      "Weight": 0.0,
+      "OnGround": false
+    },
+    {
+      "$type": "TheAlchemist.Components.ArmorComponent, TheAlchemist",
+      "FlatMitigation": 1,
+      "PercentMitigation": 10
+    }
+  ],
+  "dagger": [
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Dagger",
+      "Description": "If you wanna stab a bi... monster!"
+    },
+    {
+      "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
+      "Count": 1,
+      "MaxCount": 1,
+      "Value": 0,
+      "Weight": 0.0,
+      "OnGround": false
+    },
+    {
+      "$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+      "Damages": [
+        {
+          "Type": "Piercing",
+          "Min": 5,
+          "Max": 10
+        }
+      ]
+    }
   ]
 }

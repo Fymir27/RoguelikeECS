@@ -87,11 +87,11 @@ namespace TheAlchemist.Systems
                 weaponDamages.Add(defaultDamage);
             }
 
-            Log.Data("Damages pre mitigation:\n" + Util.GetStringFromEnumerable(weaponDamages));
+            //Log.Data("Damages pre mitigation:\n" + Util.GetStringFromEnumerable(weaponDamages));
 
             var damages = GetDamagesAfterMitigation(weaponDamages, defender);
 
-            Log.Data("Damages after mitigation:\n" + Util.GetStringFromEnumerable(damages));
+            //Log.Data("Damages after mitigation:\n" + Util.GetStringFromEnumerable(damages));
 
             foreach (var damage in damages)
             {
@@ -156,13 +156,13 @@ namespace TheAlchemist.Systems
 
             if (equipment == null)
             {
-                Log.Warning("Can't get Weapon from " + DescriptionSystem.GetNameWithID(entity) + "; No EquipmentComponent attached!");
+                //Log.Warning("Can't get Weapon from " + DescriptionSystem.GetNameWithID(entity) + "; No EquipmentComponent attached!");
                 return null;
             }
 
             if (equipment.Weapon == 0)
             {
-                Log.Warning("Can't get Weapon from " + DescriptionSystem.GetNameWithID(entity) + "; No weapon equipped!");
+                //Log.Warning("Can't get Weapon from " + DescriptionSystem.GetNameWithID(entity) + "; No weapon equipped!");
                 return null;
             }
 
@@ -175,13 +175,13 @@ namespace TheAlchemist.Systems
 
             if (equipment == null)
             {
-                Log.Warning("Can't get Armor from " + DescriptionSystem.GetNameWithID(entity) + "; No EquipmentComponent attached!");
+                //Log.Warning("Can't get Armor from " + DescriptionSystem.GetNameWithID(entity) + "; No EquipmentComponent attached!");
                 return null;
             }
 
             if (equipment.Armor == 0)
             {
-                Log.Warning("Can't get Armor from " + DescriptionSystem.GetNameWithID(entity) + "; No armor equipped!");
+                //Log.Warning("Can't get Armor from " + DescriptionSystem.GetNameWithID(entity) + "; No armor equipped!");
                 return null;
             }
 
@@ -215,11 +215,6 @@ namespace TheAlchemist.Systems
 
             var statC = EntityManager.GetComponent<StatComponent>(target);
 
-            if(statC == null)
-            {
-                Log.Warning("Can't get elemental resistances from " + DescriptionSystem.GetNameWithID(target) + "; Missing StatComponent");               
-            }
-
             foreach (var damage in damages)
             {
                 if(damage.Type.IsElemental())
@@ -236,8 +231,8 @@ namespace TheAlchemist.Systems
                     Damage modifiedDamage = new Damage()
                     {
                         Type = damage.Type,
-                        Min = Util.ChangeValueByPercentage(damage.Min, -percentChange),
-                        Max = Util.ChangeValueByPercentage(damage.Max, -percentChange)
+                        Min = Util.ChangeValueByPercentage(damage.Min, percentChange),
+                        Max = Util.ChangeValueByPercentage(damage.Max, percentChange)
                     };
 
                     result.Add(modifiedDamage);

@@ -1935,8 +1935,8 @@ namespace TheAlchemist
         public static int CreatePlayer()
         {
             int player = EntityManager.CreateEntity(EntityType.Character);
-            int playerWeapon = GameData.Instance.CreateItem("dagger");
-            int playerArmor = GameData.Instance.CreateItem("lightArmor");        
+            int playerWeapon = GameData.Instance.CreateTemplateItem("dagger");
+            int playerArmor = GameData.Instance.CreateTemplateItem("lightArmor");        
 
             List<IComponent> playerComponents = new List<IComponent>()
             {
