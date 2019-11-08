@@ -836,17 +836,27 @@ namespace TheAlchemist
             File.WriteAllText(Util.ContentPath + "/terrain.json", Util.SerializeObject(terrain, true));
             */
 
+            // spawn player in the middle of room 0
             var playerPos = rooms[0].Pos + new Position(rooms[0].Width / 2, rooms[0].Height / 2);
+
+            // if there already is a creature there, just remove it entirely
+            int oldChar = GetCharacter(playerPos);
+            if (oldChar != 0)
+            {
+                EntityManager.RemoveEntity(oldChar);
+                RemoveCharacter(playerPos);
+            }
+
             PlaceCharacter(playerPos, CreatePlayer());
 
-            int size = 5;
-            for (y = playerPos.Y - size; y <= playerPos.Y + size; y++)
-            {
-                for (x = playerPos.X - size; x <= playerPos.X + size; x++)
-                {
-                    GetTile(x, y).Discovered = true;
-                }
-            }
+            //int size = 5;
+            //for (y = playerPos.Y - size; y <= playerPos.Y + size; y++)
+            //{
+            //    for (x = playerPos.X - size; x <= playerPos.X + size; x++)
+            //    {
+            //        GetTile(x, y).Discovered = true;
+            //    }
+            //}
 
             //PlaceCharacter(new Position(Width / 2, Height / 2), CreatePlayer());
         }
@@ -1655,7 +1665,15 @@ namespace TheAlchemist
                 return;
             }
             //characters[pos.X, pos.Y] = character;
-            GetTile(pos).Character = character;
+            var tile = GetTile(pos);
+            if(tile.Character != 0)
+            {
+                Log.Warning(String.Format("You place {0} at {1} when there already is {2}!", 
+                    DescriptionSystem.GetNameWithID(character), 
+                    pos, 
+                    DescriptionSystem.GetNameWithID(tile.Character)));
+            }
+            tile.Character = character;
         }
 
         public void PlaceStructure(Position pos, int structure)

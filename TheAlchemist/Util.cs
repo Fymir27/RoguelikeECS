@@ -415,6 +415,26 @@ namespace TheAlchemist
             }
         }
 
+        /// <summary>
+        /// Tries to add a new key/value pair to the dictionary
+        /// if the key already exists, the new value is added to the existing one 
+        /// </summary>
+        /// <typeparam name="K"> Key type </typeparam>
+        /// <param name="dict"> dictionary to modify </param>
+        /// <param name="key"> key where value should be added</param>
+        /// <param name="newVal"> new value that should be added </param>
+        public static void AddOrIncrease<K>(this Dictionary<K, int> dict, K key, int newVal)
+        {
+            if(dict.ContainsKey(key))
+            {
+                dict[key] += newVal;
+            }
+            else
+            {
+                dict[key] = newVal;
+            }
+        }
+
         public static int ChangeValueByPercentage(int value, int percent)
         {
             if(percent == 0)

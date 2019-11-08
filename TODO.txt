@@ -2,5 +2,6 @@ Input rework
 UI rework
 Player Sound/Stealth (Stealth potion?)
 Multi-Tile entities
-Elemental attacks/resistance
 Correct Stat stacking
+Better enemy AI
+Better dungeon layout generation

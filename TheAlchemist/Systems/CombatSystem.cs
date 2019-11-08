@@ -55,7 +55,7 @@ namespace TheAlchemist.Systems
         }
     }
 
-    struct Damage
+    struct DamageRange
     {
         public DamageType Type;
         public int Min;
@@ -63,7 +63,7 @@ namespace TheAlchemist.Systems
 
         public override string ToString()
         {
-            return String.Format("[{0}, {1} - {2}]", Type, Min, Max);
+            return String.Format("({0} - {1}, {2})", Min, Max, Type);
         }
     }
 
@@ -71,11 +71,11 @@ namespace TheAlchemist.Systems
     {
         public event HealthLostHandler HealthLostEvent;
 
-        private Damage defaultDamage = new Damage()
+        private DamageRange defaultDamage = new DamageRange()
         {
-            Type = DamageType.Piercing,
-            Min = 3,
-            Max = 7
+            Type = DamageType.True,
+            Min = 1,
+            Max = 1
         };
 
         public void HandleBasicAttack(int attacker, int defender)
@@ -89,17 +89,27 @@ namespace TheAlchemist.Systems
 
             //Log.Data("Damages pre mitigation:\n" + Util.GetStringFromEnumerable(weaponDamages));
 
-            var damages = GetDamagesAfterMitigation(weaponDamages, defender);
+            // group together all damages by type and roll damage between min and max
+            Dictionary<DamageType, int> preMitigionDamage = new Dictionary<DamageType, int>();
 
-            //Log.Data("Damages after mitigation:\n" + Util.GetStringFromEnumerable(damages));
-
-            foreach (var damage in damages)
+            foreach (var damage in weaponDamages)
             {
-                // TODO: handle different damage types (separate events?)
-                RaiseHealthLostEvent(defender, Game.Random.Next(damage.Min, damage.Max + 1));
+                int damageValue = Game.Random.Next(damage.Min, damage.Max + 1);
+                preMitigionDamage.AddOrIncrease(damage.Type, damageValue);
             }
 
-            HandleAttackMessage(attacker, defender);
+            var finalDamages = GetDamagesAfterMitigation(preMitigionDamage, defender);
+
+            //Log.Data("Damages after mitigation:\n" + Util.GetStringFromEnumerable(damages));
+            Log.Message(DescriptionSystem.GetNameWithID(defender) + " gets hit for: " + Util.GetStringFromCollection(finalDamages));
+
+            foreach (var damage in finalDamages)
+            {
+                // TODO: handle different damage types (separate events?)
+                RaiseHealthLostEvent(defender, damage.Value);
+            }
+
+            HandleAttackMessage(attacker, defender, finalDamages);
 
             Util.TurnOver(attacker);
         }
@@ -109,7 +119,7 @@ namespace TheAlchemist.Systems
             HealthLostEvent?.Invoke(entity, amount);
         }
 
-        void HandleAttackMessage(int attacker, int defender)
+        void HandleAttackMessage(int attacker, int defender, Dictionary<DamageType, int> damages)
         {
             var posAttacker = EntityManager.GetComponent<TransformComponent>(attacker).Position;
             var posDefender = EntityManager.GetComponent<TransformComponent>(defender).Position;
@@ -147,6 +157,22 @@ namespace TheAlchemist.Systems
             }
 
             sb.Append("!");
+
+            // e.g. "(69 fire, 42 water, ...)"
+            sb.Append(" (");
+            for (int i = 0; i < damages.Count; i++)
+            {
+                if(i > 0)
+                {
+                    sb.Append(", ");
+                }              
+                sb.AppendFormat("{0} {1}", 
+                    damages.ElementAt(i).Value, 
+                    damages.ElementAt(i).Key);
+            }
+
+            sb.Append(")");
+
             UISystem.Message(sb.ToString());
         }
 
@@ -188,13 +214,13 @@ namespace TheAlchemist.Systems
             return EntityManager.GetComponent<ArmorComponent>(equipment.Armor);
         }
 
-        public static List<Damage> GetWeaponDamage(int entity)
+        public static List<DamageRange> GetWeaponDamage(int entity)
         {
             var weaponC = GetEquippedWeapon(entity);
 
             if (weaponC == null)
             {
-                return new List<Damage>();
+                return new List<DamageRange>();
             }
 
             return weaponC.Damages;
@@ -207,57 +233,50 @@ namespace TheAlchemist.Systems
         /// <param name="damages"> damages before any mitigation </param>
         /// <param name="target"> ID of target entity </param>
         /// <returns> list of damages after mitigation </returns>
-        public static List<Damage> GetDamagesAfterMitigation(List<Damage> damages, int target)
+        public static Dictionary<DamageType, int> GetDamagesAfterMitigation(Dictionary<DamageType, int> damages, int target)
         {
-            var result = new List<Damage>();
+            var result = new Dictionary<DamageType, int>();
 
             var armor = GetEquippedArmor(target);
 
             var statC = EntityManager.GetComponent<StatComponent>(target);
 
-            foreach (var damage in damages)
+            foreach (var tuple in damages)
             {
-                if(damage.Type.IsElemental())
+                var type = tuple.Key;
+                var value = tuple.Value;
+
+                if(type.IsElemental())
                 {
                     if(statC == null)
                     {                       
-                        result.Add(damage); // Add unmitigated damage
+                        result.Add(type, value); // Add unmitigated damage
                         continue;
                     }
 
-                    Stat resistingStat = damage.Type.ResistedBy();
+                    Stat resistingStat = type.ResistedBy();
                     int percentChange = -statC.Values[resistingStat];
 
-                    Damage modifiedDamage = new Damage()
-                    {
-                        Type = damage.Type,
-                        Min = Util.ChangeValueByPercentage(damage.Min, percentChange),
-                        Max = Util.ChangeValueByPercentage(damage.Max, percentChange)
-                    };
+                    var modifiedValue = Util.ChangeValueByPercentage(value, percentChange);
 
-                    result.Add(modifiedDamage);
+                    result.Add(type, modifiedValue);                   
                 }
-                else if(damage.Type.IsPhysical())
+                else if(type.IsPhysical())
                 {
                     if(armor == null)
                     {
-                        result.Add(damage); // Add unmitigated damage
+                        result.Add(type, value); // Add unmitigated damage
                         continue;
                     }
 
-                    Damage modifiedDamage = new Damage()
-                    {
-                        Type = damage.Type,
-                        // make sure physical damage isn't negative because of flat mitigation
-                        Min = Math.Max(0, Util.ChangeValueByPercentage(damage.Min, -armor.PercentMitigation) - armor.FlatMitigation),
-                        Max = Math.Max(0, Util.ChangeValueByPercentage(damage.Max, -armor.PercentMitigation) - armor.FlatMitigation)
-                    };
+                    var modifiedValue = Util.ChangeValueByPercentage(value, -armor.PercentMitigation);
+                    modifiedValue = Math.Max(0, modifiedValue - armor.FlatMitigation);
 
-                    result.Add(modifiedDamage);
+                    result.Add(type, modifiedValue);
                 }
                 else // should only be true damage left
                 {
-                    result.Add(damage);
+                    result.Add(type, value);
                 }
             }
 
