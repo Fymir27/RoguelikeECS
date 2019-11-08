@@ -26,17 +26,29 @@
 		},
 		{
 			"$type": "TheAlchemist.Components.EquipmentComponent, TheAlchemist",
-			"weaponName": "ratBite"
+			"weaponComponents": [
+				{
+					"$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+					"Damages": [
+						{
+							"Type": "Piercing",
+							"Min": 3,
+							"Max": 7
+						}
+					]
+				}
+			],
+			"armorComponents": []
 		}
 	],
-	"bat": [
+	"bat_fire": [
 		{
 			"$type": "TheAlchemist.Components.NPCComponent, TheAlchemist"
 		},
 		{
 			"$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
-			"Name": "Bat",
-			"Description": "Flying animal that navigates using echolocation."
+			"Name": "Fire Bat",
+			"Description": "Fiery flying animal that navigates using echolocation."
 		},
 		{
 			"$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
@@ -51,12 +63,28 @@
 		},
 		{
 			"$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
-			"Texture": "bat",
+			"Texture": "bat_fire",
 			"Visible": true
 		},
 		{
 			"$type": "TheAlchemist.Components.EquipmentComponent, TheAlchemist",
-			"weaponName": "batBite"
+			"weaponComponents": [
+				{
+					"$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+					"Damages": [
+						{
+							"Type": "Piercing",
+							"Min": 1,
+							"Max": 3
+						},
+						{
+							"Type": "Fire",
+							"Min": 2,
+							"Max": 5
+						}
+					]
+				}
+			]
 		}
 	],
 	"spider": [
@@ -86,7 +114,23 @@
 		},
 		{
 			"$type": "TheAlchemist.Components.EquipmentComponent, TheAlchemist",
-			"weaponName": "spiderBite"
+			"weaponComponents": [
+				{
+					"$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+					"Damages": [
+						{
+							"Type": "Piercing",
+							"Min": 2,
+							"Max": 5
+						},
+						{
+							"Type": "Nature",
+							"Min": 2,
+							"Max": 5
+						}
+					]
+				}
+			]
 		}
 	]
 }

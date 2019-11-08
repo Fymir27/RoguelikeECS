@@ -11,7 +11,7 @@ namespace TheAlchemist.Components
         public int Weapon { get; set; } // entityID
         public int Armor { get; set; }  // entityID
 
-        [Newtonsoft.Json.JsonConstructor]
+        //[Newtonsoft.Json.JsonConstructor]
         public EquipmentComponent(string weaponName, string armorName)
         { 
             if(weaponName != null && weaponName != "")
@@ -21,6 +21,19 @@ namespace TheAlchemist.Components
             if (armorName != null && armorName != "")
             {
                 Armor = GameData.Instance.CreateTemplateItem(armorName);
+            }
+        }
+
+        [Newtonsoft.Json.JsonConstructor]
+        public EquipmentComponent(string weaponName, string armorName, List<IComponent> weaponComponents, List<IComponent> armorComponents) : this(weaponName, armorName)
+        {
+            if(weaponComponents != null && weaponComponents.Count > 0)
+            {
+                Weapon = EntityManager.CreateEntity(weaponComponents, EntityType.Item);
+            }
+            if(armorComponents != null && armorComponents.Count > 0)
+            {
+                Armor = EntityManager.CreateEntity(armorComponents, EntityType.Item);
             }
         }
 
