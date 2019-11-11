@@ -172,6 +172,24 @@ namespace TheAlchemist
                 GameData.Instance.CreateItem("elementalPotion")
             });
 
+            var anchor = Util.GetPlayerPos() + Position.Right;
+            int mound = GameData.Instance.CreateCharacter("mound");
+            var multiTileC = EntityManager.GetComponent<MultiTileComponent>(mound);
+            multiTileC.Anchor = anchor;
+            multiTileC.FlippedHorizontally = false;
+            multiTileC.OccupationMatrix = new bool[,] { { true, false, true }, { true, true, true } };
+
+            testFloor.PlaceCharacter(anchor, mound);
+            testFloor.PlaceCharacter(anchor + Position.Right, mound);
+            anchor += Position.Down;
+            testFloor.PlaceCharacter(anchor, mound);
+            testFloor.PlaceCharacter(anchor + Position.Right, mound);
+            anchor += Position.Down;
+            testFloor.PlaceCharacter(anchor, mound);
+            testFloor.PlaceCharacter(anchor + Position.Right, mound);
+
+            Log.Data(DescriptionSystem.GetDebugInfoEntity(mound));
+
             //int testBush = GameData.Instance.CreateStructure("bush");
             //testFloor.PlaceStructure(Util.GetPlayerPos() + Position.Left, testBush);
 

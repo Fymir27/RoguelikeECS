@@ -57,6 +57,7 @@
     <Compile Include="Components\InventoryComponent.cs" />
     <Compile Include="Components\ItemComponent.cs" />
     <Compile Include="Components\CraftableComponent.cs" />
+    <Compile Include="Components\MultiTileComponent.cs" />
     <Compile Include="Components\SubstanceComponent.cs" />
     <Compile Include="Components\SubstanceKnowledgeComponent.cs" />
     <Compile Include="Components\UsableItemComponent.cs" />

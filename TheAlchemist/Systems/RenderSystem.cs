@@ -151,7 +151,17 @@ namespace TheAlchemist.Systems
 
                         if (sprite != null && sprite.Visible)
                         {
-                            DrawSprite(sprite, relScreenPos);
+                            var multiTileC = EntityManager.GetComponent<MultiTileComponent>(tile.Character);
+
+                            if (multiTileC == null)
+                            {
+                                DrawSprite(sprite, relScreenPos);
+                            }
+                            else
+                            {
+                                var relAnchor = multiTileC.Anchor - min;
+                                DrawSpriteMultiTile(sprite, relScreenPos, relAnchor, multiTileC.FlippedHorizontally, multiTileC.Width);
+                            }
                         }
                     }
                 }
@@ -190,6 +200,31 @@ namespace TheAlchemist.Systems
         void DrawSprite(RenderableSpriteComponent sprite, Position pos)
         {
             spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), Util.WorldToScreenPosition(pos), sprite.Tint);
+        }
+
+        /// <summary>
+        /// Draws mutli tile sprite to screen
+        /// </summary>
+        /// <param name="sprite">sprite to draw</param>
+        /// <param name="pos">relative screen position</param>
+        /// <param name="relAnchor">anchor of multi tile entity</param>
+        void DrawSpriteMultiTile(RenderableSpriteComponent sprite, Position pos, Position relAnchor, bool flip, int width)
+        {
+            var localOffset = pos - relAnchor;
+
+            if(flip)
+            {
+                localOffset.X = width - 1 - localOffset.X;
+            }
+
+            Point texLocation = new Point(localOffset.X * Util.TileSize, localOffset.Y * Util.TileSize);
+            Point size = new Point(Util.TileSize, Util.TileSize);
+
+            Rectangle sourceRect = new Rectangle(texLocation, size);
+
+            SpriteEffects effects = flip ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+
+            spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), Util.WorldToScreenPosition(pos), sourceRect, sprite.Tint, 0f, Vector2.Zero, Vector2.One, effects, 0f);
         }
     }
 }

@@ -132,5 +132,31 @@
 				}
 			]
 		}
+	],
+	"mound": [
+		{
+			"$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+			"Name": "Mound",
+			"Description": "TODO"
+		},
+		{
+			"$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
+			"Amount": 100.0,
+			"Max": 100.0,
+			"RegenerationAmount": 10.0,
+			"RegenerationProgress": 0.0
+		},
+		{
+			"$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+			"Solid": false
+		},
+		{
+			"$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+			"Texture": "mound",
+			"Visible": true
+		},
+		{
+			"$type": "TheAlchemist.Components.MultiTileComponent, TheAlchemist"
+		}
 	]
 }
