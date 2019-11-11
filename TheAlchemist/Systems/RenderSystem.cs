@@ -199,7 +199,8 @@ namespace TheAlchemist.Systems
         /// <param name="pos">relative screen position</param>
         void DrawSprite(RenderableSpriteComponent sprite, Position pos)
         {
-            spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), Util.WorldToScreenPosition(pos), sprite.Tint);
+            SpriteEffects effects = sprite.FlippedHorizontally ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+            spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), Util.WorldToScreenPosition(pos), null, sprite.Tint, 0f, Vector2.Zero, Vector2.One, effects, 0f);
         }
 
         /// <summary>

@@ -50,6 +50,28 @@ namespace TheAlchemist.Systems
                 return;
             }
 
+            var sprite = EntityManager.GetComponent<RenderableSpriteComponent>(entity);
+
+            if(sprite != null)
+            {
+                if(dir == Direction.West)
+                {
+                    sprite.FlippedHorizontally = true;
+                }
+                else if(dir == Direction.East)
+                {
+                    sprite.FlippedHorizontally = false;
+                }
+            }
+
+            var multiTileC = EntityManager.GetComponent<MultiTileComponent>(entity);
+
+            if(multiTileC != null)
+            {
+                HandleMultiTileMovement(entity, multiTileC, newPos);
+                return;
+            }
+
             int otherCharacter = floor.GetCharacter(newPos);
 
             //check if someone's already there
@@ -129,6 +151,11 @@ namespace TheAlchemist.Systems
             }
 
             Util.TurnOver(entity);
+        }
+
+        private void HandleMultiTileMovement(int entity, MultiTileComponent multiTileC, Position newPos)
+        {
+            throw new NotImplementedException();
         }
 
         // returns wether entityB was solid

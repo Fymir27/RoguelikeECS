@@ -70,6 +70,7 @@ namespace TheAlchemist.Components
     {
         public string Texture { get; set; } // name of texture
         public Color Tint { get; set; } = Color.White;
+        public bool FlippedHorizontally { get; set; } = false; // default: facing right
     }
 
     class RenderableSpriteArrayComponent : RenderableComponent<RenderableSpriteArrayComponent>
