@@ -178,17 +178,13 @@ namespace TheAlchemist
             multiTileC.Anchor = anchor;
             multiTileC.FlippedHorizontally = false;
             multiTileC.OccupationMatrix = new bool[,] { { true, false, true }, { true, true, true } };
+            //multiTileC.OccupiedPositions = new List<Position>();
 
             testFloor.PlaceCharacter(anchor, mound);
-            testFloor.PlaceCharacter(anchor + Position.Right, mound);
-            anchor += Position.Down;
-            testFloor.PlaceCharacter(anchor, mound);
-            testFloor.PlaceCharacter(anchor + Position.Right, mound);
-            anchor += Position.Down;
-            testFloor.PlaceCharacter(anchor, mound);
-            testFloor.PlaceCharacter(anchor + Position.Right, mound);
 
             Log.Data(DescriptionSystem.GetDebugInfoEntity(mound));
+
+            //movementSystem.HandleMovementEvent(mound, Direction.East);
 
             //int testBush = GameData.Instance.CreateStructure("bush");
             //testFloor.PlaceStructure(Util.GetPlayerPos() + Position.Left, testBush);

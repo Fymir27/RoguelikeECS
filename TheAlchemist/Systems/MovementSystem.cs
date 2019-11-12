@@ -52,13 +52,13 @@ namespace TheAlchemist.Systems
 
             var sprite = EntityManager.GetComponent<RenderableSpriteComponent>(entity);
 
-            if(sprite != null)
+            if (sprite != null)
             {
-                if(dir == Direction.West)
+                if (dir == Direction.West)
                 {
                     sprite.FlippedHorizontally = true;
                 }
-                else if(dir == Direction.East)
+                else if (dir == Direction.East)
                 {
                     sprite.FlippedHorizontally = false;
                 }
@@ -66,7 +66,7 @@ namespace TheAlchemist.Systems
 
             var multiTileC = EntityManager.GetComponent<MultiTileComponent>(entity);
 
-            if(multiTileC != null)
+            if (multiTileC != null)
             {
                 HandleMultiTileMovement(entity, multiTileC, newPos);
                 return;
@@ -95,7 +95,7 @@ namespace TheAlchemist.Systems
 
             int structure = floor.GetStructure(newPos);
 
-            if(structure != 0 && EntityManager.GetComponent<ColliderComponent>(structure) != null)
+            if (structure != 0 && EntityManager.GetComponent<ColliderComponent>(structure) != null)
             {
                 bool solid = RaiseCollisionEvent(entity, structure);
 
@@ -155,8 +155,101 @@ namespace TheAlchemist.Systems
 
         private void HandleMultiTileMovement(int entity, MultiTileComponent multiTileC, Position newPos)
         {
-            throw new NotImplementedException();
+            //bool[,] flippedOccupationMatrix = multiTileC.OccupationMatrix;//.FlipHorizontally();
+
+            //multiTileC.Anchor = newPos;
+
+            //int width = flippedOccupationMatrix.GetLength(0);
+            //int height = flippedOccupationMatrix.GetLength(1);
+
+            var floor = Util.CurrentFloor;
+
+            List<Position> newPositions = new List<Position>();
+
+            foreach (var offsetPos in multiTileC.OccupiedPositions)
+            {
+                var newPartialPos = newPos + offsetPos;
+                int otherCharacter = floor.GetCharacter(newPartialPos);
+
+                //check if someone's already there
+                if (otherCharacter != 0 && otherCharacter != entity)
+                {
+                    // check if collidable
+                    if (EntityManager.GetComponent<ColliderComponent>(otherCharacter) != null)
+                    {
+                        //TODO: talk to npcs?
+                        RaiseBasicAttackEvent(entity, otherCharacter);
+                        return; // don't move
+                    }
+                    else
+                    {
+                        Log.Warning("Character without collider:");
+                        Log.Data(DescriptionSystem.GetDebugInfoEntity(otherCharacter));
+                        UISystem.Message("Something seems to be there...");
+                        return;
+                    }
+                }
+
+                int structure = floor.GetStructure(newPartialPos);
+
+                if (structure != 0 && EntityManager.GetComponent<ColliderComponent>(structure) != null)
+                {
+                    bool solid = RaiseCollisionEvent(entity, structure);
+
+                    // check if interactable
+                    var interactable = EntityManager.GetComponent<InteractableComponent>(structure);
+
+                    // only interact with structures right away if they're solid ("bumping" into them)
+                    if (interactable != null && solid)
+                    {
+                        RaiseInteractionEvent(entity, structure);
+                        return;
+                    }
+                }
+
+
+                int terrain = floor.GetTerrain(newPartialPos);
+
+                // check if collidable with
+                if (terrain != 0 && EntityManager.GetComponent<ColliderComponent>(terrain) != null)
+                {
+                    // check if terrain is solid before possible interaction
+                    // this is because solidity might be changed by interaction (e.g. door gets opened)
+                    bool solid = RaiseCollisionEvent(entity, terrain);
+
+                    // check if interactable
+                    var interactable = EntityManager.GetComponent<InteractableComponent>(terrain);
+                    if (interactable != null)
+                    {
+                        RaiseInteractionEvent(entity, terrain);
+                    }
+
+                    // check if terrain is solid
+                    if (solid)
+                    {
+                        return; // don't move
+                    }
+                }
+
+                //trigger special Message on step on
+                if (entity == Util.PlayerID && terrain != 0)
+                {
+                    string message = (DescriptionSystem.GetSpecialMessage(terrain, DescriptionComponent.MessageType.StepOn));
+
+                    if (message.Length > 0)
+                    {
+                        UISystem.Message(message);
+                    }
+                }
+
+                // TODO: implement automatic item pickup?
+            }
+
+            floor.RemoveCharacter(multiTileC.Anchor);
+            floor.PlaceCharacter(newPos, entity);
+            Util.TurnOver(entity);
         }
+
 
         // returns wether entityB was solid
         private bool RaiseCollisionEvent(int entityA, int entityB)

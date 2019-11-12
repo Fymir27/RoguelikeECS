@@ -1496,6 +1496,30 @@ namespace TheAlchemist
             return true;
         }
 
+        public bool RemoveEntityMultiTile(Position pos, int entity, MultiTileComponent multiTileC)
+        {
+            if (entity == 0)
+            {
+                Log.Warning("Trying to remove entity from " + pos + ": No entity of that type here!");
+                return false;
+            }
+
+            foreach (var offsetPos in multiTileC.OccupiedPositions)
+            {
+                if(IsOutOfBounds(multiTileC.Anchor + offsetPos))
+                {
+                    Log.Warning("Trying to remove " + DescriptionSystem.GetNameWithID(entity) + " out of bounds! " + pos);
+                    return false;
+                }
+            }
+
+            var sprite = EntityManager.GetComponent<RenderableSpriteComponent>(entity);
+
+            if (sprite != null) sprite.Visible = false;
+
+            return true;
+        }
+
         public void RemoveTerrain(Position pos)
         {
             if (IsOutOfBounds(pos))
@@ -1515,21 +1539,29 @@ namespace TheAlchemist
         }
 
         public void RemoveCharacter(Position pos)
-        {
-            if (IsOutOfBounds(pos))
-            {
-                Log.Warning("Can't remove character out of bounds! " + pos);
-                return;
-            }
-
+        {     
             int character = GetTile(pos).Character; // characters[(int)pos.X, (int)pos.Y];
 
-            if (!RemoveEntity(pos, character))
-            {
-                return;
-            }
+            var multiTileC = EntityManager.GetComponent<MultiTileComponent>(character);
 
-            GetTile(pos).Character = 0; // characters[(int)pos.X, (int)pos.Y] = 0;
+            if (multiTileC != null)
+            {
+                if (!RemoveEntityMultiTile(pos, character, multiTileC))
+                {
+                    return;
+                }
+
+                multiTileC.OccupiedPositions.ForEach(offsetPos => GetTile(multiTileC.Anchor + offsetPos).Character = 0);
+            }
+            else
+            {
+                if (!RemoveEntity(pos, character))
+                {
+                    return;
+                }
+
+                GetTile(pos).Character = 0;
+            }
         }
 
         public void RemoveStructure(Position pos)
@@ -1648,6 +1680,45 @@ namespace TheAlchemist
             return true;
         }
 
+        private bool PlaceEntityMultiTile(Position pos, int entity, MultiTileComponent multiTileC)
+        {          
+            foreach (var offsetPos in multiTileC.OccupiedPositions)
+            {
+                var realPos = pos + offsetPos;
+                if(IsOutOfBounds(realPos))
+                {
+                    Log.Warning(String.Format("Trying to place Multi-tile entity {0} out of bounds! Anchor: {1} Offset: {2}", 
+                        DescriptionSystem.GetNameWithID(entity), multiTileC.Anchor, offsetPos));
+                    return false;
+                }              
+            }
+
+            var transform = EntityManager.GetComponent<TransformComponent>(entity);
+
+            if (transform == null)
+            {
+                transform = new TransformComponent();
+                EntityManager.AddComponent(entity, transform);
+            }
+
+            transform.Position = pos;
+            multiTileC.Anchor = pos;
+
+            var sprite = EntityManager.GetComponent<RenderableSpriteComponent>(entity);
+
+            if (sprite == null)
+            {
+                // might be desirable in some cases
+                Log.Warning("Sprite missing for " + DescriptionSystem.GetNameWithID(entity) + "!");
+            }
+            else
+            {
+                sprite.Visible = true;
+            }
+
+            return true;
+        }
+
         public void PlaceTerrain(Position pos, int terrain)
         {
             if (!PlaceEntity(pos, terrain, RenderableSpriteComponent.RenderLayer.Terrain))
@@ -1660,20 +1731,42 @@ namespace TheAlchemist
 
         public void PlaceCharacter(Position pos, int character)
         {
-            if (!PlaceEntity(pos, character, RenderableSpriteComponent.RenderLayer.Character))
+            var multiTileC = EntityManager.GetComponent<MultiTileComponent>(character);
+
+            List<Position> newPositions = new List<Position>();
+
+            if (multiTileC != null)
             {
-                return;
+                if (!PlaceEntityMultiTile(pos, character, multiTileC))
+                {
+                    return;
+                }
+
+                foreach (var offsetPos in multiTileC.OccupiedPositions)
+                {
+                    newPositions.Add(pos + offsetPos);
+                }
             }
-            //characters[pos.X, pos.Y] = character;
-            var tile = GetTile(pos);
-            if(tile.Character != 0)
+            else
             {
-                Log.Warning(String.Format("You place {0} at {1} when there already is {2}!", 
-                    DescriptionSystem.GetNameWithID(character), 
-                    pos, 
-                    DescriptionSystem.GetNameWithID(tile.Character)));
+                if (!PlaceEntity(pos, character, RenderableSpriteComponent.RenderLayer.Character))
+                {
+                    return;
+                }
+
+                newPositions.Add(pos);
             }
-            tile.Character = character;
+
+            if(newPositions.TrueForAll(newPos => GetTile(newPos).Character == 0))
+            {
+                newPositions.ForEach(newPos => GetTile(newPos).Character = character);
+            }
+            else
+            { 
+                Log.Warning(String.Format("Can't place {0} at {1} when there already is/are entitie(s)!",
+                    DescriptionSystem.GetNameWithID(character),
+                    pos));
+            }
         }
 
         public void PlaceStructure(Position pos, int structure)

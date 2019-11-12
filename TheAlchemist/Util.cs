@@ -425,7 +425,7 @@ namespace TheAlchemist
         /// <param name="newVal"> new value that should be added </param>
         public static void AddOrIncrease<K>(this Dictionary<K, int> dict, K key, int newVal)
         {
-            if(dict.ContainsKey(key))
+            if (dict.ContainsKey(key))
             {
                 dict[key] += newVal;
             }
@@ -437,7 +437,7 @@ namespace TheAlchemist
 
         public static int ChangeValueByPercentage(int value, int percent)
         {
-            if(percent == 0)
+            if (percent == 0)
             {
                 return value;
             }
@@ -445,6 +445,25 @@ namespace TheAlchemist
             float ratio = 1f + percent / 100f;
 
             return (int)Math.Round(value * ratio);
+        }
+
+        public static T[,] FlipHorizontally<T>(this T[,] matrix)
+        {
+            int width = matrix.GetLength(0);
+            int height = matrix.GetLength(1);
+
+            T[,] result = new T[width, height];
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int mirroredIndex = width - 1 - x;
+                    result[x, y] = matrix[mirroredIndex, y];
+                }
+            }
+
+            return result;
         }
     }
 }

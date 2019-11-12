@@ -141,9 +141,9 @@
 		},
 		{
 			"$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
-			"Amount": 100.0,
-			"Max": 100.0,
-			"RegenerationAmount": 10.0,
+			"Amount": 10000.0,
+			"Max": 10000.0,
+			"RegenerationAmount": 100.0,
 			"RegenerationProgress": 0.0
 		},
 		{
@@ -156,7 +156,47 @@
 			"Visible": true
 		},
 		{
-			"$type": "TheAlchemist.Components.MultiTileComponent, TheAlchemist"
+			"$type": "TheAlchemist.Components.MultiTileComponent, TheAlchemist",
+			"OccupiedPositions": [
+				{
+					"X": 0,
+					"Y": 0
+				},
+				{
+					"X": 1,
+					"Y": 0
+				},
+				{
+					"X": 0,
+					"Y": 1
+				},
+				{
+					"X": 0,
+					"Y": 2
+				},
+				{
+					"X": 1,
+					"Y": 2
+				}
+			]
+		},
+		{
+			"$type": "TheAlchemist.Components.NPCComponent, TheAlchemist"
+		},
+		{
+			"$type": "TheAlchemist.Components.EquipmentComponent, TheAlchemist",
+			"weaponComponents": [
+				{
+					"$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+					"Damages": [
+						{
+							"Type": "Piercing",
+							"Min": 7,
+							"Max": 12
+						}
+					]
+				}
+			]
 		}
 	]
 }
