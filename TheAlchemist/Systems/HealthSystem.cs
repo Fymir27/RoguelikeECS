@@ -34,6 +34,7 @@ namespace TheAlchemist.Systems
             if (healthComponent.Amount <= 0)
             {
                 UISystem.Message(DescriptionSystem.GetNameWithID(entity) + " dies!");
+                Util.CurrentFloor.RemoveCharacter(LocationSystem.GetPosition(entity));
                 EntityManager.RemoveEntity(entity); // mark entity for deletion
             }
 

@@ -12,7 +12,7 @@
 			"$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
 			"Amount": 10.0,
 			"Max": 10.0,
-			"RegenerationAmount": 1.0,
+			"RegenerationAmount": 0.3,
 			"RegenerationProgress": 0.0
 		},
 		{
@@ -54,7 +54,7 @@
 			"$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
 			"Amount": 10.0,
 			"Max": 10.0,
-			"RegenerationAmount": 1.0,
+			"RegenerationAmount": 0.1,
 			"RegenerationProgress": 0.0
 		},
 		{
@@ -100,7 +100,7 @@
 			"$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
 			"Amount": 10.0,
 			"Max": 10.0,
-			"RegenerationAmount": 1.0,
+			"RegenerationAmount": 0.1,
 			"RegenerationProgress": 0.0
 		},
 		{
@@ -141,9 +141,9 @@
 		},
 		{
 			"$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
-			"Amount": 10000.0,
-			"Max": 10000.0,
-			"RegenerationAmount": 100.0,
+			"Amount": 20.0,
+			"Max": 20.0,
+			"RegenerationAmount": 1.0,
 			"RegenerationProgress": 0.0
 		},
 		{
@@ -157,27 +157,17 @@
 		},
 		{
 			"$type": "TheAlchemist.Components.MultiTileComponent, TheAlchemist",
-			"OccupiedPositions": [
-				{
-					"X": 0,
-					"Y": 0
-				},
-				{
-					"X": 1,
-					"Y": 0
-				},
-				{
-					"X": 0,
-					"Y": 1
-				},
-				{
-					"X": 0,
-					"Y": 2
-				},
-				{
-					"X": 1,
-					"Y": 2
-				}
+			"OccupationMatrix": [
+				[
+					1,
+					1,
+					1
+				],
+				[
+					1,
+					0,
+					1
+				]
 			]
 		},
 		{
@@ -191,10 +181,22 @@
 					"Damages": [
 						{
 							"Type": "Piercing",
-							"Min": 7,
-							"Max": 12
+							"Min": 4,
+							"Max": 6
+						},
+						{
+							"Type": "Slashing",
+							"Min": 4,
+							"Max": 6
 						}
 					]
+				}
+			],
+			"armorComponents": [
+				{
+					"$type": "TheAlchemist.Components.ArmorComponent, TheAlchemist",
+					"PercentMitigation": 20,
+					"FlatMitigation": 2
 				}
 			]
 		}

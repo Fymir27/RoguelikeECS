@@ -67,29 +67,49 @@ namespace TheAlchemist.Systems
             var multiTileC = EntityManager.GetComponent<MultiTileComponent>(entity);
 
             if (multiTileC != null)
-            {
-                HandleMultiTileMovement(entity, multiTileC, newPos);
+            {                   
+                HandleMultiTileMovement(entity, multiTileC, newPos, sprite.FlippedHorizontally);
+                multiTileC.FlippedHorizontally = sprite.FlippedHorizontally;
                 return;
             }
 
+            if (TryMove(entity, newPos))
+            {
+                // Move entity
+                floor.RemoveCharacter(entityTransform.Position);
+                floor.PlaceCharacter(newPos, entity);
+                Util.TurnOver(entity);
+            }                      
+        }
+
+        /// <summary>
+        /// checks if moving onto newPos is possible
+        /// and triggers any interaction otherwise
+        /// </summary>
+        /// <param name="entity">ID of entity to move</param>
+        /// <param name="newPos">new Position to move to</param>
+        /// <returns>wether movement is possible</returns>
+        private bool TryMove(int entity, Position newPos)
+        {
+            var floor = Util.CurrentFloor;
             int otherCharacter = floor.GetCharacter(newPos);
 
             //check if someone's already there
-            if (otherCharacter != 0)
+            if (otherCharacter != 0 && otherCharacter != entity)
             {
                 // check if collidable
                 if (EntityManager.GetComponent<ColliderComponent>(otherCharacter) != null)
                 {
                     //TODO: talk to npcs?
                     RaiseBasicAttackEvent(entity, otherCharacter);
-                    return; // don't move
+                    return false;
                 }
                 else
                 {
                     Log.Warning("Character without collider:");
                     Log.Data(DescriptionSystem.GetDebugInfoEntity(otherCharacter));
                     UISystem.Message("Something seems to be there...");
-                    return;
+                    return false;
                 }
             }
 
@@ -106,7 +126,7 @@ namespace TheAlchemist.Systems
                 if (interactable != null && solid)
                 {
                     RaiseInteractionEvent(entity, structure);
-                    return;
+                    return false;
                 }
             }
 
@@ -129,15 +149,9 @@ namespace TheAlchemist.Systems
                 // check if terrain is solid
                 if (solid)
                 {
-                    return; // don't move
+                    return false;                                                                                                                                                
                 }
             }
-
-            // TODO: implement automatic item pickup?
-
-            // Move entity
-            floor.RemoveCharacter(entityTransform.Position);
-            floor.PlaceCharacter(newPos, entity);
 
             //trigger special Message on step on
             if (entity == Util.PlayerID && terrain != 0)
@@ -150,10 +164,10 @@ namespace TheAlchemist.Systems
                 }
             }
 
-            Util.TurnOver(entity);
+            return true;
         }
 
-        private void HandleMultiTileMovement(int entity, MultiTileComponent multiTileC, Position newPos)
+        private void HandleMultiTileMovement(int entity, MultiTileComponent multiTileC, Position newPos, bool flipped)
         {
             //bool[,] flippedOccupationMatrix = multiTileC.OccupationMatrix;//.FlipHorizontally();
 
@@ -164,89 +178,34 @@ namespace TheAlchemist.Systems
 
             var floor = Util.CurrentFloor;
 
-            List<Position> newPositions = new List<Position>();
+            bool movementPossible = true;
 
-            foreach (var offsetPos in multiTileC.OccupiedPositions)
+            foreach (var offsetPos in multiTileC.OccupiedPositions[flipped])
             {
                 var newPartialPos = newPos + offsetPos;
-                int otherCharacter = floor.GetCharacter(newPartialPos);
-
-                //check if someone's already there
-                if (otherCharacter != 0 && otherCharacter != entity)
+                if(!TryMove(entity, newPartialPos))
                 {
-                    // check if collidable
-                    if (EntityManager.GetComponent<ColliderComponent>(otherCharacter) != null)
-                    {
-                        //TODO: talk to npcs?
-                        RaiseBasicAttackEvent(entity, otherCharacter);
-                        return; // don't move
-                    }
-                    else
-                    {
-                        Log.Warning("Character without collider:");
-                        Log.Data(DescriptionSystem.GetDebugInfoEntity(otherCharacter));
-                        UISystem.Message("Something seems to be there...");
-                        return;
-                    }
+                    movementPossible = false;
                 }
-
-                int structure = floor.GetStructure(newPartialPos);
-
-                if (structure != 0 && EntityManager.GetComponent<ColliderComponent>(structure) != null)
-                {
-                    bool solid = RaiseCollisionEvent(entity, structure);
-
-                    // check if interactable
-                    var interactable = EntityManager.GetComponent<InteractableComponent>(structure);
-
-                    // only interact with structures right away if they're solid ("bumping" into them)
-                    if (interactable != null && solid)
-                    {
-                        RaiseInteractionEvent(entity, structure);
-                        return;
-                    }
-                }
-
-
-                int terrain = floor.GetTerrain(newPartialPos);
-
-                // check if collidable with
-                if (terrain != 0 && EntityManager.GetComponent<ColliderComponent>(terrain) != null)
-                {
-                    // check if terrain is solid before possible interaction
-                    // this is because solidity might be changed by interaction (e.g. door gets opened)
-                    bool solid = RaiseCollisionEvent(entity, terrain);
-
-                    // check if interactable
-                    var interactable = EntityManager.GetComponent<InteractableComponent>(terrain);
-                    if (interactable != null)
-                    {
-                        RaiseInteractionEvent(entity, terrain);
-                    }
-
-                    // check if terrain is solid
-                    if (solid)
-                    {
-                        return; // don't move
-                    }
-                }
-
-                //trigger special Message on step on
-                if (entity == Util.PlayerID && terrain != 0)
-                {
-                    string message = (DescriptionSystem.GetSpecialMessage(terrain, DescriptionComponent.MessageType.StepOn));
-
-                    if (message.Length > 0)
-                    {
-                        UISystem.Message(message);
-                    }
-                }
-
-                // TODO: implement automatic item pickup?
             }
 
+            // removal and readding is always needed
+            // because the entity might have flipped
             floor.RemoveCharacter(multiTileC.Anchor);
-            floor.PlaceCharacter(newPos, entity);
+
+            multiTileC.FlippedHorizontally = flipped;
+
+            if (movementPossible)
+            {
+                floor.PlaceCharacter(newPos, entity);
+                //Util.CurrentFloor.LogCharactersAroundPlayer();
+            }
+            else
+            {
+                // Place on same position (although may be flipped now)
+                floor.PlaceCharacter(multiTileC.Anchor, entity);
+            }
+
             Util.TurnOver(entity);
         }
 
@@ -268,6 +227,6 @@ namespace TheAlchemist.Systems
         {
             // SHOULD throw an exception if event is not handled
             BasicAttackEvent(attacker, defender);
-        }
+        }        
     }
 }

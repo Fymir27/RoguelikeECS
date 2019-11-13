@@ -169,29 +169,9 @@ namespace TheAlchemist
                 GameData.Instance.CreateItem("healthPotion"),
                 GameData.Instance.CreateItem("healthPotion"),
                 GameData.Instance.CreateItem("poisonPotion"),
+                GameData.Instance.CreateItem("poisonPotion"),
                 GameData.Instance.CreateItem("elementalPotion")
-            });
-
-            var anchor = Util.GetPlayerPos() + Position.Right;
-            int mound = GameData.Instance.CreateCharacter("mound");
-            var multiTileC = EntityManager.GetComponent<MultiTileComponent>(mound);
-            multiTileC.Anchor = anchor;
-            multiTileC.FlippedHorizontally = false;
-            multiTileC.OccupationMatrix = new bool[,] { { true, false, true }, { true, true, true } };
-            //multiTileC.OccupiedPositions = new List<Position>();
-
-            testFloor.PlaceCharacter(anchor, mound);
-
-            Log.Data(DescriptionSystem.GetDebugInfoEntity(mound));
-
-            //movementSystem.HandleMovementEvent(mound, Direction.East);
-
-            //int testBush = GameData.Instance.CreateStructure("bush");
-            //testFloor.PlaceStructure(Util.GetPlayerPos() + Position.Left, testBush);
-
-            //int berries = GameData.Instance.CreateItem("testBerries");
-            //Log.Data(DescriptionSystem.GetDebugInfoEntity(berries));
-            //Util.GetPlayerInventory().Items.Add(berries);
+            });         
 
             //EntityManager.Dump();
             //EntityManager.RemoveEntity(testBush);

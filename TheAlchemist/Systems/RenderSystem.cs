@@ -160,7 +160,7 @@ namespace TheAlchemist.Systems
                             else
                             {
                                 var relAnchor = multiTileC.Anchor - min;
-                                DrawSpriteMultiTile(sprite, relScreenPos, relAnchor, multiTileC.FlippedHorizontally, multiTileC.Width);
+                                DrawSpriteMultiTile(sprite, relScreenPos, relAnchor, multiTileC.Width);
                             }
                         }
                     }
@@ -209,11 +209,11 @@ namespace TheAlchemist.Systems
         /// <param name="sprite">sprite to draw</param>
         /// <param name="pos">relative screen position</param>
         /// <param name="relAnchor">anchor of multi tile entity</param>
-        void DrawSpriteMultiTile(RenderableSpriteComponent sprite, Position pos, Position relAnchor, bool flip, int width)
+        void DrawSpriteMultiTile(RenderableSpriteComponent sprite, Position pos, Position relAnchor, int width)
         {
             var localOffset = pos - relAnchor;
 
-            if(flip)
+            if(sprite.FlippedHorizontally)
             {
                 localOffset.X = width - 1 - localOffset.X;
             }
@@ -223,7 +223,7 @@ namespace TheAlchemist.Systems
 
             Rectangle sourceRect = new Rectangle(texLocation, size);
 
-            SpriteEffects effects = flip ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+            SpriteEffects effects = sprite.FlippedHorizontally ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
 
             spriteBatch.Draw(TextureManager.GetTexture(sprite.Texture), Util.WorldToScreenPosition(pos), sourceRect, sprite.Tint, 0f, Vector2.Zero, Vector2.One, effects, 0f);
         }

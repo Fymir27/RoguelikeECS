@@ -1496,19 +1496,13 @@ namespace TheAlchemist
             return true;
         }
 
-        public bool RemoveEntityMultiTile(Position pos, int entity, MultiTileComponent multiTileC)
-        {
-            if (entity == 0)
-            {
-                Log.Warning("Trying to remove entity from " + pos + ": No entity of that type here!");
-                return false;
-            }
-
-            foreach (var offsetPos in multiTileC.OccupiedPositions)
+        public bool RemoveEntityMultiTile(int entity, MultiTileComponent multiTileC)
+        {           
+            foreach (var offsetPos in multiTileC.OccupiedPositions[multiTileC.FlippedHorizontally])
             {
                 if(IsOutOfBounds(multiTileC.Anchor + offsetPos))
                 {
-                    Log.Warning("Trying to remove " + DescriptionSystem.GetNameWithID(entity) + " out of bounds! " + pos);
+                    Log.Warning("Trying to remove " + DescriptionSystem.GetNameWithID(entity) + " out of bounds! " + multiTileC.Anchor);
                     return false;
                 }
             }
@@ -1542,16 +1536,22 @@ namespace TheAlchemist
         {     
             int character = GetTile(pos).Character; // characters[(int)pos.X, (int)pos.Y];
 
+            if (character == 0)
+            {
+                Log.Warning("Trying to remove character from " + pos + ": No entity of that type here!");
+                return;
+            }
+
             var multiTileC = EntityManager.GetComponent<MultiTileComponent>(character);
 
             if (multiTileC != null)
             {
-                if (!RemoveEntityMultiTile(pos, character, multiTileC))
+                if (!RemoveEntityMultiTile(character, multiTileC))
                 {
                     return;
                 }
 
-                multiTileC.OccupiedPositions.ForEach(offsetPos => GetTile(multiTileC.Anchor + offsetPos).Character = 0);
+                multiTileC.OccupiedPositions[multiTileC.FlippedHorizontally].ForEach(offsetPos => GetTile(multiTileC.Anchor + offsetPos).Character = 0);
             }
             else
             {
@@ -1682,7 +1682,7 @@ namespace TheAlchemist
 
         private bool PlaceEntityMultiTile(Position pos, int entity, MultiTileComponent multiTileC)
         {          
-            foreach (var offsetPos in multiTileC.OccupiedPositions)
+            foreach (var offsetPos in multiTileC.OccupiedPositions[multiTileC.FlippedHorizontally])
             {
                 var realPos = pos + offsetPos;
                 if(IsOutOfBounds(realPos))
@@ -1742,7 +1742,7 @@ namespace TheAlchemist
                     return;
                 }
 
-                foreach (var offsetPos in multiTileC.OccupiedPositions)
+                foreach (var offsetPos in multiTileC.OccupiedPositions[multiTileC.FlippedHorizontally])
                 {
                     newPositions.Add(pos + offsetPos);
                 }
@@ -2185,6 +2185,30 @@ namespace TheAlchemist
 
             FileStream fileStream = new FileStream(path, FileMode.OpenOrCreate);
             texFloor.SaveAsPng(fileStream, Width, Height);
+        }
+
+        public void LogCharactersAroundPlayer()
+        {
+            var playerPos = Util.GetPlayerPos();
+            int xRadius = 5;
+            int yRadius = 5;
+            int xMin = Util.Clamp(playerPos.X - xRadius, 0, Width);
+            int xMax = Util.Clamp(playerPos.X + xRadius, 0, Width);
+            int yMin = Util.Clamp(playerPos.Y - yRadius, 0, Height);
+            int yMax = Util.Clamp(playerPos.Y + yRadius, 0, Height);
+
+            StringBuilder sb = new StringBuilder();
+
+            for (int y = yMin; y < yMax; y++)
+            {
+                for (int x = xMin; x < xMax; x++)
+                {
+                    sb.AppendFormat(" {0,5} ", GetTile(x,y).Character);
+                }
+                sb.AppendLine();
+            }
+
+            Log.Data("Characters in the vicinity of player: \n" + sb.ToString());
         }
     }
     /*
