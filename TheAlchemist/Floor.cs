@@ -1050,11 +1050,44 @@ namespace TheAlchemist
 
                 for (int i = 0; i < spawnCount; i++)
                 {
-                    var pos = room.freePositions[Game.Random.Next(0, room.freePositions.Count)];
+                    var pos = Util.PickRandomElement(room.freePositions);
                     var name = Util.PickRandomElement(names);
-                    PlaceCharacter(pos, GameData.Instance.CreateCharacter(name));
-                    //Log.Data(DescriptionSystem.GetDebugInfoEntity(GetCharacter(pos)));
-                    room.freePositions.Remove(pos);
+                    int entity = GameData.Instance.CreateCharacter(name);
+
+                    var multiTileC = EntityManager.GetComponent<MultiTileComponent>(entity);
+
+                    if (multiTileC != null)
+                    {
+                        // might need a few more tries to find a position for big things
+                        int tries = 0;
+                        int maxTries = 10;
+
+                        bool success = false;
+                        while (tries++ < maxTries)
+                        {
+                            success = MultiTileCharacterPlacable(pos, multiTileC);
+
+                            if (success)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                pos = Util.PickRandomElement(room.freePositions);
+                            }
+                        }
+
+                        if (success)
+                        {
+                            PlaceCharacter(pos, entity);
+                            room.freePositions.RemoveAll(multiTileC.OccupiedPositions.Select(offsetPos => pos + offsetPos).Contains);
+                        }
+                    }
+                    else
+                    {
+                        PlaceCharacter(pos, entity);
+                        room.freePositions.Remove(pos);
+                    }
                 }
             }
         }
@@ -1401,20 +1434,7 @@ namespace TheAlchemist
 
         public bool IsSolid(Position pos)
         {
-            int terrainID = GetTerrain(pos);
-
-            if (terrainID == 0)
-                return false;
-
-            var terrainCollider = EntityManager.GetComponent<ColliderComponent>(terrainID);
-
-            if (terrainCollider == null)
-                return false;
-
-            if (terrainCollider.Solid)
-                return true;
-
-            return false;
+            return !IsWalkable(pos);
         }
 
         public int GetCharacter(Position pos)
@@ -1498,7 +1518,7 @@ namespace TheAlchemist
 
         public bool RemoveEntityMultiTile(int entity, MultiTileComponent multiTileC)
         {           
-            foreach (var offsetPos in multiTileC.OccupiedPositions[multiTileC.FlippedHorizontally])
+            foreach (var offsetPos in multiTileC.OccupiedPositions)
             {
                 if(IsOutOfBounds(multiTileC.Anchor + offsetPos))
                 {
@@ -1551,7 +1571,7 @@ namespace TheAlchemist
                     return;
                 }
 
-                multiTileC.OccupiedPositions[multiTileC.FlippedHorizontally].ForEach(offsetPos => GetTile(multiTileC.Anchor + offsetPos).Character = 0);
+                multiTileC.OccupiedPositions.ForEach(offsetPos => GetTile(multiTileC.Anchor + offsetPos).Character = 0);
             }
             else
             {
@@ -1682,7 +1702,7 @@ namespace TheAlchemist
 
         private bool PlaceEntityMultiTile(Position pos, int entity, MultiTileComponent multiTileC)
         {          
-            foreach (var offsetPos in multiTileC.OccupiedPositions[multiTileC.FlippedHorizontally])
+            foreach (var offsetPos in multiTileC.OccupiedPositions)
             {
                 var realPos = pos + offsetPos;
                 if(IsOutOfBounds(realPos))
@@ -1690,7 +1710,7 @@ namespace TheAlchemist
                     Log.Warning(String.Format("Trying to place Multi-tile entity {0} out of bounds! Anchor: {1} Offset: {2}", 
                         DescriptionSystem.GetNameWithID(entity), multiTileC.Anchor, offsetPos));
                     return false;
-                }              
+                }
             }
 
             var transform = EntityManager.GetComponent<TransformComponent>(entity);
@@ -1742,7 +1762,7 @@ namespace TheAlchemist
                     return;
                 }
 
-                foreach (var offsetPos in multiTileC.OccupiedPositions[multiTileC.FlippedHorizontally])
+                foreach (var offsetPos in multiTileC.OccupiedPositions)
                 {
                     newPositions.Add(pos + offsetPos);
                 }
@@ -1779,30 +1799,31 @@ namespace TheAlchemist
             GetTile(pos).Structure = structure;
         }
 
-        /* public void PlaceItems(Position pos, IEnumerable<int> items)
+        public bool MultiTileCharacterPlacable(Position pos, MultiTileComponent multiTileC)
         {
-            foreach(int item in items)
+            foreach (var offsetPos in multiTileC.OccupiedPositions)
             {
-                if (!PlaceEntity(pos, item, RenderableSpriteComponent.RenderLayer.Item))
+                var partialPos = pos + offsetPos;
+
+                if(IsOutOfBounds(partialPos))
                 {
-                    return;
+                    return false;
                 }
-            }            
 
-            var itemsHere = this.items[(int)pos.X, (int)pos.Y];
+                if(GetTile(pos).Character != 0)
+                {
+                    return false;
+                }
 
-            if (itemsHere == null)
-            {
-                itemsHere = new List<int>();
-                itemsHere.AddRange(items);
+                if(IsSolid(partialPos))
+                {
+                    return false;
+                }
             }
-            else
-            {
-                itemsHere.AddRange(items);
-            }
-
+            return true;
         }
-        */
+
+        
 
         public void PlaceItem(Position pos, int item)
         {
@@ -1835,65 +1856,7 @@ namespace TheAlchemist
             }
             */
         }
-
-        /* public Floor(int width, int height)
-        {
-            this.width = width;
-            this.height = height;
-
-            terrain = new int[width, height];
-            characters = new int[width, height];
-            items = new List<int>[width, height]; // don't initialize each List yet to save space!     
-
-            for (int y = 0; y < width; y++)
-            {
-                for (int x = 0; x < height; x++)
-                {
-                    // create sourrounding wall
-                    if(y == 0 || y == height - 1)
-                    {
-                        PlaceTerrain(new Vector2(x, y), CreateWall());
-                    }
-                    else if(x == 0 || x == width - 1)
-                    {
-                        PlaceTerrain(new Vector2(x, y), CreateWall());
-                    }                      
-                }
-            }
-
-            PlaceCharacter(new Vector2(1, 1), CreatePlayer());
-
-            int testEnemy = EntityManager.CreateEntity();
-            int testArmor = EntityManager.CreateEntity();
-            int testWeapon = EntityManager.CreateEntity();
-
-            EntityManager.AddComponent(testArmor, new ArmorComponent() { FlatMitigation = 2 });
-            EntityManager.AddComponent(testWeapon, new WeaponComponent() { Damage = 5 });
-
-            List<IComponent> enemyComponents = new List<IComponent>()
-            {
-                new NPCComponent(),
-                new HealthComponent() { Amount = 20, Max = 20, RegenerationAmount = 1 },
-                new EquipmentComponent() { Weapon = testWeapon , Armor = testArmor },
-                new TransformComponent() { Position = new Vector2(3, 3) },
-                new ColliderComponent() { Solid = false },
-                new RenderableSpriteComponent() { Visible = true, Texture = "enemy" }
-            };
-
-            EntityManager.AddComponents(testEnemy, enemyComponents);
-
-
-
-            characters[3, 3] = testEnemy;
-        }*/
-
-
-
-        // returns shortest path
-        public List<Position> GetPath(Position from, Position to)
-        {
-            return null;
-        }
+  
 
         // returns "straight" line (Bresenham)
         public List<Position> GetLine(Position from, Position to, bool stopAtSolid = true, bool onlyCardinal = false)
@@ -2211,59 +2174,4 @@ namespace TheAlchemist
             Log.Data("Characters in the vicinity of player: \n" + sb.ToString());
         }
     }
-    /*
-    class Floor
-    {
-        Tile[,] tiles;
-
-        public Floor(int width, int height)
-        {
-            tiles = new Tile[width, height];
-            for (int x = 0; x < tiles.GetLength(0); x++)
-            {
-                for (int y = 0; y < tiles.GetLength(1); y++)
-                {
-                    tiles[x, y] = new Tile();                 
-                }
-            }
-        }
-
-        Floor()
-        {
-
-        }
-
-        public override string ToString()
-        {
-            StringBuilder sb = new StringBuilder();
-            for (int y = 0; y < tiles.GetLength(1); y++)
-            {
-                for (int x = 0; x < tiles.GetLength(0); x++)         
-                {
-                    sb.Append(tiles[x, y].ToString()).Append(' ');
-                }
-                sb.Append('\n');
-            }
-            return sb.ToString();
-        }
-
-        public static Floor ReadFromFile(string filename)
-        {
-            string contentPath = @"C:\Users\Oliver\Source\Repos\RoguelikeECS\TheAlchemist\Content";
-            string[] rows = File.ReadAllLines(contentPath + @"\" + filename);
-            int width = rows[0].Length;
-            int height = rows.Length;
-            Floor floor = new Floor();
-            floor.tiles = new Tile[width, height];
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    floor.tiles[x, y] = new Tile(rows[y][x]);
-                }
-            }
-            return floor;
-        }
-    }
-    */
 }

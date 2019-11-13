@@ -9,12 +9,27 @@ namespace TheAlchemist.Components
     class MultiTileComponent : Component<MultiTileComponent>
     {
         public Position Anchor { get; set; }
-        //public bool[,] OccupationMatrix { get; set; }
-        public Dictionary<bool, List<Position>> OccupiedPositions { get; set; } // from anchor, Key = flipped
+        public List<Position> OccupiedPositions  // from anchor
+        {
+            get
+            {
+                if(FlippedHorizontally)
+                {
+                    return occupiedPositionsFlipped;
+                }
+                else
+                {
+                    return occupiedPositions;
+                }
+            }
+        }
         public bool FlippedHorizontally { get; set; }
 
         public int Width; // => OccupationMatrix.GetLength(0);
         public int Height; // => OccupationMatrix.GetLength(1);
+
+        private List<Position> occupiedPositions;
+        private List<Position> occupiedPositionsFlipped;
 
         [Newtonsoft.Json.JsonConstructor]
         MultiTileComponent(bool[,] occupationMatrix)
@@ -22,11 +37,8 @@ namespace TheAlchemist.Components
             Width = occupationMatrix.GetLength(0);
             Height = occupationMatrix.GetLength(1);
 
-            OccupiedPositions = new Dictionary<bool, List<Position>>()
-            {
-                { true, new List<Position>() },
-                { false, new List<Position>() }
-            };
+            occupiedPositions = new List<Position>();
+            occupiedPositionsFlipped = new List<Position>();
 
             for (int y = 0; y < Height; y++)
             {
@@ -34,8 +46,8 @@ namespace TheAlchemist.Components
                 {
                     if (occupationMatrix[x, y])
                     {
-                        OccupiedPositions[false].Add(new Position(x, y));
-                        OccupiedPositions[true].Add(new Position(Width - 1 - x, y));
+                        occupiedPositions.Add(new Position(x, y));
+                        occupiedPositionsFlipped.Add(new Position(Width - 1 - x, y));
                     }
                 }
             }

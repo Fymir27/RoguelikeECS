@@ -180,7 +180,7 @@ namespace TheAlchemist.Systems
 
             bool movementPossible = true;
 
-            foreach (var offsetPos in multiTileC.OccupiedPositions[flipped])
+            foreach (var offsetPos in multiTileC.OccupiedPositions)
             {
                 var newPartialPos = newPos + offsetPos;
                 if(!TryMove(entity, newPartialPos))
