@@ -118,7 +118,9 @@ namespace TheAlchemist
         static readonly KeyboardState noKeyPressed = new KeyboardState();
         KeyboardState prevKeyState = noKeyPressed;
 
+        // -- all in Milliseconds -- //
         readonly int keyHoldDelay = 500; // delay until key registers as beeing held down
+        readonly int heldDownInputDelay = 200; // delay for input beeing accepted when key is beeing held down
         int keyHeldDownFor = 0; // milliseconds
 
         // keyboard mods active
@@ -151,8 +153,12 @@ namespace TheAlchemist
                 keyHeldDownFor += gameTime.ElapsedGameTime.Milliseconds;
 
                 if (keyHeldDownFor < keyHoldDelay)
-                {
+                {                   
                     return false;
+                }
+                else
+                {
+                    keyHeldDownFor = keyHoldDelay - heldDownInputDelay;
                 }
             }
             else
@@ -190,8 +196,17 @@ namespace TheAlchemist
 
             Command command = Command.None;
 
+            StringBuilder sb = new StringBuilder();
+
             foreach (var keyPressed in curKeyState.GetPressedKeys())
             {
+                sb.AppendFormat("{0}, ", keyPressed);
+            }
+
+            Log.Message(sb.ToString());
+
+            foreach (var keyPressed in curKeyState.GetPressedKeys())
+            {              
                 if (keyPressed == Keys.F1)
                 {
                     EntityManager.Dump();
@@ -205,6 +220,8 @@ namespace TheAlchemist
                     break;
                 }
             }
+
+            
 
             if (command == Command.None)
             {
