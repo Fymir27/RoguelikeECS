@@ -24,6 +24,8 @@ namespace TheAlchemist
         public static int MessageLogLineCount { get; set; } = 11;
         public static string[] MessageLog { get; set; } = new string[MessageLogLineCount];
 
+        public static NineSlicedSprite NineSlice;
+
         public static void Render(SpriteBatch spriteBatch)
         {
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -202,6 +204,9 @@ namespace TheAlchemist
             // draw description text
             spriteBatch.DrawString(Util.MonospaceFont, description, new Vector2(Util.WorldViewPixelWidth + 10, 40), Color.Black);
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+            NineSlice.Draw(spriteBatch);
         }
 
         public static void SyncInventoryCursor()

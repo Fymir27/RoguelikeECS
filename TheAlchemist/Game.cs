@@ -171,7 +171,9 @@ namespace TheAlchemist
                 GameData.Instance.CreateItem("poisonPotion"),
                 GameData.Instance.CreateItem("poisonPotion"),
                 GameData.Instance.CreateItem("elementalPotion")
-            });         
+            });
+
+            UI.NineSlice = new NineSlicedSprite("nineSlice", new Rectangle(0, 0, 150, 90), graphics.GraphicsDevice);
 
             //EntityManager.Dump();
             //EntityManager.RemoveEntity(testBush);

@@ -32,6 +32,50 @@ namespace TheAlchemist
         Restricted = 3
     }
 
+    public struct Array1D<T>
+    {
+        private T[] data;
+        private int width;
+        private int height;
+
+        public Array1D(T[] data, int width, int height)
+        {
+            if(data.Length != width * height)
+            {
+                throw new ArgumentOutOfRangeException("data", "Data array needs to be of length width * height!");
+            }
+
+            this.data = data;
+            this.width = width;
+            this.height = height;
+        }
+
+        public Array1D(int width, int height)
+        {
+            data = new T[width * height];
+            this.width = width;
+            this.height = height;
+        }
+
+        public T this[int x, int y]
+        {
+            get => data[y * width + x];
+            set => data[y * width + x] = value;
+        }
+            
+
+        public T this[int i]
+        {
+            get => data[i];
+            set => data[i] = value;
+        }
+
+        public T[] GetData()
+        {
+            return data;
+        }
+    }
+
     // marks a position in the game world
     [JsonObject]
     public struct Position
@@ -460,6 +504,46 @@ namespace TheAlchemist
                 {
                     int mirroredIndex = width - 1 - x;
                     result[x, y] = matrix[mirroredIndex, y];
+                }
+            }
+
+            return result;
+        }
+
+        public static T[,] Make2D<T>(this T[] source, int width, int height)
+        {
+            T[,] result = new T[width, height];
+
+            if(source.Length != width * height)
+            {
+                throw new ArgumentOutOfRangeException("source", "Source array needs to be of length width * height!");
+            }
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int sourceIndex = y * width + x;
+                    result[x, y] = source[sourceIndex];
+                }
+            }
+
+            return result;
+        }
+
+        public static T[] Make1D<T>(this T[,] source)
+        {
+            int width = source.GetLength(0);
+            int height = source.GetLength(1);
+
+            T[] result = new T[width * height];          
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int resultIndex = y * width + x;
+                    result[resultIndex] = source[x, y];
                 }
             }
 
