@@ -70,10 +70,13 @@ namespace TheAlchemist
 
         public static bool CraftingMode = false;
 
-        public static int MessageLogLineCount { get; set; } = 11;
+        public static int MessageLogLineCount { get; set; } = 9;
         public static string[] MessageLog { get; set; } = new string[MessageLogLineCount];
 
         public static UIWindow CraftingWindow;
+        public static UIWindow TooltipWindow;
+        public static UIWindow InventoryWindow;
+        public static UIWindow MessageLogWindow;
 
         public static GraphicsDevice Graphics { get; private set; }
 
@@ -82,14 +85,19 @@ namespace TheAlchemist
             UI.Graphics = graphics;
 
             int margin = 25;
-            var bounds = new Rectangle(margin, margin, Util.WorldViewPixelWidth - margin * 2, Util.WorldViewPixelHeight - margin * 2);
-            CraftingWindow = new UIWindow("Crafting", bounds);            
+            CraftingWindow = new UIWindow("Crafting", new Rectangle(margin, margin, Util.WorldViewPixelWidth - margin * 2, Util.WorldViewPixelHeight - margin * 2));
+
+            TooltipWindow = new UIWindow("Tooltip", new Rectangle(Util.WorldViewPixelWidth, 0, Util.ScreenWidth - Util.WorldViewPixelWidth, 220));
+
+            InventoryWindow = new UIWindow("Inventory", new Rectangle(Util.WorldViewPixelWidth, 220, Util.ScreenWidth - Util.WorldViewPixelWidth, Util.ScreenHeight - 220));
+
+            MessageLogWindow = new UIWindow("Log", new Rectangle(0, Util.WorldViewPixelHeight, Util.WorldViewPixelWidth, Util.ScreenHeight - Util.WorldViewPixelHeight));
         }
 
         public static void Render(SpriteBatch spriteBatch)
         {
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
-            spriteBatch.Draw(TextureManager.GetTexture("messageLogBox"), new Vector2(0, Util.WorldViewPixelHeight), Color.White);
+            //spriteBatch.Draw(TextureManager.GetTexture("messageLogBox"), new Vector2(0, Util.WorldViewPixelHeight), Color.White);
             //spriteBatch.DrawString(Util.BigFont, "Message Log", new Vector2(10, Util.WorldHeight + 10), Color.Black);
            
             string messageLogString = "";
@@ -97,11 +105,15 @@ namespace TheAlchemist
             {
                 messageLogString += MessageLog[i] + '\n';
             }
-            spriteBatch.DrawString(Util.DefaultFont, messageLogString, new Vector2(10, Util.WorldViewPixelHeight + 10), Color.Black);
+            //spriteBatch.DrawString(Util.DefaultFont, messageLogString, new Vector2(10, Util.WorldViewPixelHeight + 10), Color.Black);
+
+            MessageLogWindow.Content.Clear();
+            MessageLogWindow.Content.Add(messageLogString);
+            MessageLogWindow.Draw(spriteBatch);
 
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
-            spriteBatch.Draw(TextureManager.GetTexture("inventory"), new Vector2(Util.WorldViewPixelWidth, 220), InventoryOpen ? Color.Aquamarine : Color.White);
-            spriteBatch.DrawString(Util.BigFont, "Inventory", new Vector2(Util.WorldViewPixelWidth + 10, 220 + 10), Color.Black);
+            //spriteBatch.Draw(TextureManager.GetTexture("inventory"), new Vector2(Util.WorldViewPixelWidth, 220), InventoryOpen ? Color.Aquamarine : Color.White);
+            //spriteBatch.DrawString(Util.BigFont, "Inventory", new Vector2(Util.WorldViewPixelWidth + 10, 220 + 10), Color.Black);
 
             var items = EntityManager.GetComponent<InventoryComponent>(Util.PlayerID).Items;
 
@@ -120,7 +132,7 @@ namespace TheAlchemist
                 itemStringLeftCol += counter++ + ": " + DescriptionSystem.GetName(item) + " x" + EntityManager.GetComponent<ItemComponent>(item).Count + '\n';
             }
 
-            spriteBatch.DrawString(Util.DefaultFont, itemStringLeftCol, new Vector2(Util.WorldViewPixelWidth + 20, 220 + 40), Color.Black);
+            //spriteBatch.DrawString(Util.DefaultFont, itemStringLeftCol, new Vector2(Util.WorldViewPixelWidth + 20, 220 + 40), Color.Black);
 
             string itemStringRightCol = "";
             foreach (var item in itemsSecondHalf)
@@ -130,10 +142,15 @@ namespace TheAlchemist
                 itemStringRightCol += counter++ + ": " + DescriptionSystem.GetName(item) + " x" + EntityManager.GetComponent<ItemComponent>(item).Count + '\n';
             }
 
-            spriteBatch.DrawString(Util.DefaultFont, itemStringRightCol, new Vector2(Util.WorldViewPixelWidth + 20 + 240, 220 + 40), Color.Black);
+            //spriteBatch.DrawString(Util.DefaultFont, itemStringRightCol, new Vector2(Util.WorldViewPixelWidth + 20 + 240, 220 + 40), Color.Black);
+
+            InventoryWindow.Content.Clear();
+            // TODO: what about right column?
+            InventoryWindow.Content.Add(itemStringLeftCol);
+            InventoryWindow.Draw(spriteBatch);
 
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
-            spriteBatch.Draw(TextureManager.GetTexture("tooltip"), new Vector2(Util.WorldViewPixelWidth, 0), Color.White);
+            //spriteBatch.Draw(TextureManager.GetTexture("tooltip"), new Vector2(Util.WorldViewPixelWidth, 0), Color.White);
 
 
             InputManager.CommandDomain curDomain = InputManager.Instance.GetCurrentDomain();
@@ -207,10 +224,10 @@ namespace TheAlchemist
                         description = descriptionC.Description;
                     }
                 }
-            }
+            }           
 
             // draw name
-            spriteBatch.DrawString(Util.BigFont, name, new Vector2(Util.WorldViewPixelWidth + 10, 10), Color.Black);
+            //spriteBatch.DrawString(Util.BigFont, name, new Vector2(Util.WorldViewPixelWidth + 10, 10), Color.Black);
 
             // split description into multiple lines
             int rowLength = 40;
@@ -246,8 +263,15 @@ namespace TheAlchemist
             }
 
             // draw description text
-            spriteBatch.DrawString(Util.MonospaceFont, description, new Vector2(Util.WorldViewPixelWidth + 10, 40), Color.Black);
+            //spriteBatch.DrawString(Util.MonospaceFont, description, new Vector2(Util.WorldViewPixelWidth + 10, 40), Color.Black);
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+            TooltipWindow.Name = name;
+            TooltipWindow.Content.Clear();
+
+            TooltipWindow.Content.Add(description);
+
+            TooltipWindow.Draw(spriteBatch);
 
             // draw crafting window
             if (CraftingMode)

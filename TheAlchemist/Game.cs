@@ -309,7 +309,7 @@ namespace TheAlchemist
             GraphicsDevice.SetRenderTarget(virtualScreen);
 
             spriteBatch.Begin(); //:::::::::::::::::::::::::::::::::::::::::::::::::::
-            GraphicsDevice.Clear(Color.White);
+            GraphicsDevice.Clear(Color.Black);
 
             spriteBatch.Draw(renderedWorld, Vector2.Zero, Color.White);
             UI.Render(spriteBatch);
