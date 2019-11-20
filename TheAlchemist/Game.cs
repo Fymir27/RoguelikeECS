@@ -147,7 +147,7 @@ namespace TheAlchemist
             string keybindings = File.ReadAllText(Util.ContentPath + "/keybindings.json");
             input.LoadKeyBindings(keybindings);
             input.EnterDomain(InputManager.CommandDomain.Exploring); // start out with exploring as bottom level command domain
-            input.ControlledEntity = Util.PlayerID;
+            input.ControlledEntity = Util.PlayerID;        
 
             base.Initialize();
             Log.Message("Initialization completed!");
@@ -173,7 +173,6 @@ namespace TheAlchemist
                 GameData.Instance.CreateItem("elementalPotion")
             });
 
-            UI.NineSlice = new NineSlicedSprite("nineSlice", new Rectangle(0, 0, 150, 90), graphics.GraphicsDevice);
 
             //EntityManager.Dump();
             //EntityManager.RemoveEntity(testBush);
@@ -223,6 +222,9 @@ namespace TheAlchemist
             TextureManager.Init(Content);
             //TextureManager.LoadTextures(textures);
             TextureManager.LoadAllTextures("Sprites");
+
+            Log.Message("Loading UI...");
+            UI.Init(graphics.GraphicsDevice);
 
             Util.CurrentFloor.GenerateImage("./floor.png", GraphicsDevice);
         }

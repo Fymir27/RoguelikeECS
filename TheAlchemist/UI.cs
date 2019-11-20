@@ -12,6 +12,55 @@ namespace TheAlchemist
     using Components;
     using Systems;
 
+    /// <summary>
+    /// represents a part of the UI
+    /// Depends on UI.Graphics and fonts in Util already initialized
+    /// </summary>
+    struct UIWindow
+    {
+        public string Name;
+        public readonly NineSlicedSprite Background;       
+        public List<string> Content;
+
+        public static readonly int Padding = 10;
+
+        public UIWindow(string name)
+        {           
+            Name = name;
+            Background = null;
+            Content = new List<string>();
+        }
+
+        public UIWindow(string name, Rectangle bounds, string backgroundTexture = "UIBox") : this(name)
+        {
+            if (UI.Graphics == null)
+            {
+                throw new Exception("UI.Graphics not initialized before creating UIWindow!");
+            }
+
+            Background = new NineSlicedSprite(backgroundTexture, bounds, UI.Graphics);
+        }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            Background.Draw(spriteBatch);
+
+            var anchor = Background.Rect.Location;
+
+            var drawPos = new Vector2(anchor.X + Padding, anchor.Y + Padding);
+
+            // Draw Name
+            spriteBatch.DrawString(Util.BigFont, Name, drawPos, Color.Black);
+            drawPos.Y += Util.BigFont.LineSpacing + Padding;
+
+            foreach (var line in Content)
+            {             
+                spriteBatch.DrawString(Util.DefaultFont, line, drawPos, Color.Black);
+                drawPos.Y += Util.DefaultFont.LineSpacing;
+            }
+        }
+    }
+
     // special entity for UI element access
     static class UI
     {
@@ -24,36 +73,31 @@ namespace TheAlchemist
         public static int MessageLogLineCount { get; set; } = 11;
         public static string[] MessageLog { get; set; } = new string[MessageLogLineCount];
 
-        public static NineSlicedSprite NineSlice;
+        public static UIWindow CraftingWindow;
+
+        public static GraphicsDevice Graphics { get; private set; }
+
+        public static void Init(GraphicsDevice graphics)
+        {
+            UI.Graphics = graphics;
+
+            int margin = 25;
+            var bounds = new Rectangle(margin, margin, Util.WorldViewPixelWidth - margin * 2, Util.WorldViewPixelHeight - margin * 2);
+            CraftingWindow = new UIWindow("Crafting", bounds);            
+        }
 
         public static void Render(SpriteBatch spriteBatch)
         {
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
             spriteBatch.Draw(TextureManager.GetTexture("messageLogBox"), new Vector2(0, Util.WorldViewPixelHeight), Color.White);
             //spriteBatch.DrawString(Util.BigFont, "Message Log", new Vector2(10, Util.WorldHeight + 10), Color.Black);
-
-            if (CraftingMode)
+           
+            string messageLogString = "";
+            for (int i = 0; i < MessageLogLineCount; i++)
             {
-                StringBuilder sb = new StringBuilder();
-                //sb.Append("\n(( Crafting ))\n");
-                sb.Append("(press 'R' to reset and 'Enter' to craft)\n\n");
-                sb.Append("Current Recipe:\n");
-                foreach (var ingredientName in CraftingSystem.Instance.GetIngredientNames())
-                {
-                    sb.Append("- " + ingredientName + "\n");
-                }
-                spriteBatch.DrawString(Util.BigFont, "Crafting", new Vector2(10, Util.WorldViewPixelHeight + 10), Color.Black);
-                spriteBatch.DrawString(Util.DefaultFont, sb.ToString(), new Vector2(10, Util.WorldViewPixelHeight + 40), Color.Black);
+                messageLogString += MessageLog[i] + '\n';
             }
-            else
-            {
-                string messageLogString = "";
-                for (int i = 0; i < MessageLogLineCount; i++)
-                {
-                    messageLogString += MessageLog[i] + '\n';
-                }
-                spriteBatch.DrawString(Util.DefaultFont, messageLogString, new Vector2(10, Util.WorldViewPixelHeight + 10), Color.Black);
-            }
+            spriteBatch.DrawString(Util.DefaultFont, messageLogString, new Vector2(10, Util.WorldViewPixelHeight + 10), Color.Black);
 
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
             spriteBatch.Draw(TextureManager.GetTexture("inventory"), new Vector2(Util.WorldViewPixelWidth, 220), InventoryOpen ? Color.Aquamarine : Color.White);
@@ -205,8 +249,23 @@ namespace TheAlchemist
             spriteBatch.DrawString(Util.MonospaceFont, description, new Vector2(Util.WorldViewPixelWidth + 10, 40), Color.Black);
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+            // draw crafting window
+            if (CraftingMode)
+            {
+                CraftingWindow.Content.Clear();
 
-            NineSlice.Draw(spriteBatch);
+                CraftingWindow.Content.Add("(press 'R' to reset and 'Enter' to craft)");
+                CraftingWindow.Content.Add("");
+                CraftingWindow.Content.Add("Current Recipe:");
+
+                foreach (var ingredientName in CraftingSystem.Instance.GetIngredientNames())
+                {
+                    CraftingWindow.Content.Add("- " + ingredientName);
+                }
+
+                CraftingWindow.Draw(spriteBatch);
+            }
+            // ------------------------------------------------------------------------------------------------------------------------------------------------------------
         }
 
         public static void SyncInventoryCursor()
