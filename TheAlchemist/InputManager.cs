@@ -196,14 +196,14 @@ namespace TheAlchemist
 
             Command command = Command.None;
 
-            StringBuilder sb = new StringBuilder();
+            //StringBuilder sb = new StringBuilder();
 
-            foreach (var keyPressed in curKeyState.GetPressedKeys())
-            {
-                sb.AppendFormat("{0}, ", keyPressed);
-            }
+            //foreach (var keyPressed in curKeyState.GetPressedKeys())
+            //{
+            //    sb.AppendFormat("{0}, ", keyPressed);
+            //}
 
-            Log.Message(sb.ToString());
+            //Log.Message(sb.ToString());
 
             foreach (var keyPressed in curKeyState.GetPressedKeys())
             {              

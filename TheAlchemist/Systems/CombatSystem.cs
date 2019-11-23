@@ -67,6 +67,12 @@ namespace TheAlchemist.Systems
         }
     }
 
+    struct StatScaling
+    {
+        public Stat Stat { get; set; }
+        public float Value { get; set; }
+    }
+
     class CombatSystem
     {
         public event HealthLostHandler HealthLostEvent;
@@ -78,9 +84,25 @@ namespace TheAlchemist.Systems
             Max = 1
         };
 
+        private Dictionary<Stat, int> defaultStats = new Dictionary<Stat, int>()
+        {
+            { Stat.Strength, 10 },
+            { Stat.Dexterity, 10},
+            { Stat.Intelligence, 10 }
+        };
+
         public void HandleBasicAttack(int attacker, int defender)
         {
-            var weaponDamages = GetWeaponDamage(attacker);
+            var weapon = GetEquippedWeapon(attacker);
+
+            List<DamageRange> weaponDamages = new List<DamageRange>();
+            List<StatScaling> weaponScalings = new List<StatScaling>();
+
+            if (weapon != null)
+            {
+                weaponDamages = weapon.Damages;
+                weaponScalings = weapon.Scalings;
+            }         
 
             if (weaponDamages.Count == 0)
             {
@@ -92,24 +114,61 @@ namespace TheAlchemist.Systems
             // group together all damages by type and roll damage between min and max
             Dictionary<DamageType, int> preMitigionDamage = new Dictionary<DamageType, int>();
 
+            var attackerStatC = EntityManager.GetComponent<StatComponent>(attacker);
+
+            Dictionary<Stat, int> attackerStats;
+
+            if(attackerStatC == null)
+            {
+                attackerStats = defaultStats;
+            }
+            else
+            {
+                attackerStats = attackerStatC.Values;
+            }
+
+            StringBuilder sb = new StringBuilder();
+
             foreach (var damage in weaponDamages)
             {
                 int damageValue = Game.Random.Next(damage.Min, damage.Max + 1);
+
+                sb.AppendLine("Damage pre scaling: " + damageValue);
+
+                float finalModifier = 1f;
+
+                foreach (var scaling in weaponScalings)
+                {
+                    int statValue = 0;
+                    attackerStats.TryGetValue(scaling.Stat, out statValue);
+                    float modifier = (statValue - 10) / 10f;
+                    modifier = 1f + modifier * scaling.Value;
+                    finalModifier *= modifier;
+                }
+
+                sb.AppendLine("Final Modifier: " + finalModifier);
+
+                damageValue = (int)Math.Round(damageValue * finalModifier);
+
+                sb.AppendLine("Damage after scaling: " + damageValue);
+
                 preMitigionDamage.AddOrIncrease(damage.Type, damageValue);
             }
+
+            Log.Message(sb.ToString());
 
             var finalDamages = GetDamagesAfterMitigation(preMitigionDamage, defender);
 
             //Log.Data("Damages after mitigation:\n" + Util.GetStringFromEnumerable(damages));
             Log.Message(DescriptionSystem.GetNameWithID(defender) + " gets hit for: " + Util.GetStringFromCollection(finalDamages));
 
+            HandleAttackMessage(attacker, defender, finalDamages);
+
             foreach (var damage in finalDamages)
             {
                 // TODO: handle different damage types (separate events?)
                 RaiseHealthLostEvent(defender, damage.Value);
-            }
-
-            HandleAttackMessage(attacker, defender, finalDamages);
+            }     
 
             Util.TurnOver(attacker);
         }

@@ -24,9 +24,9 @@ namespace TheAlchemist
             Update(rect);
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch, Color tint)
         {
-            spriteBatch.Draw(Texture, Rect, Color.White);
+            spriteBatch.Draw(Texture, Rect, tint);
         }
 
         public void Update(Rectangle rect)

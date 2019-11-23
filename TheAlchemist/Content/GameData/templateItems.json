@@ -116,6 +116,16 @@
           "Min": 5,
           "Max": 10
         }
+      ],
+      "Scalings": [
+        {
+          "Stat": "Dexterity",
+          "Value": 1
+        },
+        {
+          "Stat": "Strength",
+          "Value": 0.5
+        }
       ]
     }
   ]

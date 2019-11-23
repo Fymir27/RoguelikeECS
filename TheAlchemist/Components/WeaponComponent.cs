@@ -9,5 +9,6 @@ namespace TheAlchemist.Components
     class WeaponComponent : Component<WeaponComponent>
     {
         public List<Systems.DamageRange> Damages { get; set; }
+        public List<Systems.StatScaling> Scalings { get; set; } = new List<Systems.StatScaling>();
     }
 }

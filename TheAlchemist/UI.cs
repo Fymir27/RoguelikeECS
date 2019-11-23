@@ -19,19 +19,27 @@ namespace TheAlchemist
     struct UIWindow
     {
         public string Name;
-        public readonly NineSlicedSprite Background;       
-        public List<string> Content;
+        public bool DisplayName;       
+        public int Padding;
 
-        public static readonly int Padding = 10;
+        public readonly List<string> Content;
+        public readonly NineSlicedSprite Background;
+        public SpriteFont NameFont;
+        public SpriteFont ContentFont;
 
-        public UIWindow(string name)
+        public UIWindow(string name, bool displayName, int padding = 10)
         {           
             Name = name;
-            Background = null;
+            DisplayName = displayName;
+            Padding = padding;
+         
             Content = new List<string>();
+            Background = null;
+            NameFont = Util.BigFont;
+            ContentFont = Util.DefaultFont;
         }
 
-        public UIWindow(string name, Rectangle bounds, string backgroundTexture = "UIBox") : this(name)
+        public UIWindow(string name, Rectangle bounds, bool displayName = true, string backgroundTexture = "UIBox") : this(name, displayName)
         {
             if (UI.Graphics == null)
             {
@@ -43,20 +51,25 @@ namespace TheAlchemist
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            Background.Draw(spriteBatch);
+            Draw(spriteBatch, Color.White);
+        }
+
+        public void Draw(SpriteBatch spriteBatch, Color tint)
+        {
+            Background.Draw(spriteBatch, tint);
 
             var anchor = Background.Rect.Location;
 
             var drawPos = new Vector2(anchor.X + Padding, anchor.Y + Padding);
 
             // Draw Name
-            spriteBatch.DrawString(Util.BigFont, Name, drawPos, Color.Black);
-            drawPos.Y += Util.BigFont.LineSpacing + Padding;
+            spriteBatch.DrawString(NameFont, Name, drawPos, Color.Black);
+            drawPos.Y += NameFont.LineSpacing + Padding;
 
             foreach (var line in Content)
             {             
-                spriteBatch.DrawString(Util.DefaultFont, line, drawPos, Color.Black);
-                drawPos.Y += Util.DefaultFont.LineSpacing;
+                spriteBatch.DrawString(ContentFont, line, drawPos, Color.Black);
+                drawPos.Y += ContentFont.LineSpacing;
             }
         }
     }
@@ -88,6 +101,7 @@ namespace TheAlchemist
             CraftingWindow = new UIWindow("Crafting", new Rectangle(margin, margin, Util.WorldViewPixelWidth - margin * 2, Util.WorldViewPixelHeight - margin * 2));
 
             TooltipWindow = new UIWindow("Tooltip", new Rectangle(Util.WorldViewPixelWidth, 0, Util.ScreenWidth - Util.WorldViewPixelWidth, 220));
+            TooltipWindow.ContentFont = Util.MonospaceFont;
 
             InventoryWindow = new UIWindow("Inventory", new Rectangle(Util.WorldViewPixelWidth, 220, Util.ScreenWidth - Util.WorldViewPixelWidth, Util.ScreenHeight - 220));
 
@@ -147,7 +161,7 @@ namespace TheAlchemist
             InventoryWindow.Content.Clear();
             // TODO: what about right column?
             InventoryWindow.Content.Add(itemStringLeftCol);
-            InventoryWindow.Draw(spriteBatch);
+            InventoryWindow.Draw(spriteBatch, InventoryOpen ? Color.CornflowerBlue : Color.White);
 
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
             //spriteBatch.Draw(TextureManager.GetTexture("tooltip"), new Vector2(Util.WorldViewPixelWidth, 0), Color.White);
