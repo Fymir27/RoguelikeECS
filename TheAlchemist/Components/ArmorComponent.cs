@@ -10,5 +10,10 @@ namespace TheAlchemist.Components
     {
         public int FlatMitigation { get; set; }
         public int PercentMitigation { get; set; }
+
+        public override string ToString()
+        {
+            return String.Format("{0}: {1}%+{2}", Systems.DescriptionSystem.GetName(EntityID), PercentMitigation, FlatMitigation);
+        }
     }
 }

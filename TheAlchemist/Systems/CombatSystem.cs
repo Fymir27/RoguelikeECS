@@ -71,6 +71,11 @@ namespace TheAlchemist.Systems
     {
         public Stat Stat { get; set; }
         public float Value { get; set; }
+
+        public override string ToString()
+        {
+            return String.Format("({0} {1})", Value, Stat.ToString());
+        }
     }
 
     class CombatSystem
@@ -155,7 +160,7 @@ namespace TheAlchemist.Systems
                 preMitigionDamage.AddOrIncrease(damage.Type, damageValue);
             }
 
-            Log.Message(sb.ToString());
+            //Log.Data(sb.ToString());
 
             var finalDamages = GetDamagesAfterMitigation(preMitigionDamage, defender);
 

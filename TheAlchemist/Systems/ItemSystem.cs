@@ -218,6 +218,25 @@ namespace TheAlchemist.Systems
             //}
         }
 
+        /// <summary>
+        /// tries to add multiple items and returns the one's that failed
+        /// </summary>
+        /// <param name="character"></param>
+        /// <param name="items"></param>
+        /// <returns>array of items that failed to be added</returns>
+        public int[] AddItems(int character, int[] items)
+        {
+            List<int> failedItems = new List<int>();
+            foreach (var item in items)
+            {
+                if(!AddItem(character, item))
+                {
+                    failedItems.Add(item);
+                }
+            }
+            return failedItems.ToArray();
+        }
+
         public void UseItem(int character, int item, ItemUsage usage)
         {
             var usableItem = EntityManager.GetComponent<UsableItemComponent>(item);

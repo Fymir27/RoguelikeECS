@@ -86,7 +86,7 @@ namespace TheAlchemist
         public static int MessageLogLineCount { get; set; } = 9;
         public static string[] MessageLog { get; set; } = new string[MessageLogLineCount];
 
-        public static UIWindow CraftingWindow;
+        public static UIWindow PopUpWindow;
         public static UIWindow TooltipWindow;
         public static UIWindow InventoryWindow;
         public static UIWindow MessageLogWindow;
@@ -98,7 +98,7 @@ namespace TheAlchemist
             UI.Graphics = graphics;
 
             int margin = 25;
-            CraftingWindow = new UIWindow("Crafting", new Rectangle(margin, margin, Util.WorldViewPixelWidth - margin * 2, Util.WorldViewPixelHeight - margin * 2));
+            PopUpWindow = new UIWindow("Crafting", new Rectangle(margin, margin, Util.WorldViewPixelWidth - margin * 2, Util.WorldViewPixelHeight - margin * 2));
 
             TooltipWindow = new UIWindow("Tooltip", new Rectangle(Util.WorldViewPixelWidth, 0, Util.ScreenWidth - Util.WorldViewPixelWidth, 220));
             TooltipWindow.ContentFont = Util.MonospaceFont;
@@ -110,10 +110,11 @@ namespace TheAlchemist
 
         public static void Render(SpriteBatch spriteBatch)
         {
+            StringBuilder sb = new StringBuilder();
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
             //spriteBatch.Draw(TextureManager.GetTexture("messageLogBox"), new Vector2(0, Util.WorldViewPixelHeight), Color.White);
             //spriteBatch.DrawString(Util.BigFont, "Message Log", new Vector2(10, Util.WorldHeight + 10), Color.Black);
-           
+
             string messageLogString = "";
             for (int i = 0; i < MessageLogLineCount; i++)
             {
@@ -128,39 +129,35 @@ namespace TheAlchemist
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
             //spriteBatch.Draw(TextureManager.GetTexture("inventory"), new Vector2(Util.WorldViewPixelWidth, 220), InventoryOpen ? Color.Aquamarine : Color.White);
             //spriteBatch.DrawString(Util.BigFont, "Inventory", new Vector2(Util.WorldViewPixelWidth + 10, 220 + 10), Color.Black);
+            InventoryWindow.Content.Clear();
+
+            var weapon = CombatSystem.GetEquippedWeapon(Util.PlayerID);
+
+            if (weapon != null)
+            {
+                InventoryWindow.Content.Add(weapon.ToString());
+            }
+
+            var armor = CombatSystem.GetEquippedArmor(Util.PlayerID);
+
+            if(armor != null)
+            {
+                InventoryWindow.Content.Add(armor.ToString());
+            }
+
+            InventoryWindow.Content.Add("");
 
             var items = EntityManager.GetComponent<InventoryComponent>(Util.PlayerID).Items;
-
-            int counter = 1;
-
-            var itemsFirstHalf = items.Take(InventoryColumnLength);
-            var itemsSecondHalf = items.Skip(InventoryColumnLength);
-
             SyncInventoryCursor();
 
-            string itemStringLeftCol = "";
-            foreach (var item in itemsFirstHalf)
+            for (int i = 0; i < items.Count; i++)
             {
-                if (counter == InventoryCursorPosition)
-                    itemStringLeftCol += "# ";
-                itemStringLeftCol += counter++ + ": " + DescriptionSystem.GetName(item) + " x" + EntityManager.GetComponent<ItemComponent>(item).Count + '\n';
-            }
+                int item = items[i];
+                bool selected = i == InventoryCursorPosition - 1;
+                var itemC = EntityManager.GetComponent<ItemComponent>(item);
+                InventoryWindow.Content.Add(String.Format("{0} {1} x{2}", selected ? "#" : "  ", DescriptionSystem.GetName(item), itemC.Count));
+            }                  
 
-            //spriteBatch.DrawString(Util.DefaultFont, itemStringLeftCol, new Vector2(Util.WorldViewPixelWidth + 20, 220 + 40), Color.Black);
-
-            string itemStringRightCol = "";
-            foreach (var item in itemsSecondHalf)
-            {
-                if (counter == InventoryCursorPosition)
-                    itemStringRightCol += "# ";
-                itemStringRightCol += counter++ + ": " + DescriptionSystem.GetName(item) + " x" + EntityManager.GetComponent<ItemComponent>(item).Count + '\n';
-            }
-
-            //spriteBatch.DrawString(Util.DefaultFont, itemStringRightCol, new Vector2(Util.WorldViewPixelWidth + 20 + 240, 220 + 40), Color.Black);
-
-            InventoryWindow.Content.Clear();
-            // TODO: what about right column?
-            InventoryWindow.Content.Add(itemStringLeftCol);
             InventoryWindow.Draw(spriteBatch, InventoryOpen ? Color.CornflowerBlue : Color.White);
 
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -290,18 +287,20 @@ namespace TheAlchemist
             // draw crafting window
             if (CraftingMode)
             {
-                CraftingWindow.Content.Clear();
+                PopUpWindow.Name = "Crafting";
+                PopUpWindow.DisplayName = true;
 
-                CraftingWindow.Content.Add("(press 'R' to reset and 'Enter' to craft)");
-                CraftingWindow.Content.Add("");
-                CraftingWindow.Content.Add("Current Recipe:");
+                PopUpWindow.Content.Clear();
+                PopUpWindow.Content.Add("(press 'R' to reset and 'Enter' to craft)");
+                PopUpWindow.Content.Add("");
+                PopUpWindow.Content.Add("Current Recipe:");
 
                 foreach (var ingredientName in CraftingSystem.Instance.GetIngredientNames())
                 {
-                    CraftingWindow.Content.Add("- " + ingredientName);
+                    PopUpWindow.Content.Add("- " + ingredientName);
                 }
 
-                CraftingWindow.Draw(spriteBatch);
+                PopUpWindow.Draw(spriteBatch);
             }
             // ------------------------------------------------------------------------------------------------------------------------------------------------------------
         }

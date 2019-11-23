@@ -160,9 +160,8 @@ namespace TheAlchemist
                 new ItemComponent() { MaxCount = 5, Count = 3, Value = 1, Weight = 10 }
             }, EntityType.Item);
 
-
             // fill inventory with test items
-            Util.GetPlayerInventory().Items.AddRange(new List<int>()
+            itemSystem.AddItems(Util.PlayerID, new int[] 
             {
                 //testRock,
                 GameData.Instance.CreateItem("healthPotion"),
