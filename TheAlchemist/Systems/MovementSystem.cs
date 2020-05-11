@@ -92,6 +92,12 @@ namespace TheAlchemist.Systems
         private bool TryMove(int entity, Position newPos)
         {
             var floor = Util.CurrentFloor;
+
+            if(floor.IsOutOfBounds(newPos))
+            {
+                return false;
+            }
+
             int otherCharacter = floor.GetCharacter(newPos);
 
             //check if someone's already there

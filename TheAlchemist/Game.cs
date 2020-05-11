@@ -76,7 +76,9 @@ namespace TheAlchemist
             gameData.Load(Util.ContentPath + "/GameData");
 
             //Floor test = new Floor(Content.RootDirectory + "/map.txt");
-            Floor testFloor = new Floor();
+            Floor testFloor = new Floor(100, 70);
+            //testFloor.GenerateSimple();
+            testFloor.GenerateGraphBased();
 
             //EntityManager.Dump();
 
