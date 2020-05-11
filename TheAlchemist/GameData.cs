@@ -16,6 +16,20 @@ namespace TheAlchemist
     // This class loads and saves JSON representations of template enemies/items/terrain...
     class GameData
     {
+        public struct TileTemplate
+        {
+            public string Terrain;
+            public string Structure;
+            public string[] Items;
+            public string Character;
+        }
+
+        public struct RoomTemplate
+        {
+            public List<char[,]> Layouts;
+            public Dictionary<char, TileTemplate> SpecialTiles;
+        }
+
         public static GameData Instance = null;
 
         // string json = Entities[type][name]
@@ -23,28 +37,113 @@ namespace TheAlchemist
 
         public Dictionary<string, string> TemplateItems = new Dictionary<string, string>();
 
-        public void Load(string basePath)
+        public Dictionary<string, RoomTemplate> RoomTemplates = new Dictionary<string, RoomTemplate>();
+
+        public void Load(string contentPath)
         {
             try
             {
                 Log.Message("Loading terrain...");
-                Entities[EntityType.Terrain] = LoadEntities(basePath + "/terrain.json");
+                Entities[EntityType.Terrain] = LoadEntities(contentPath + "/terrain.json");
 
                 Log.Message("Loading items...");
-                Entities[EntityType.Item] = LoadEntities(basePath + "/items.json");
-                TemplateItems = LoadEntities(basePath + "/templateItems.json");
+                Entities[EntityType.Item] = LoadEntities(contentPath + "/items.json");
+                TemplateItems = LoadEntities(contentPath + "/templateItems.json");
 
                 Log.Message("Loading structures...");
-                Entities[EntityType.Structure] = LoadEntities(basePath + "/structures.json");             
+                Entities[EntityType.Structure] = LoadEntities(contentPath + "/structures.json");             
 
                 Log.Message("Loading characters...");
-                Entities[EntityType.Character] = LoadEntities(basePath + "/characters.json");
+                Entities[EntityType.Character] = LoadEntities(contentPath + "/characters.json");
+
+                Log.Message("Loading room templates...");
+                LoadRoomTemplates(contentPath);
             }
             catch (JsonException e)
             {
                 Log.Error("GameData failed to load: " + e.ToString());
                 throw e;
             }
+        }
+
+        public void LoadRoomTemplates(string contentPath)
+        {
+            try
+            {
+                DirectoryInfo dir = new DirectoryInfo(contentPath + "/RoomTemplates");
+                FileInfo[] files = dir.GetFiles("*.json");
+                foreach (var file in files)
+                {
+                    string json = File.ReadAllText(file.FullName);
+                    //Log.Data(file.Name + ": \n" + json);
+                    var obj = JObject.Parse(json);
+                    var layouts = obj.GetValue("layouts").Children();
+
+                    RoomTemplate room;
+                    room.Layouts = new List<char[,]>();
+                    room.SpecialTiles = new Dictionary<char, TileTemplate>();
+
+                    HashSet<char> placeholders = new HashSet<char>();
+
+                    foreach (var serializedLayout in layouts)
+                    {                        
+                        var lines = serializedLayout.ToObject<string[]>();
+                        if(lines.Length == 0)
+                        {
+                            Log.Error("Empty layout in " + file.Name);
+                            break;
+                        }
+                        int width = lines[0].Length;
+                        int height = lines.Length;
+                        var layout = new char[width, height];
+                        for (int y = 0; y < height; y++)
+                        {
+                            for (int x = 0; x < width; x++)
+                            {
+                                char c = lines[y][x];
+                                layout[x, y] = c;
+                                if (char.IsLetter(c))
+                                {
+                                    placeholders.Add(c);
+                                }
+                            }
+                        }
+                        room.Layouts.Add(layout);
+                    }
+                    foreach (char ph in placeholders)
+                    {
+                        if(!obj.ContainsKey(ph.ToString()))
+                        {
+                            Log.Error($"Placeholder '{ph}' not described!");
+                            continue;
+                        }
+
+                        // TODO: parse TileTemplates
+                        room.SpecialTiles.Add(ph, new TileTemplate());
+                    }
+                    if(placeholders.Count == room.SpecialTiles.Count)
+                    {
+                        RoomTemplates.Add(Path.GetFileNameWithoutExtension(file.Name), room);
+                    }
+                    else
+                    {
+                        Log.Error($"Room template '{file.Name}' failed to load!");
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Log.Error($"An error occured while loading Room Templates from {contentPath}: {e.Message}");
+            }
+            catch (JsonException e)
+            {
+                Log.Error($"An error occured while parsing Room Templates: {e.Message}");
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Something went wrong: {e.Message}");
+            }
+            Log.Message($"Room templates loaded ({RoomTemplates.Count}): {Util.GetStringFromEnumerable(RoomTemplates.Keys)}");
         }
 
 

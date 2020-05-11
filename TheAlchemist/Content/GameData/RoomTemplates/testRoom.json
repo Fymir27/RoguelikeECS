@@ -1,0 +1,35 @@
+{
+    "layouts": [
+        [
+            "####",
+            "# B#",
+            "#A #",
+            "####"
+        ],
+        [
+            "#####",
+            "## B#",
+            "#C ##",
+            "#####"
+        ]
+    ],
+    "A": {
+        "terrain": "",
+        "structure": "",
+        "items": [],
+        "character": ""
+    },
+    "B": {
+        "terrain": "",
+        "structure": "",
+        "items": [],
+        "character": ""
+    },
+    "C": {
+        "terrain": "",
+        "structure": "",
+        "items": [],
+        "character": ""
+    },
+    "tileset": "default"
+}
