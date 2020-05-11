@@ -77,8 +77,8 @@ namespace TheAlchemist
 
             //Floor test = new Floor(Content.RootDirectory + "/map.txt");
             Floor testFloor = new Floor(100, 70);
-            //testFloor.GenerateSimple();
-            testFloor.GenerateGraphBased();
+            testFloor.GenerateSimple();
+            //testFloor.GenerateGraphBased();
 
             //EntityManager.Dump();
 
