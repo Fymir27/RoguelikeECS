@@ -87,6 +87,7 @@ namespace TheAlchemist
         public Position(Position other) { X = other.X; Y = other.Y; }
 
         public static readonly Position Zero = new Position(0, 0);
+        public static readonly Position One = new Position(1, 1);
 
         public static readonly Position Up = new Position(0, -1);
         public static readonly Position Right = new Position(1, 0);

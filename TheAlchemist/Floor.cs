@@ -1633,6 +1633,32 @@ namespace TheAlchemist
         // configuring/adding the the transform to the position and
         // setting the sprite to visible
         // returns true if successful
+        public void InitTileFromTemplate(Position pos, TileTemplate template)
+        {
+            if(IsOutOfBounds(pos))
+            {
+                Log.Warning("Trying to initialize tile out of bounds! " + pos);
+                return;
+            }
+
+            if (template.Terrain != null && template.Terrain != "")
+                PlaceTerrain(pos, GameData.Instance.CreateTerrain(template.Terrain));
+
+            if (template.Items != null)
+            {
+                foreach (var itemName in template.Items)
+                {
+                    PlaceItem(pos, GameData.Instance.CreateItem(itemName));
+                }
+            }
+
+            if (template.Structure != null && template.Structure != "")
+                PlaceStructure(pos, GameData.Instance.CreateTerrain(template.Structure));
+
+            if (template.Character != null && template.Character != "")
+                PlaceCharacter(pos, GameData.Instance.CreateCharacter(template.Character));
+        }
+
         private bool PlaceEntity(Position pos, int entity, int renderLayer = 0)
         {
             if (entity == 0) // can happen during init

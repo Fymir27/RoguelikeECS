@@ -13,23 +13,28 @@ namespace TheAlchemist
     using Components;
     using Systems;
 
+    public struct TileTemplate
+    {
+        public string Terrain;
+        public string Structure;
+        public string[] Items;
+        public string Character;
+    }
+
+    public struct RoomTemplate
+    {
+        public List<char[,]> Layouts;
+        public Dictionary<char, TileTemplate> CustomTiles;
+        public static Dictionary<char, TileTemplate> DefaultTiles = new Dictionary<char, TileTemplate>()
+            {
+                { '#', new TileTemplate() { Terrain = "wall"} },
+                { ' ', new TileTemplate() { } }
+            };
+    }
+
     // This class loads and saves JSON representations of template enemies/items/terrain...
     class GameData
     {
-        public struct TileTemplate
-        {
-            public string Terrain;
-            public string Structure;
-            public string[] Items;
-            public string Character;
-        }
-
-        public struct RoomTemplate
-        {
-            public List<char[,]> Layouts;
-            public Dictionary<char, TileTemplate> SpecialTiles;
-        }
-
         public static GameData Instance = null;
 
         // string json = Entities[type][name]
@@ -81,7 +86,7 @@ namespace TheAlchemist
 
                     RoomTemplate room;
                     room.Layouts = new List<char[,]>();
-                    room.SpecialTiles = new Dictionary<char, TileTemplate>();
+                    room.CustomTiles = new Dictionary<char, TileTemplate>();
 
                     HashSet<char> placeholders = new HashSet<char>();
 
@@ -100,11 +105,15 @@ namespace TheAlchemist
                         {
                             for (int x = 0; x < width; x++)
                             {
-                                char c = lines[y][x];
+                                char c = lines[y][x];                               
                                 layout[x, y] = c;
                                 if (char.IsLetter(c))
                                 {
                                     placeholders.Add(c);
+                                }
+                                else if (!RoomTemplate.DefaultTiles.ContainsKey(c))
+                                {
+                                    Log.Error("Unknown symbol in room layout: " + c);
                                 }
                             }
                         }
@@ -118,10 +127,11 @@ namespace TheAlchemist
                             continue;
                         }
 
-                        // TODO: parse TileTemplates
-                        room.SpecialTiles.Add(ph, new TileTemplate());
+                        string tileTemplateSerialized = obj.GetValue(ph.ToString()).ToString();
+                        room.CustomTiles.Add(ph, JsonConvert.DeserializeObject<TileTemplate>(tileTemplateSerialized));
+                        Log.Data(room.CustomTiles[ph].Character);
                     }
-                    if(placeholders.Count == room.SpecialTiles.Count)
+                    if(placeholders.Count == room.CustomTiles.Count)
                     {
                         RoomTemplates.Add(Path.GetFileNameWithoutExtension(file.Name), room);
                     }

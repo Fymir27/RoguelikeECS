@@ -165,7 +165,64 @@ namespace TheAlchemist
 
             File.WriteAllText("advancedDungeon.gv", GraphPrinter.ToDot(dungeon));
 
-            InitPlayer(Position.Zero);
+            var room = GenerateRoom(Position.Zero, GameData.Instance.RoomTemplates["testRoom"]);
+
+            InitPlayer(Position.One);
+        }
+
+        public Tile[,] GenerateRoom(Position pos, RoomTemplate template, bool random = true, int layoutIndex = 0)
+        {
+            char[,] layout;
+
+            if(random)
+            {
+                layout = Util.PickRandomElement(template.Layouts);
+            }
+            else if(layoutIndex >= 0 && layoutIndex < template.Layouts.Count)
+            {
+                layout = template.Layouts[layoutIndex];
+            }
+            else
+            {
+                Log.Error("Invalid layout index: " + layoutIndex);
+                return null;
+            }
+
+            int width = layout.GetLength(0);
+            int height = layout.GetLength(1);
+
+            var room = new Tile[width, height];
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    char symbol = layout[x, y];
+
+                    TileTemplate tileTemplate;
+                    Position tilePos = pos + new Position(x, y);
+
+                    if(IsOutOfBounds(tilePos))
+                    {
+                        Log.Warning("Trying to place tile out of bounds! " + tilePos);
+                    }
+
+                    if(RoomTemplate.DefaultTiles.TryGetValue(symbol, out tileTemplate))
+                    {
+                        InitTileFromTemplate(tilePos, tileTemplate);
+                    }
+                    else if(template.CustomTiles.TryGetValue(symbol, out tileTemplate))
+                    {
+                        InitTileFromTemplate(tilePos, tileTemplate);
+                    }
+                    else
+                    {
+                        Log.Warning("Unkown symbol from Layout: " + symbol);
+                    }
+                }
+            }
+
+            return room;
         }
     }
 }

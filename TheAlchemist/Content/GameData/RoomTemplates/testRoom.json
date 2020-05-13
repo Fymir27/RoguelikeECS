@@ -17,19 +17,19 @@
         "terrain": "",
         "structure": "",
         "items": [],
-        "character": ""
+        "character": "rat"
     },
     "B": {
         "terrain": "",
         "structure": "",
         "items": [],
-        "character": ""
+        "character": "bat_fire"
     },
     "C": {
         "terrain": "",
         "structure": "",
         "items": [],
-        "character": ""
+        "character": "spider"
     },
     "tileset": "default"
 }
