@@ -13,12 +13,30 @@ namespace TheAlchemist
     using Components;
     using Systems;
 
+    public struct EntityTemplate
+    {
+        public string Name;
+        public int Weight;
+
+        // only used for item quantities
+        public int Min;
+        public int Max;
+
+        public EntityTemplate(string name, int weight = 1, int min = 0, int max = 0)
+        {
+            Name = name;
+            Weight = weight;
+            Min = min;
+            Max = max;
+        }
+    }
+
     public struct TileTemplate
     {
-        public string Terrain;
-        public string Structure;
-        public string[] Items;
-        public string Character;
+        public EntityTemplate[] Terrains;
+        public EntityTemplate[] Structures;
+        public EntityTemplate[] Items;
+        public EntityTemplate[] Characters;
     }
 
     public struct RoomTemplate
@@ -27,7 +45,7 @@ namespace TheAlchemist
         public Dictionary<char, TileTemplate> CustomTiles;
         public static Dictionary<char, TileTemplate> DefaultTiles = new Dictionary<char, TileTemplate>()
             {
-                { '#', new TileTemplate() { Terrain = "wall"} },
+                { '#', new TileTemplate() { Terrains = new EntityTemplate[] { new EntityTemplate("wall") } } },
                 { ' ', new TileTemplate() { } }
             };
     }
@@ -129,7 +147,6 @@ namespace TheAlchemist
 
                         string tileTemplateSerialized = obj.GetValue(ph.ToString()).ToString();
                         room.CustomTiles.Add(ph, JsonConvert.DeserializeObject<TileTemplate>(tileTemplateSerialized));
-                        Log.Data(room.CustomTiles[ph].Character);
                     }
                     if(placeholders.Count == room.CustomTiles.Count)
                     {

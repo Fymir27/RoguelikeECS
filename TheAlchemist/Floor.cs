@@ -1635,28 +1635,26 @@ namespace TheAlchemist
         // returns true if successful
         public void InitTileFromTemplate(Position pos, TileTemplate template)
         {
-            if(IsOutOfBounds(pos))
+            if (IsOutOfBounds(pos))
             {
                 Log.Warning("Trying to initialize tile out of bounds! " + pos);
                 return;
             }
 
-            if (template.Terrain != null && template.Terrain != "")
-                PlaceTerrain(pos, GameData.Instance.CreateTerrain(template.Terrain));
+            // TODO: randomly pick (weighted)
 
-            if (template.Items != null)
-            {
-                foreach (var itemName in template.Items)
-                {
-                    PlaceItem(pos, GameData.Instance.CreateItem(itemName));
-                }
-            }
+            if (template.Terrains != null && template.Terrains.Length > 0)
+                PlaceTerrain(pos, GameData.Instance.CreateTerrain(template.Terrains[0].Name));
 
-            if (template.Structure != null && template.Structure != "")
-                PlaceStructure(pos, GameData.Instance.CreateTerrain(template.Structure));
+            // TODO: randomize item count
+            if (template.Items != null && template.Items.Length > 0)
+                PlaceItem(pos, GameData.Instance.CreateItem(template.Items[0].Name));           
 
-            if (template.Character != null && template.Character != "")
-                PlaceCharacter(pos, GameData.Instance.CreateCharacter(template.Character));
+            if (template.Structures != null && template.Structures.Length > 0)
+                PlaceStructure(pos, GameData.Instance.CreateStructure(template.Structures[0].Name));
+
+            if (template.Characters != null && template.Characters.Length > 0)
+                PlaceCharacter(pos, GameData.Instance.CreateCharacter(template.Characters[0].Name));
         }
 
         private bool PlaceEntity(Position pos, int entity, int renderLayer = 0)
