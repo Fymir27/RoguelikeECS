@@ -1641,20 +1641,29 @@ namespace TheAlchemist
                 return;
             }
 
-            // TODO: randomly pick (weighted)
+            void PickAndPlaceEntity(Position placementPos, SortedList<int, EntityTemplate> templateList, Func<string, int> loaderFunction, Action<Position, int> placementFunction)
+            {
+                if (templateList == null || templateList.Count == 0)
+                    return;
 
-            if (template.Terrains != null && template.Terrains.Length > 0)
-                PlaceTerrain(pos, GameData.Instance.CreateTerrain(template.Terrains[0].Name));
+                string name = Util.PickRandomElementWeighted(templateList).Name;
 
-            // TODO: randomize item count
-            if (template.Items != null && template.Items.Length > 0)
-                PlaceItem(pos, GameData.Instance.CreateItem(template.Items[0].Name));           
+                if (string.IsNullOrEmpty(name))
+                    return;
 
-            if (template.Structures != null && template.Structures.Length > 0)
-                PlaceStructure(pos, GameData.Instance.CreateStructure(template.Structures[0].Name));
+                int entity = loaderFunction(name);
 
-            if (template.Characters != null && template.Characters.Length > 0)
-                PlaceCharacter(pos, GameData.Instance.CreateCharacter(template.Characters[0].Name));
+                if (entity == 0)
+                    return;
+
+                placementFunction(placementPos, entity);
+            }
+
+            PickAndPlaceEntity(pos, template.Terrains, GameData.Instance.CreateTerrain, PlaceTerrain);
+            PickAndPlaceEntity(pos, template.Structures, GameData.Instance.CreateStructure, PlaceStructure);
+            PickAndPlaceEntity(pos, template.Items, GameData.Instance.CreateItem, PlaceItem);
+            PickAndPlaceEntity(pos, template.Characters, GameData.Instance.CreateCharacter, PlaceCharacter);
+           
         }
 
         private bool PlaceEntity(Position pos, int entity, int renderLayer = 0)

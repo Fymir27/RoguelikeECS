@@ -100,8 +100,9 @@
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="GraphUtilities">
-      <HintPath>..\..\..\..\..\Source\Repos\Fymir27\GraphUtilities\GraphUtilities\bin\Debug\netstandard1.4\GraphUtilities.dll</HintPath>
+    <Reference Include="GraphUtilities, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\GraphUtilities\GraphUtilities\bin\Debug\netstandard1.4\GraphUtilities.dll</HintPath>
     </Reference>
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>

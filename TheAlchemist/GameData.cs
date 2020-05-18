@@ -22,21 +22,73 @@ namespace TheAlchemist
         public int Min;
         public int Max;
 
-        public EntityTemplate(string name, int weight = 1, int min = 0, int max = 0)
+        public static EntityTemplate Empty = new EntityTemplate("");
+
+        [JsonConstructor]
+        public EntityTemplate(string name, int weight = 1, int min = 1, int max = 1)
         {
             Name = name;
+            if(weight == 0)
+            {
+                WeightZeroWarning();
+                weight = 1;
+            }
             Weight = weight;
             Min = min;
             Max = max;
+        }
+
+        public static void WeightZeroWarning()
+        {
+            Log.Warning("Weight of EntityTemplate can't be 0! (set to 1)");
         }
     }
 
     public struct TileTemplate
     {
-        public EntityTemplate[] Terrains;
-        public EntityTemplate[] Structures;
-        public EntityTemplate[] Items;
-        public EntityTemplate[] Characters;
+        public SortedList<int, EntityTemplate> Terrains;
+        public SortedList<int, EntityTemplate> Structures;
+        public SortedList<int, EntityTemplate> Items;
+        public SortedList<int, EntityTemplate> Characters;
+
+        [JsonConstructor]
+        public TileTemplate(EntityTemplate[] terrains, EntityTemplate[] structures, EntityTemplate[] items, EntityTemplate[] characters)
+        {
+            SortedList<int, EntityTemplate> AccumulateWeights(EntityTemplate[] list)
+            {
+                int acc = 0;
+                var result = new SortedList<int, EntityTemplate>();
+                if(list == null)
+                {
+                    return result;
+                }
+                foreach (var template in list)
+                {
+                    if(template.Name == null)
+                    {
+                        acc++;
+                        result.Add(acc, EntityTemplate.Empty);
+                        continue;
+                    }
+                   
+
+                    if(template.Weight == 0)
+                    {
+                        Log.Warning($"EntityTemplate with name '{template.Name}' has Weight 0 and will be ignored!");
+                        continue;
+                    }
+
+                    acc += template.Weight;
+                    result.Add(acc, template);
+                }
+                return result;
+            }
+
+            Terrains = AccumulateWeights(terrains);
+            Structures = AccumulateWeights(structures);
+            Items = AccumulateWeights(items);
+            Characters = AccumulateWeights(characters);           
+        }
     }
 
     public struct RoomTemplate
@@ -45,7 +97,7 @@ namespace TheAlchemist
         public Dictionary<char, TileTemplate> CustomTiles;
         public static Dictionary<char, TileTemplate> DefaultTiles = new Dictionary<char, TileTemplate>()
             {
-                { '#', new TileTemplate() { Terrains = new EntityTemplate[] { new EntityTemplate("wall") } } },
+                { '#', new TileTemplate() { Terrains = new SortedList<int, EntityTemplate>() { { 1, new EntityTemplate("wall") } } } },
                 { ' ', new TileTemplate() { } }
             };
     }
@@ -145,6 +197,7 @@ namespace TheAlchemist
                             continue;
                         }
 
+                        Log.Data("Placeholder: " + ph);
                         string tileTemplateSerialized = obj.GetValue(ph.ToString()).ToString();
                         room.CustomTiles.Add(ph, JsonConvert.DeserializeObject<TileTemplate>(tileTemplateSerialized));
                     }
@@ -254,6 +307,24 @@ namespace TheAlchemist
                 Log.Data(e.Message);
                 throw e;
             }
+        }
+
+        public static void WriteDummyToFile()
+        {
+            EntityTemplate empty = new EntityTemplate();
+            EntityTemplate bat = new EntityTemplate("bat", 1);
+            EntityTemplate spider = new EntityTemplate("spider", 3);
+            EntityTemplate wall = new EntityTemplate("wall");
+            EntityTemplate healthPotion = new EntityTemplate("healthPotion", 0, 1, 3);
+            TileTemplate test = new TileTemplate(
+                new EntityTemplate[] { wall, empty },
+                new EntityTemplate[] { },
+                new EntityTemplate[] { healthPotion, empty },
+                new EntityTemplate[] { bat, spider }
+            );
+
+            string str = Util.SerializeObject(test, true);
+            Log.Data(str);
         }
     }
 }

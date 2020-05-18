@@ -251,6 +251,34 @@ namespace TheAlchemist
             return result.Substring(0, result.Length - 1) + "]";
         }
 
+        public static T PickRandomElementWeighted<T>(SortedList<int, T> list)
+        {
+            if(list == null)
+            {
+                string message = "Util.GetRandomElementWeighted: Input list is null!";
+                Log.Error(message);
+                throw new ArgumentNullException(message);
+            }
+
+            if(list.Count == 0)
+            {
+                string message = "Util.GetRandomElementWeighted: Empty input list!";
+                Log.Error(message);
+                throw new ArgumentException(message);
+            }
+
+            int max = list.Last().Key;
+            int r = Game.Random.Next(max);
+            foreach (var pair in list)
+            {
+                if(r < pair.Key)
+                {
+                    return pair.Value;
+                }
+            }
+            throw new ArgumentException("W T F did you do? This SortedList is not sorted!!!");
+        }
+
         // transforms world position to screen position based on tile size
         public static Vector2 WorldToScreenPosition(Position worldPos)
         {
