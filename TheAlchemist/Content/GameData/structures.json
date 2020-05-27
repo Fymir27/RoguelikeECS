@@ -57,5 +57,47 @@
       "GrantsItems": true,
       "Items": []
     }
+  ],
+  "tree": [
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Tree",
+      "Description": "Standing tall..."
+    },
+    {
+      "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+      "Texture": "square",
+      "Tint": {
+        "B": 0,
+        "G": 255,
+        "R": 0,
+        "A": 255
+      }
+    },
+    {
+      "$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+      "Solid": true
+    }
+  ],
+  "statue": [
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Statue",
+      "Description": "Very detailed!"
+    },
+    {
+      "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+      "Texture": "square",
+      "Tint": {
+        "B": 200,
+        "G": 200,
+        "R": 200,
+        "A": 255
+      }
+    },
+    {
+      "$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+      "Solid": true
+    }
   ]
 }

@@ -129,9 +129,12 @@ namespace TheAlchemist.Systems
                 var interactable = EntityManager.GetComponent<InteractableComponent>(structure);
 
                 // only interact with structures right away if they're solid ("bumping" into them)
-                if (interactable != null && solid)
+                if (solid)
                 {
-                    RaiseInteractionEvent(entity, structure);
+                    if (interactable != null)
+                    {
+                        RaiseInteractionEvent(entity, structure);
+                    }
                     return false;
                 }
             }

@@ -1,0 +1,46 @@
+{
+    "layouts": [
+        [
+            "##########",
+            "#aaaS aaa#",
+            "#a##  ##a#",
+            "#a#wwww#a#",
+            "#a#wwww#a#",
+            "#a##ww##a#",
+            "#a      a#",
+            "####dd####"
+        ]
+    ],
+    "a": {
+        "structures": [
+            {
+                "name": "bush"
+            },
+            {
+                "name": "tree"
+            }
+        ]
+    },
+    "S": {
+        "structures": [
+            {
+                "name": "statue"
+            }
+        ]
+    },
+    "w": {
+        "terrains": [
+            {
+                "name": "water"
+            }
+        ]
+    },
+    "d": {
+        "structures": [
+            {
+                "name": "door"
+            }
+        ]
+    },
+    "tileset": "default"
+}

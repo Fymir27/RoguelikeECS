@@ -165,9 +165,9 @@ namespace TheAlchemist
 
             File.WriteAllText("advancedDungeon.gv", GraphPrinter.ToDot(dungeon));
 
-            var room = GenerateRoom(Position.Zero, GameData.Instance.RoomTemplates["testRoom"]);
+            var room = GenerateRoom(Position.Zero, GameData.Instance.RoomTemplates["fountain"]);
 
-            InitPlayer(Position.One);
+            InitPlayer(new Position(4, 6));
         }
 
         public Tile[,] GenerateRoom(Position pos, RoomTemplate template, bool random = true, int layoutIndex = 0)
