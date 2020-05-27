@@ -1795,12 +1795,42 @@ namespace TheAlchemist
 
         public void PlaceStructure(Position pos, int structure)
         {
-            if (!PlaceEntity(pos, structure, RenderableSpriteComponent.RenderLayer.Structure))
+            var multiTileC = EntityManager.GetComponent<MultiTileComponent>(structure);
+
+            List<Position> newPositions = new List<Position>();
+
+            if (multiTileC != null)
             {
-                return;
+                if (!PlaceEntityMultiTile(pos, structure, multiTileC))
+                {
+                    return;
+                }
+
+                foreach (var offsetPos in multiTileC.OccupiedPositions)
+                {
+                    newPositions.Add(pos + offsetPos);
+                }
+            }
+            else
+            {
+                if (!PlaceEntity(pos, structure, RenderableSpriteComponent.RenderLayer.Structure))
+                {
+                    return;
+                }
+
+                newPositions.Add(pos);
             }
 
-            GetTile(pos).Structure = structure;
+            if (newPositions.TrueForAll(newPos => GetTile(newPos).Structure == 0))
+            {
+                newPositions.ForEach(newPos => GetTile(newPos).Structure = structure);
+            }
+            else
+            {
+                Log.Warning(String.Format("Can't place {0} at {1} when there already is/are entitie(s)!",
+                    DescriptionSystem.GetNameWithID(structure),
+                    pos));
+            }
         }
 
         public bool MultiTileCharacterPlacable(Position pos, MultiTileComponent multiTileC)

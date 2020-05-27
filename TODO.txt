@@ -4,3 +4,4 @@ Correct Stat stacking
 Better enemy AI
 Better dungeon layout generation
 Instability of potions (crafted too often)
+Opacity != Solidity of tile

@@ -66,17 +66,11 @@
     },
     {
       "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
-      "Texture": "square",
-      "Tint": {
-        "B": 0,
-        "G": 255,
-        "R": 0,
-        "A": 255
-      }
+      "Texture": "tree"
     },
     {
       "$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
-      "Solid": true
+      "Solid": false
     }
   ],
   "statue": [
@@ -87,17 +81,24 @@
     },
     {
       "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
-      "Texture": "square",
-      "Tint": {
-        "B": 200,
-        "G": 200,
-        "R": 200,
-        "A": 255
-      }
+      "Texture": "statue"
     },
     {
       "$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
       "Solid": true
+    },
+    {
+      "$type": "TheAlchemist.Components.MultiTileComponent, TheAlchemist",
+      "OccupationMatrix": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
     }
   ]
 }

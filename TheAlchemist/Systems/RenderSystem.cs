@@ -124,7 +124,17 @@ namespace TheAlchemist.Systems
 
                         if (sprite != null && sprite.Visible)
                         {
-                            DrawSprite(sprite, relScreenPos);
+                            var multiTileC = EntityManager.GetComponent<MultiTileComponent>(tile.Structure);
+
+                            if (multiTileC == null)
+                            {
+                                DrawSprite(sprite, relScreenPos);
+                            }
+                            else
+                            {
+                                var relAnchor = multiTileC.Anchor - min;
+                                DrawSpriteMultiTile(sprite, relScreenPos, relAnchor, multiTileC.Width);
+                            }
                         }
                     }
 
