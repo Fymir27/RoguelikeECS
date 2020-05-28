@@ -27,7 +27,21 @@ namespace TheAlchemist
     {
         public bool IsOpaque(Position pos)
         {
-            return IsTileBlocked(pos);
+            Tile tile = GetTile(pos);
+            if (tile == null)
+                return true;
+
+            int structure = tile.Structure;
+
+            if (structure != 0 && IsBlockingSight(structure))
+                return true;
+
+            int terrain = tile.Terrain;
+
+            if (terrain != 0 && IsBlockingSight(terrain))
+                return true;
+
+            return false;
         }
 
         public void SetSeen(Position pos)
@@ -191,6 +205,23 @@ namespace TheAlchemist
                 }
 
                 return true;
+            }
+
+            return false;
+        }
+
+        public bool IsBlockingSight(int entity)
+        {
+            if (entity == 0)
+            {
+                return false;
+            }
+
+            var collider = EntityManager.GetComponent<ColliderComponent>(entity);
+
+            if (collider != null)
+            {
+                return collider.Opaque;
             }
 
             return false;

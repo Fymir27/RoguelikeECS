@@ -38,13 +38,7 @@
     },
     {
       "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
-      "Texture": "square",
-      "Tint": {
-        "B": 160,
-        "G": 158,
-        "R": 95,
-        "A": 255
-      },
+      "Texture": "water",
       "Visible": true,
       "Layer": 0,
       "EntityID": 0

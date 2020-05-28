@@ -71,6 +71,15 @@
     {
       "$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
       "Solid": false
+    },
+    {
+      "$type": "TheAlchemist.Components.MultiTileComponent, TheAlchemist",
+      "OccupationMatrix": [
+        [
+          1,
+          1
+        ]
+      ]
     }
   ],
   "statue": [
@@ -85,7 +94,8 @@
     },
     {
       "$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
-      "Solid": true
+      "Solid": true,
+      "Opaque": false
     },
     {
       "$type": "TheAlchemist.Components.MultiTileComponent, TheAlchemist",
