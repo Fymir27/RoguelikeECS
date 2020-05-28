@@ -52,5 +52,14 @@
       "Layer": 0,
       "EntityID": 0
     }
+  ],
+  "mossyGround": [
+    {
+      "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+      "Texture": "mossyGround",
+      "Visible": true,
+      "Layer": 0,
+      "EntityID": 0
+    }
   ]
 }

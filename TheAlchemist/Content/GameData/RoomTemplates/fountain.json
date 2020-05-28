@@ -2,16 +2,21 @@
     "layouts": [
         [
             "##########",
-            "#aaaS aaa#",
-            "#a##  ##a#",
+            "#aaaSmaaa#",
+            "#a##mm##a#",
             "#a#wwww#a#",
             "#a#wwww#a#",
             "#a##ww##a#",
-            "#a      a#",
-            "####dd####"
+            "#ammmmmma#",
+            "####++####"
         ]
     ],
     "a": {
+        "terrains": [
+            {
+                "name": "mossyGround"
+            }
+        ],
         "structures": [
             {
                 "name": "bush"
@@ -21,7 +26,19 @@
             }
         ]
     },
+    "m": {
+        "terrains": [
+            {
+                "name": "mossyGround"
+            }
+        ]
+    },
     "S": {
+        "terrains": [
+            {
+                "name": "mossyGround"
+            }
+        ],
         "structures": [
             {
                 "name": "statue"
@@ -32,13 +49,6 @@
         "terrains": [
             {
                 "name": "water"
-            }
-        ]
-    },
-    "d": {
-        "structures": [
-            {
-                "name": "door"
             }
         ]
     },

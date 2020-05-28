@@ -30,7 +30,6 @@ namespace TheAlchemist
             Name = name;
             if(weight == 0)
             {
-                WeightZeroWarning();
                 weight = 1;
             }
             Weight = weight;
@@ -98,6 +97,7 @@ namespace TheAlchemist
         public static Dictionary<char, TileTemplate> DefaultTiles = new Dictionary<char, TileTemplate>()
             {
                 { '#', new TileTemplate() { Terrains = new SortedList<int, EntityTemplate>() { { 1, new EntityTemplate("wall") } } } },
+                { '+', new TileTemplate() { Structures = new SortedList<int, EntityTemplate>() { { 1, new EntityTemplate("door") } } } },
                 { ' ', new TileTemplate() { } }
             };
     }
@@ -197,7 +197,6 @@ namespace TheAlchemist
                             continue;
                         }
 
-                        Log.Data("Placeholder: " + ph);
                         string tileTemplateSerialized = obj.GetValue(ph.ToString()).ToString();
                         room.CustomTiles.Add(ph, JsonConvert.DeserializeObject<TileTemplate>(tileTemplateSerialized));
                     }
