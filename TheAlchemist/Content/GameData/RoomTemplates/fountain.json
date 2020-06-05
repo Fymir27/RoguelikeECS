@@ -2,12 +2,12 @@
     "layouts": [
         [
             "##########",
-            "#aaaSmaaa#",
-            "#a##mm##a#",
-            "#a#wwww#a#",
-            "#a#wwww#a#",
-            "#a##ww##a#",
-            "#ammmmmma#",
+            "#ammSmmma#",
+            "#arrmmrra#",
+            "#arwwwwra#",
+            "#arwwwwra#",
+            "#arrwwrra#",
+            "#mmmmmmmm#",
             "####++####"
         ]
     ],
@@ -49,6 +49,18 @@
         "terrains": [
             {
                 "name": "water"
+            }
+        ]
+    },
+    "r": {
+        "terrains": [
+            {
+                "name": "mossyGround"
+            }
+        ],
+        "structures": [
+            {
+                "name": "rocks"
             }
         ]
     },

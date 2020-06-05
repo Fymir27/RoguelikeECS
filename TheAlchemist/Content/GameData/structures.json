@@ -82,6 +82,22 @@
       ]
     }
   ],
+  "rocks": [
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Rocks",
+      "Description": "..."
+    },
+    {
+      "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+      "Texture": "rocks"
+    },
+    {
+      "$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+      "Solid": true,
+      "Opaque": false
+    }
+  ],
   "statue": [
     {
       "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
