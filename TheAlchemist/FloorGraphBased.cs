@@ -153,8 +153,6 @@ namespace TheAlchemist
                 } while (!ruleSuccess);
             }
 
-            File.WriteAllText("advancedDungeon.gv", GraphPrinter.ToDot(dungeon));
-
             return dungeon;
         }
 
@@ -182,32 +180,48 @@ namespace TheAlchemist
             Position curPos = Position.Zero;
 
             List<Vertex> placedVertices = new List<Vertex>();
+            Dictionary<Position, Vertex> roomLayout = new Dictionary<Position, Vertex>();
 
             while (!done)
             {
                 int neighbourCount = curVertex.Edges.Count;
-                Console.WriteLine("NeighbourCount: " + neighbourCount);
-                double angleDelta = (Math.PI * 2.0) / neighbourCount; // in radians
-                Console.WriteLine("AngleDelta: " + angleDelta);
-                double angleOffset = Game.Random.NextDouble() * angleDelta;
-                Console.WriteLine("AngleOffset: " + angleOffset);
-                double curRadius = 6; // TODO: get bounding radius of room
 
-                double curAngle = angleOffset;
+                // collapse neighbouring rooms into junctions that lead into those rooms
+                // until there's only max neighbours left
+                int maxNeighbours = 6;
+                int iterationCount = neighbourCount - maxNeighbours;
+                for (int i = 0; i < iterationCount; i++)
+                {
+                    Console.WriteLine("Iteration " + i + " of neighbour count reduction on " + curVertex);
+
+                    // remember rooms/edges
+                    Edge edge1 = curVertex.Edges[i];
+                    Vertex room1 = edge1.GetOtherVertex(curVertex);
+                    Edge edge2 = curVertex.Edges[neighbourCount - i - 1];
+                    Vertex room2 = edge2.GetOtherVertex(curVertex);
+
+                    // add junction instead of room1 and remove edge to room2 entirely
+                    var junc = new Junction();
+                    dungeonGraph.AddVertex(junc);
+                    edge1.ReplaceVertex(room1, junc);
+                    dungeonGraph.RemoveEdge(edge2);
+
+                    // connect rooms to the junction
+                    Edge newEdge1 = new Edge(junc, room1);
+                    Edge newEdge2 = new Edge(junc, room2);
+                    dungeonGraph.AddEdge(newEdge1);
+                    dungeonGraph.AddEdge(newEdge2);
+                }
+
 
                 foreach (var edge in curVertex.Edges)
                 {
-                    double newRadius = 6; // TODO: get bounding radius of new room
-                    double x = Math.Sin(curAngle);
-                    double y = Math.Cos(curAngle);
-                    x = x * (curRadius + newRadius);
-                    y = y * (curRadius + newRadius);
-                    Position pos = new Position((int)Math.Round(x), (int)Math.Round(y));
-                    Console.WriteLine(pos);
-                    curAngle += angleDelta;
+                   
                 }
                 done = true;
             }
+
+            File.WriteAllText("advancedDungeon.gv", GraphPrinter.ToDot(dungeonGraph));
         }
 
         public Tile[,] GenerateRoom(Position pos, RoomTemplate template, bool random = true, int layoutIndex = 0)
