@@ -47,27 +47,60 @@ namespace TheAlchemist
 
         class FinalRoom : RoomVertex { }
 
-        public void GenerateGraphBased()
+        private Tuple<ReplacementRule, int>[] GetReplacementRules()
         {
-            // instantiate tiles and set terrain
-            for (int y = 0; y < height; y++)
+            var builder = new ReplacementRuleBuilder();
+
+            builder.Reset()
+                   .MappedVertex<BasicRoom>("a")
+                   .PatternVertexWithEdge<BasicRoom, Edge>("b")
+                   .MoveToTag("a").ReplacementVertexWithEdge<Junction, Edge>("j")
+                   .ReplacementVertexWithEdge<BasicRoom, Edge>().MoveToTag("j")
+                   .ReplacementVertexWithEdge<BasicRoom, Edge>().MapToTag("b");
+
+            var addJunction = builder.GetResult();
+
+            builder.Reset()
+                .MappedVertex<BasicRoom>("a")
+                .PatternVertexWithEdge<BasicRoom, Edge>("b").MoveToTag("a")
+                .ReplacementVertexWithEdge<BasicRoom, Edge>()
+                .ReplacementVertexWithEdge<BasicRoom, Edge>().MapToTag("b");
+
+            var stretch = builder.GetResult();
+
+            builder.Reset()
+                .MappedVertex<BasicRoom>("a")
+                .PatternVertexWithEdge<Junction, Edge>("j")
+                .PatternVertexWithEdge<BasicRoom, Edge>("b").MoveToTag("j")
+                .PatternVertexWithEdge<BasicRoom, Edge>("c").MoveToTag("a")
+                .ReplacementVertexWithEdge<BasicRoom, Edge>().MapToTag("b")
+                .ReplacementVertexWithEdge<BasicRoom, Edge>().MapToTag("c")
+                .ReplacementEdge<Edge>().MoveToTag("a");
+
+            var transformJunction = builder.GetResult();
+
+            builder.Reset()
+                .MappedVertex<BasicRoom>("a")
+                .MappedVertexWithEdge<BasicRoom, Edge>()
+                .MappedVertexWithEdge<BasicRoom, Edge>()
+                .MappedVertexWithEdge<BasicRoom, Edge>()
+                .ReplacementEdge<Edge>().MoveToTag("a");
+
+            var createLoop = builder.GetResult();
+
+            var rules = new Tuple<ReplacementRule, int>[]
             {
-                for (int x = 0; x < width; x++)
-                {
-                    tiles[x, y] = new Tile();
-                    //PlaceTerrain(new Position(x, y), Crea());
-                }
-            }
+                Tuple.Create(addJunction, 3),
+                Tuple.Create(stretch, 2),
+                Tuple.Create(createLoop, 2),
+                Tuple.Create(transformJunction, 1)
+            };
 
-            Random rnd;
-            int seed = 0; //1948689677;
+            return rules;     
+    }
 
-            if (seed == 0)
-                seed = (int)System.DateTime.Now.Ticks;
-
-            Console.WriteLine("Seed: " + seed);
-            rnd = new Random(seed);
-
+        private Graph GenerateGraph()
+        {  
             var builder = new ReplacementRuleBuilder();
 
             builder.MappedVertex<StartingRoom>("start")
@@ -83,56 +116,13 @@ namespace TheAlchemist
 
             for (int i = 0; i < 15; i++)
             {
-                builder.Reset()
-                    .MappedVertex<BasicRoom>("a")
-                    .PatternVertexWithEdge<BasicRoom, Edge>("b")
-                    .MoveToTag("a").ReplacementVertexWithEdge<Junction, Edge>("j")
-                    .ReplacementVertexWithEdge<BasicRoom, Edge>().MoveToTag("j")
-                    .ReplacementVertexWithEdge<BasicRoom, Edge>().MapToTag("b");
-
-                var addJunction = builder.GetResult();
-
-                builder.Reset()
-                    .MappedVertex<BasicRoom>("a")
-                    .PatternVertexWithEdge<BasicRoom, Edge>("b").MoveToTag("a")
-                    .ReplacementVertexWithEdge<BasicRoom, Edge>()
-                    .ReplacementVertexWithEdge<BasicRoom, Edge>().MapToTag("b");
-
-                var stretch = builder.GetResult();
-
-                builder.Reset()
-                    .MappedVertex<BasicRoom>("a")
-                    .PatternVertexWithEdge<Junction, Edge>("j")
-                    .PatternVertexWithEdge<BasicRoom, Edge>("b").MoveToTag("j")
-                    .PatternVertexWithEdge<BasicRoom, Edge>("c").MoveToTag("a")
-                    .ReplacementVertexWithEdge<BasicRoom, Edge>().MapToTag("b")
-                    .ReplacementVertexWithEdge<BasicRoom, Edge>().MapToTag("c")
-                    .ReplacementEdge<Edge>().MoveToTag("a");
-
-                var transformJunction = builder.GetResult();
-
-                builder.Reset()
-                    .MappedVertex<BasicRoom>("a")
-                    .MappedVertexWithEdge<BasicRoom, Edge>()
-                    .MappedVertexWithEdge<BasicRoom, Edge>()
-                    .MappedVertexWithEdge<BasicRoom, Edge>()
-                    .ReplacementEdge<Edge>().MoveToTag("a");
-
-                var createLoop = builder.GetResult();
+                var rules = GetReplacementRules();
 
                 builder.Reset()
                     .MappedVertex<BasicRoom>()
                     .ReplacementVertexWithEdge<BasicRoom, Edge>();
 
                 var addRoom = builder.GetResult();
-
-                var rules = new Tuple<ReplacementRule, int>[]
-                {
-                Tuple.Create(addJunction, 3),
-                Tuple.Create(stretch, 2),
-                Tuple.Create(createLoop, 2),
-                Tuple.Create(transformJunction, 1)
-                };
 
                 int acc = 0;
                 int[] absoluteDistribution = rules.Select(t => acc += t.Item2).ToArray();
@@ -149,7 +139,7 @@ namespace TheAlchemist
                         break;
                     }
 
-                    int r = rnd.Next(acc);
+                    int r = Game.Random.Next(acc);
 
                     for (ruleIndex = 0; ruleIndex < rules.Length; ruleIndex++)
                     {
@@ -165,9 +155,59 @@ namespace TheAlchemist
 
             File.WriteAllText("advancedDungeon.gv", GraphPrinter.ToDot(dungeon));
 
+            return dungeon;
+        }
+
+        public void GenerateGraphBased()
+        {
+            // instantiate tiles and set terrain
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    tiles[x, y] = new Tile();
+                    //PlaceTerrain(new Position(x, y), Crea());
+                }
+            }
+
+            Graph dungeonGraph = GenerateGraph();
+
             var room = GenerateRoom(Position.Zero, GameData.Instance.RoomTemplates["fountain"]);
 
             InitPlayer(new Position(4, 6));
+
+            bool done = false;
+
+            Vertex curVertex = dungeonGraph.Vertices[0];
+            Position curPos = Position.Zero;
+
+            List<Vertex> placedVertices = new List<Vertex>();
+
+            while (!done)
+            {
+                int neighbourCount = curVertex.Edges.Count;
+                Console.WriteLine("NeighbourCount: " + neighbourCount);
+                double angleDelta = (Math.PI * 2.0) / neighbourCount; // in radians
+                Console.WriteLine("AngleDelta: " + angleDelta);
+                double angleOffset = Game.Random.NextDouble() * angleDelta;
+                Console.WriteLine("AngleOffset: " + angleOffset);
+                double curRadius = 6; // TODO: get bounding radius of room
+
+                double curAngle = angleOffset;
+
+                foreach (var edge in curVertex.Edges)
+                {
+                    double newRadius = 6; // TODO: get bounding radius of new room
+                    double x = Math.Sin(curAngle);
+                    double y = Math.Cos(curAngle);
+                    x = x * (curRadius + newRadius);
+                    y = y * (curRadius + newRadius);
+                    Position pos = new Position((int)Math.Round(x), (int)Math.Round(y));
+                    Console.WriteLine(pos);
+                    curAngle += angleDelta;
+                }
+                done = true;
+            }
         }
 
         public Tile[,] GenerateRoom(Position pos, RoomTemplate template, bool random = true, int layoutIndex = 0)
