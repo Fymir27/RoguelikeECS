@@ -174,16 +174,21 @@ namespace TheAlchemist
 
             InitPlayer(new Position(4, 6));
 
-            bool done = false;
-
-            Vertex curVertex = dungeonGraph.Vertices[0];
             Position curPos = Position.Zero;
+            Queue<Vertex> todo = new Queue<Vertex>();
+            todo.Enqueue(dungeonGraph.Vertices[0]);
 
             List<Vertex> placedVertices = new List<Vertex>();
             Dictionary<Position, Vertex> roomLayout = new Dictionary<Position, Vertex>();
 
-            while (!done)
+            while (todo.Count > 0)
             {
+                Vertex curVertex = todo.Dequeue();
+                placedVertices.Add(curVertex);
+
+                // TODO: place room
+                Console.WriteLine("Placing " + curVertex);
+
                 int neighbourCount = curVertex.Edges.Count;
 
                 // collapse neighbouring rooms into junctions that lead into those rooms
@@ -213,12 +218,11 @@ namespace TheAlchemist
                     dungeonGraph.AddEdge(newEdge2);
                 }
 
-
-                foreach (var edge in curVertex.Edges)
+                var notVisited = curVertex.Edges.Select(e => e.GetOtherVertex(curVertex)).Where(v => !placedVertices.Contains(v));
+                foreach (var vertex in notVisited)
                 {
-                   
+                    todo.Enqueue(vertex);
                 }
-                done = true;
             }
 
             File.WriteAllText("advancedDungeon.gv", GraphPrinter.ToDot(dungeonGraph));
