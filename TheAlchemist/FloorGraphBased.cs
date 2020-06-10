@@ -174,7 +174,6 @@ namespace TheAlchemist
 
             InitPlayer(new Position(4, 6));
 
-            Position curPos = Position.Zero;
             Queue<Vertex> todo = new Queue<Vertex>();
             todo.Enqueue(dungeonGraph.Vertices[0]);
 
@@ -183,17 +182,27 @@ namespace TheAlchemist
 
             while (todo.Count > 0)
             {
-                Vertex curVertex = todo.Dequeue();
+                Vertex curVertex = todo.Dequeue();              
                 placedVertices.Add(curVertex);
 
-                // TODO: place room
-                Console.WriteLine("Placing " + curVertex);
+                var curPos = Position.Zero; // TODO: find free pos connected to prev one
 
-                int neighbourCount = curVertex.Edges.Count;
+                var freeAdjacentPositions = curPos.GetNeighboursHexPointyTop().Where(p => !roomLayout.ContainsKey(p));
+
+                // TODO: place room
+                Console.WriteLine("Placing " + curVertex + " at " + curPos);
+
+                var notVisited = curVertex.Edges.Select(e => e.GetOtherVertex(curVertex)).Where(v => !placedVertices.Contains(v));
+                int neighbourCount = notVisited.Count();
 
                 // collapse neighbouring rooms into junctions that lead into those rooms
                 // until there's only max neighbours left
-                int maxNeighbours = 6;
+                int maxNeighbours = freeAdjacentPositions.Count();
+                if(maxNeighbours == 0)
+                {
+                    // TODO: fallback/retry
+                    throw new Exception("No more room to place room!");
+                }
                 int iterationCount = neighbourCount - maxNeighbours;
                 for (int i = 0; i < iterationCount; i++)
                 {
@@ -218,10 +227,14 @@ namespace TheAlchemist
                     dungeonGraph.AddEdge(newEdge2);
                 }
 
-                var notVisited = curVertex.Edges.Select(e => e.GetOtherVertex(curVertex)).Where(v => !placedVertices.Contains(v));
+                // update after possible reduction of neighbours
+                notVisited = curVertex.Edges.Select(e => e.GetOtherVertex(curVertex)).Where(v => !placedVertices.Contains(v));
+
+                Console.WriteLine("Neighbours: " + notVisited.Count());
+                var randomizedAdjacentPositions = new Stack<Position>(Util.Shuffle(freeAdjacentPositions));
                 foreach (var vertex in notVisited)
                 {
-                    todo.Enqueue(vertex);
+                    todo.Enqueue(Tuple.Create(randomizedAdjacentPositions.Pop(), vertex));
                 }
             }
 

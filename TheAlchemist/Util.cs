@@ -104,6 +104,18 @@ namespace TheAlchemist
             return result;
         }
 
+        public Position[] GetNeighboursHexPointyTop()
+        {
+            Position[] result = new Position[6];
+            result[0] = this + Up;
+            result[1] = this + Up + Right;
+            result[2] = this + Right;
+            result[3] = this + Down + Right;
+            result[4] = this + Down;
+            result[5] = this + Left;
+            return result;
+        }
+
         public static implicit operator Position(Vector2 other) { return new Position((int)other.X, (int)other.Y); }
 
         public static Position operator +(Position first, Position second)
@@ -438,6 +450,20 @@ namespace TheAlchemist
         public static T PickRandomElement<T>(List<T> list)
         {
             return list[Game.Random.Next(0, list.Count)];
+        }
+
+        // based on Fisher-Yates shuffle
+        public static List<T> Shuffle<T>(IEnumerable<T> enumerable)
+        {          
+            List<T> list = enumerable.ToList();
+            for (int n = list.Count() - 1; n >= 0; n--)
+            {
+                int r = Game.Random.Next(n + 1);
+                T value = list[r];
+                list[r] = list[n];
+                list[n] = value;
+            }
+            return list;
         }
 
         public static InventoryComponent GetPlayerInventory()
