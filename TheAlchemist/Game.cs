@@ -39,7 +39,7 @@ namespace TheAlchemist
         RenderSystem renderSystem;
         UISystem uiSystem;
 
-        public static int Seed = (int)DateTime.Now.TimeOfDay.TotalSeconds;
+        public static int Seed = 78600; // (int)DateTime.Now.TimeOfDay.TotalSeconds;
         public static Random Random { get; } = new Random(Seed);
 
 
@@ -67,6 +67,8 @@ namespace TheAlchemist
         /// </summary>
         protected override void Initialize()
         {
+            Console.Write(typeof(string).Assembly.ImageRuntimeVersion);
+
             Util.ContentPath = Content.RootDirectory;
 
             Log.Init(AppDomain.CurrentDomain.BaseDirectory);

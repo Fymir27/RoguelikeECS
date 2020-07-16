@@ -104,15 +104,52 @@ namespace TheAlchemist
             return result;
         }
 
+        public static Position[] HexDirections =
+        {
+            Up,
+            Up + Right,
+            Right,
+            Down,
+            Down + Left,
+            Left
+        };
         public Position[] GetNeighboursHexPointyTop()
         {
             Position[] result = new Position[6];
             result[0] = this + Up;
             result[1] = this + Up + Right;
             result[2] = this + Right;
-            result[3] = this + Down + Right;
-            result[4] = this + Down;
+            result[3] = this + Down;
+            result[4] = this + Down + Left;
             result[5] = this + Left;
+            return result;
+        }
+
+        public Position[] HexCircle(int circumference)
+        {
+            var result = new Position[circumference];
+            int stepDirectionIndex = Game.Random.Next(0, HexDirections.Length);
+            Position step = HexDirections[stepDirectionIndex];
+            int radius = (int)Math.Ceiling(circumference / Math.PI) / 2;
+            Position start = this + step * radius;
+            stepDirectionIndex = (stepDirectionIndex + 2) % 6;
+            step = HexDirections[stepDirectionIndex];
+            Console.WriteLine($"Making circle with circumf. {circumference}, center {this}, start {start}, startStep {step}");
+            int maxPool = circumference;
+            int pool = maxPool;
+            Position cur = start;
+            for (int i = 0; i < circumference; i++)            
+            {
+                result[i] = cur;
+                cur += step;
+                pool -= 6;
+                while(pool <= 0)
+                {
+                    stepDirectionIndex = (stepDirectionIndex + 1) % 6;
+                    step = HexDirections[stepDirectionIndex];
+                    pool += maxPool;
+                }
+            }
             return result;
         }
 

@@ -111,6 +111,7 @@ namespace TheAlchemist
             var initialRule = builder.GetResult();
 
             var dungeon = new Graph();
+            dungeon.Random = Game.Random;
             dungeon.AddVertex(new StartingRoom());
             dungeon.Replace(initialRule, true);
 
@@ -169,20 +170,112 @@ namespace TheAlchemist
             }
 
             Graph dungeonGraph = GenerateGraph();
+            File.WriteAllText("advancedDungeon.gv", GraphPrinter.ToDot(dungeonGraph, true, true));
 
             var room = GenerateRoom(Position.Zero, GameData.Instance.RoomTemplates["fountain"]);
 
             InitPlayer(new Position(4, 6));
 
+
+            List<Cycle> cycles = dungeonGraph.GetCycles(true);
+            Dictionary<Vertex, List<Cycle>> belongsToCycle = new Dictionary<Vertex, List<Cycle>>();
+
+            foreach (var vertex in dungeonGraph.Vertices)
+            {
+                belongsToCycle[vertex] = new List<Cycle>();
+            }
+
+            foreach (var cycle in cycles)
+            {
+                foreach (var vertex in cycle.Vertices())
+                {
+                    belongsToCycle[vertex].Add(cycle);
+                }
+            }
+
+            HashSet<Vertex> verticesPlaced = new HashSet<Vertex>();
+            Dictionary<Position, Vertex> grid = new Dictionary<Position, Vertex>();
+
+            // tuples consist of vertex to place and position of ancestor(=neighbour)
+            Stack<Tuple<Vertex, Position>> todo = new Stack<Tuple<Vertex, Position>>();
+
+            Vertex v = dungeonGraph.Vertices.First();
+            Position pos = Position.Zero;
+
+            Position min = Position.Zero;
+            Position max = Position.Zero;
+
+            grid.Add(pos, v);
+            verticesPlaced.Add(v);            
+
+            int totalVertexCount = dungeonGraph.Vertices.Count;
+            while(verticesPlaced.Count < totalVertexCount)
+            {
+                foreach (var neighbour in v.Edges.Select(e => e.GetOtherVertex(v)).Where(n => !verticesPlaced.Contains(n)))
+                {
+                    todo.Push(Tuple.Create(neighbour, pos));
+                }
+
+                if (true/*belongsToCycle[v].Count == 0*/)
+                {
+                    // get next neighbour that hasn't been placed yet
+                    while (verticesPlaced.Contains(v)) {
+                        var next = todo.Pop();
+                        v = next.Item1;
+                        pos = next.Item2;
+                    }
+
+                    var newPos = pos;
+                    foreach (var dir in Position.HexDirections)
+                    {
+                        if(!grid.ContainsKey(pos + dir))
+                        {
+                            newPos = pos + dir;
+                        }
+                    }
+                    if(newPos == pos)
+                    {
+                        throw new InvalidOperationException("No neighbours reachable!");
+                    }
+
+                    min.X = Math.Min(min.X, newPos.X);
+                    min.Y = Math.Min(min.Y, newPos.Y);
+                    max.X = Math.Max(max.X, newPos.X);
+                    max.Y = Math.Max(max.Y, newPos.Y);
+
+                    grid.Add(newPos, v);
+                    verticesPlaced.Add(v);
+                    pos = newPos;
+                }
+            }
+
+            while(cycles.Count > 0)
+            {
+                var cycle = cycles[0];
+                var vertices = cycle.Vertices();
+                //int radius = (int)Math.Ceiling(vertices.Count / Math.PI) / 2;
+                //Console.WriteLine($"Cycle of length {vertices.Count} has radius {radius}");
+                cycles.RemoveAt(0);
+                var cyclePositions = Position.Zero.HexCircle(vertices.Count);
+            }
+
+            /*
             Queue<Position> todo = new Queue<Position>();
             Dictionary<Position, Vertex> roomLayout = new Dictionary<Position, Vertex>();
 
             roomLayout.Add(Position.Zero, dungeonGraph.Vertices[0]);
             todo.Enqueue(Position.Zero);
 
+            Position min = Position.Zero;
+            Position max = Position.Zero;
+
             while (todo.Count > 0)
             {
                 Position curPos = todo.Dequeue();
+                if (curPos.X < min.X) min.X = curPos.X;
+                if (curPos.Y < min.Y) min.Y = curPos.Y;
+                if (curPos.X > max.X) max.X = curPos.X;
+                if (curPos.Y > max.Y) max.Y = curPos.Y;
                 var curVertex = roomLayout[curPos];
 
                 var freeAdjacentPositions = curPos.GetNeighboursHexPointyTop().Where(p => !roomLayout.ContainsKey(p));
@@ -240,6 +333,77 @@ namespace TheAlchemist
             }
 
             File.WriteAllText("advancedDungeon.gv", GraphPrinter.ToDot(dungeonGraph));
+            */
+            var layoutAsText = DrawLayout(grid, min, max);
+            File.WriteAllText("roomLayout.txt", layoutAsText);
+        }
+
+        public string DrawLayout(Dictionary<Position, Vertex> roomLayout, Position min, Position max)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            for (int y = min.Y; y <= max.Y; y++)
+            {
+                StringBuilder connectionRow = new StringBuilder();
+                int rowNr = y + Math.Abs(min.Y);
+                sb.Append(new String(' ', 2 * rowNr));
+                connectionRow.Append(new String(' ', 2 * rowNr));
+                for (int x = min.X; x <= max.X; x++)
+                {
+                    var pos = new Position(x, y);
+                    if (roomLayout.ContainsKey(pos))
+                    {
+                        var vertex = roomLayout[pos];
+                        Vertex otherVertex = null;
+                        roomLayout.TryGetValue(pos + Position.Left, out otherVertex);
+                        if (vertex.Edges.Any(e => e.GetOtherVertex(vertex) == otherVertex))
+                        {
+                            sb.Append("--");
+                        }
+                        else
+                        {
+                            sb.Append("  ");
+                        }
+                        sb.Append(vertex.ToString()[0]);
+                        roomLayout.TryGetValue(pos + Position.Right, out otherVertex);
+                        if (vertex.Edges.Any(e => e.GetOtherVertex(vertex) == otherVertex))
+                        {
+                            sb.Append("-");
+                        }
+                        else
+                        {
+                            sb.Append(" ");
+                        }
+                        roomLayout.TryGetValue(pos + Position.Down + Position.Left, out otherVertex);
+                        if (vertex.Edges.Any(e => e.GetOtherVertex(vertex) == otherVertex))
+                        {
+                            connectionRow.Append(" /");
+                        }
+                        else
+                        {
+                            connectionRow.Append("  ");
+                        }
+                        connectionRow.Append(" ");
+                        roomLayout.TryGetValue(pos + Position.Down, out otherVertex);
+                        if (vertex.Edges.Any(e => e.GetOtherVertex(vertex) == otherVertex))
+                        {
+                            connectionRow.Append("\\");
+                        }
+                        else
+                        {
+                            connectionRow.Append(" ");
+                        }
+                    }
+                    else
+                    {
+                        sb.Append("    ");
+                        connectionRow.Append("    ");
+                    }
+                }
+                sb.AppendLine();
+                sb.AppendLine(connectionRow.ToString());
+            }
+            return sb.ToString();
         }
 
         public Tile[,] GenerateRoom(Position pos, RoomTemplate template, bool random = true, int layoutIndex = 0)
