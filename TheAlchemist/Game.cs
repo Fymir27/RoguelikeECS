@@ -39,7 +39,7 @@ namespace TheAlchemist
         RenderSystem renderSystem;
         UISystem uiSystem;
 
-        public static int Seed = 78600; // (int)DateTime.Now.TimeOfDay.TotalSeconds;
+        public static int Seed = 73732;//78600; // (int)DateTime.Now.TimeOfDay.TotalSeconds;
         public static Random Random { get; } = new Random(Seed);
 
 

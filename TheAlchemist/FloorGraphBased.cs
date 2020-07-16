@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 using GraphUtilities;
+using Microsoft.Xna.Framework.Graphics;
+using System.Security.Cryptography.X509Certificates;
 
 namespace TheAlchemist
 {
@@ -15,7 +17,7 @@ namespace TheAlchemist
         {
             public override string ToString()
             {
-                return "Room";
+                return "Room" + ID;
             }
         }
 
@@ -23,7 +25,7 @@ namespace TheAlchemist
         {
             public override string ToString()
             {
-                return "Fragment";
+                return "Fragment" + ID;
             }
         }
 
@@ -31,7 +33,7 @@ namespace TheAlchemist
         {
             public override string ToString()
             {
-                return "Junc.";
+                return "Junc." + ID;
             }
         }
 
@@ -92,7 +94,7 @@ namespace TheAlchemist
             {
                 Tuple.Create(addJunction, 3),
                 Tuple.Create(stretch, 2),
-                Tuple.Create(createLoop, 2),
+                Tuple.Create(createLoop, 1),
                 Tuple.Create(transformJunction, 1)
             };
 
@@ -115,7 +117,7 @@ namespace TheAlchemist
             dungeon.AddVertex(new StartingRoom());
             dungeon.Replace(initialRule, true);
 
-            for (int i = 0; i < 15; i++)
+            for (int i = 0; i < 10; i++)
             {
                 var rules = GetReplacementRules();
 
@@ -195,7 +197,7 @@ namespace TheAlchemist
 
             HashSet<Vertex> verticesPlaced = new HashSet<Vertex>();
             Dictionary<Position, Vertex> grid = new Dictionary<Position, Vertex>();
-
+          
             // tuples consist of vertex to place and position of ancestor(=neighbour)
             Stack<Tuple<Vertex, Position>> todo = new Stack<Tuple<Vertex, Position>>();
 
@@ -205,8 +207,18 @@ namespace TheAlchemist
             Position min = Position.Zero;
             Position max = Position.Zero;
 
-            grid.Add(pos, v);
-            verticesPlaced.Add(v);            
+            void Place(Vertex vertex, Position position)
+            {
+                min.X = Math.Min(min.X, position.X);
+                min.Y = Math.Min(min.Y, position.Y);
+                max.X = Math.Max(max.X, position.X);
+                max.Y = Math.Max(max.Y, position.Y);
+
+                grid.Add(position, vertex);
+                verticesPlaced.Add(vertex);
+            }
+
+            Place(v, pos);            
 
             int totalVertexCount = dungeonGraph.Vertices.Count;
             while(verticesPlaced.Count < totalVertexCount)
@@ -216,15 +228,16 @@ namespace TheAlchemist
                     todo.Push(Tuple.Create(neighbour, pos));
                 }
 
-                if (true/*belongsToCycle[v].Count == 0*/)
+                // get next neighbour that hasn't been placed yet
+                while (verticesPlaced.Contains(v))
                 {
-                    // get next neighbour that hasn't been placed yet
-                    while (verticesPlaced.Contains(v)) {
-                        var next = todo.Pop();
-                        v = next.Item1;
-                        pos = next.Item2;
-                    }
+                    var next = todo.Pop();
+                    v = next.Item1;
+                    pos = next.Item2;
+                }
 
+                if (belongsToCycle[v].Count == 0)
+                {  
                     var newPos = pos;
                     foreach (var dir in Position.HexDirections)
                     {
@@ -235,17 +248,67 @@ namespace TheAlchemist
                     }
                     if(newPos == pos)
                     {
-                        throw new InvalidOperationException("No neighbours reachable!");
+                        // TODO:
+                        throw new Exception("No neighbours reachable!");
                     }
 
-                    min.X = Math.Min(min.X, newPos.X);
-                    min.Y = Math.Min(min.Y, newPos.Y);
-                    max.X = Math.Max(max.X, newPos.X);
-                    max.Y = Math.Max(max.Y, newPos.Y);
-
-                    grid.Add(newPos, v);
-                    verticesPlaced.Add(v);
+                    Place(v, newPos);
                     pos = newPos;
+                } 
+                else
+                {
+                    List<Cycle> inCycles = belongsToCycle[v];
+                    if(inCycles.Count > 1)
+                    {
+                        // TODO:
+                        throw new Exception("Vertex in multiple cylces... Can't handle that (yet)!");
+                    } 
+                    else
+                    {
+                        Cycle cycle = inCycles.First();
+                        int circumference = cycle.EdgeCount;
+                        int radius = (int)Math.Round((circumference / Math.PI) / 2);
+                        var cycleVertices = cycle.Vertices();
+
+                        var newPos = pos;
+                        foreach (var dir in Position.HexDirections)
+                        {
+                            newPos = pos + dir;
+                            var center = newPos + dir * radius;
+                            var circlePositions = center.HexCircle(circumference);
+                            bool circlePlacable = circlePositions.All(p => !grid.ContainsKey(p));
+
+                            if (circlePlacable)
+                            {
+                                int cycleOffset = cycleVertices.IndexOf(v);
+                                int circleOffset = Array.IndexOf(circlePositions, newPos);
+                                for (int i = 0; i < circlePositions.Length; i++)
+                                {
+                                    int cycleIndex = (i + cycleOffset) % circlePositions.Length;
+                                    v = cycleVertices[cycleIndex];
+                                    int circleIndex = (i + circleOffset) % circlePositions.Length;
+                                    newPos = circlePositions[circleIndex];
+                                    Place(v, newPos);
+                                    belongsToCycle[v].Clear();
+
+                                    foreach (var neighbour in v.Edges.Select(e => e.GetOtherVertex(v)).Where(n => !verticesPlaced.Contains(n)))
+                                    {
+                                        if (!cycleVertices.Contains(neighbour))
+                                        {
+                                            todo.Push(Tuple.Create(neighbour, newPos));
+                                        }
+                                    }
+                                }                                
+                                break;
+                            }                            
+                        }
+                        if (newPos == pos)
+                        {
+                            // TODO:
+                            throw new Exception("Circle not placable!");
+                        }
+                        pos = newPos;
+                    }
                 }
             }
 
