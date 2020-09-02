@@ -263,157 +263,140 @@ namespace TheAlchemist
 
                         Place(v, newPos);
                         pos = newPos;
+                        continue;
+                    }
+                    
+                    List<Cycle> inCycles = belongsToCycle[v];
+                    if (inCycles.Count > 1)
+                    {
+                        if (inCycles.Count > 2)
+                        {
+                            throw new Exception("Vertex in more than 2 cylces... Can't handle that (yet)!");
+                        }
+
+                        var overlaps = inCycles[0].Overlap(inCycles[1]);
+
+                        if (overlaps.Count > 1)
+                        {
+                            throw new Exception("Can't handle cycles with more than one overlap!");
+                        }
+
+                        var oldPos = pos;
+                        int sharedVertexCount = overlaps.First().Count + 1; // vertices = edges + 1
+                        var sharedLine = new List<Position>();
+                        for (int directionIndex = 0; directionIndex < 6; directionIndex++)
+                        {
+                            var dir = Position.HexDirections[directionIndex];
+                            pos = oldPos;
+                            sharedLine.Clear();
+
+                            for (int i = 0; i < sharedVertexCount; i++)
+                            {
+                                pos += dir;
+                                if (grid.ContainsKey(pos))
+                                {
+                                    break;
+                                }
+                                sharedLine.Add(pos);
+                            }
+
+                            if (sharedLine.Count != sharedVertexCount)
+                                continue; // try other direction
+
+                            Place(v, sharedLine[0]);
+                            for (int i = 0; i < sharedVertexCount - 1; i++)
+                            {                               
+                                v = overlaps.First()[i].GetOtherVertex(v);
+                                Place(v, sharedLine[i + 1]);                                
+                            }
+
+                            var dir0 = Position.HexDirections[(directionIndex + 1) % 6];
+                            var dir1 = Position.HexDirections[(directionIndex + 5) % 6];                                    
+
+                            var cycle0 = sharedLine[sharedVertexCount - 1].HexCircle(sharedLine.ToArray(), inCycles[0].EdgeCount, 1);
+                            var cycle1 = sharedLine[sharedVertexCount - 1].HexCircle(sharedLine.ToArray(), inCycles[1].EdgeCount, -1);
+
+                            var overlappingCyclesPositions = new Position[][] { cycle0, cycle1 };
+
+                            bool cyclesPlacable = overlappingCyclesPositions.All(c => c.All(p => sharedLine.Contains(p) || !grid.ContainsKey(p)));
+
+                            if (!cyclesPlacable)
+                                continue; // try new direction
+
+                            var overlappingCycles = new List<Vertex>[] { inCycles[0].Vertices(), inCycles[1].Vertices() };
+                                       
+                            var overlap = overlaps.First();
+
+                            for(int cycleIndex = 0; cycleIndex < overlappingCycles.Count(); cycleIndex++) 
+                            {
+                                var cycleVerts = overlappingCycles[cycleIndex];
+                                var cyclePositions = overlappingCyclesPositions[cycleIndex];
+
+                                // check if vertices in cycle are (counter)clockwise
+                                bool increaseIndex = overlap.First().GetOtherVertex(cycleVerts[0]) == cycleVerts[1];
+                                int increment = increaseIndex ? 1 : cycleVerts.Count - 1;
+
+                                int vertIndex = 0;
+                                int posIndex = 0;
+                                while(posIndex < cyclePositions.Count())
+                                {
+                                    if (!sharedLine.Contains(cyclePositions[posIndex]))
+                                    {
+                                        pos = cyclePositions[posIndex];
+                                        v = cycleVerts[vertIndex];
+                                        Place(v, pos);
+                                    }
+                                    posIndex++;
+                                    vertIndex = (vertIndex + increment) % cycleVerts.Count;
+                                }                                                                          
+                            }
+                            break;
+                        }
                     }
                     else
                     {
-                        List<Cycle> inCycles = belongsToCycle[v];
-                        if (inCycles.Count > 1)
+                        Cycle cycle = inCycles.First();
+                        int circumference = cycle.EdgeCount;
+                        var cycleVertices = cycle.Vertices();
+
+                        var newPos = pos;
+                        foreach (var dir in Position.HexDirections)
                         {
-                            if (inCycles.Count > 2)
+                            var circlePositions = newPos.HexCircle(dir, circumference);
+                            bool circlePlacable = circlePositions.All(p => !grid.ContainsKey(p));
+
+                            if (circlePlacable)
                             {
-                                throw new Exception("Vertex in more than 2 cylces... Can't handle that (yet)!");
-                            }
-
-                            var overlaps = inCycles[0].Overlap(inCycles[1]);
-
-                            if (overlaps.Count > 1)
-                            {
-                                throw new Exception("Can't handle cycles with more than one overlap!");
-                            }
-
-                            var oldPos = pos;
-                            int sharedVertexCount = overlaps.First().Count + 1; // vertices = edges + 1
-                            var sharedLine = new List<Position>();
-                            for (int directionIndex = 0; directionIndex < 6; directionIndex++)
-                            {
-                                var dir = Position.HexDirections[directionIndex];
-                                pos = oldPos;
-                                sharedLine.Clear();
-
-                                int i = 0;
-                                for (; i < sharedVertexCount; i++)
+                                newPos = pos + dir;
+                                int cycleOffset = cycleVertices.IndexOf(v);
+                                int circleOffset = Array.IndexOf(circlePositions, newPos);
+                                for (int i = 0; i < circlePositions.Length; i++)
                                 {
-                                    pos += dir;
-                                    if (grid.ContainsKey(pos))
+                                    int cycleIndex = (i + cycleOffset) % circlePositions.Length;
+                                    v = cycleVertices[cycleIndex];
+                                    int circleIndex = (i + circleOffset) % circlePositions.Length;
+                                    newPos = circlePositions[circleIndex];
+                                    Place(v, newPos);
+                                    belongsToCycle[v].Clear();
+
+                                    foreach (var neighbour in v.Edges.Select(e => e.GetOtherVertex(v)).Where(n => !verticesPlaced.Contains(n)))
                                     {
-                                        break;
-                                    }
-                                    sharedLine.Add(pos);
-                                }
-                                if (i == sharedVertexCount)
-                                {
-                                    Place(v, sharedLine[0]);
-                                    for (i = 0; i < sharedVertexCount - 1; i++)
-                                    {
-                                        try
+                                        if (!cycleVertices.Contains(neighbour))
                                         {
-                                            v = overlaps.First()[i].GetOtherVertex(v);
-                                            Place(v, sharedLine[i + 1]);
-                                        } 
-                                        catch(ArgumentException e)
-                                        {
-                                            Console.WriteLine(e.StackTrace);
+                                            todo.Push(Tuple.Create(neighbour, newPos));
                                         }
                                     }
-
-                                    var dir0 = Position.HexDirections[(directionIndex + 1) % 6];
-                                    var dir1 = Position.HexDirections[(directionIndex + 5) % 6];
-
-                                    /*
-                                    var circle0Start = new List<Position>(sharedLine);
-                                    circle0Start.Add(dir0);
-                                    var circle1Start = new List<Position>(sharedLine);
-                                    circle1Start.Add(dir1);
-                                    */
-
-                                    var cycle0 = sharedLine[sharedVertexCount - 1].HexCircle(sharedLine.ToArray(), inCycles[0].EdgeCount, 1);
-                                    var cycle1 = sharedLine[sharedVertexCount - 1].HexCircle(sharedLine.ToArray(), inCycles[1].EdgeCount, -1);
-
-                                    var overlappingCyclesPositions = new Position[][] { cycle0, cycle1 };
-
-                                    bool cyclesPlacable = overlappingCyclesPositions.All(c => c.All(p => sharedLine.Contains(p) || !grid.ContainsKey(p))); //cycle0.All(p => sharedLine.Contains(p) || !grid.ContainsKey(p)) && cycle0.All(p => sharedLine.Contains(p) || !grid.ContainsKey(p));
-
-                                    if (cyclesPlacable)
-                                    {
-                                        var overlappingCycles = new List<Vertex>[] { inCycles[0].Vertices(), inCycles[1].Vertices() };
-                                       
-                                        var overlap = overlaps.First();
-
-                                        for(int cycleIndex = 0; cycleIndex < overlappingCycles.Count(); cycleIndex++) {
-
-                                            var cycleVerts = overlappingCycles[cycleIndex];
-                                            var cyclePositions = overlappingCyclesPositions[cycleIndex];
-                                            bool increaseIndex = overlap.First().GetOtherVertex(cycleVerts[0]) == cycleVerts[1];
-                                            int increment = increaseIndex ? 1 : cycleVerts.Count - 1;
-
-                                            int vertIndex = 0;
-                                            int posIndex = 0;
-                                            while(posIndex < cyclePositions.Count())
-                                            {
-                                                if (!sharedLine.Contains(cyclePositions[posIndex]))
-                                                {
-                                                    pos = cyclePositions[posIndex];
-                                                    v = cycleVerts[vertIndex];
-                                                    Place(v, pos);
-                                                }
-                                                posIndex++;
-                                                vertIndex = (vertIndex + increment) % cycleVerts.Count;
-                                            }                                         
-                                        }
-                                        break;
-                                    }
                                 }
-                            }                           
-
-                            var tmpLayout = DrawLayout(grid, min, max);
-                            File.WriteAllText("roomLayout.txt", tmpLayout);
-
+                                break;
+                            }
                         }
-                        else
+                        if (newPos == pos)
                         {
-                            Cycle cycle = inCycles.First();
-                            int circumference = cycle.EdgeCount;
-                            var cycleVertices = cycle.Vertices();
-
-                            var newPos = pos;
-                            foreach (var dir in Position.HexDirections)
-                            {
-                                var circlePositions = newPos.HexCircle(dir, circumference);
-                                bool circlePlacable = circlePositions.All(p => !grid.ContainsKey(p));
-
-                                if (circlePlacable)
-                                {
-                                    newPos = pos + dir;
-                                    int cycleOffset = cycleVertices.IndexOf(v);
-                                    int circleOffset = Array.IndexOf(circlePositions, newPos);
-                                    for (int i = 0; i < circlePositions.Length; i++)
-                                    {
-                                        int cycleIndex = (i + cycleOffset) % circlePositions.Length;
-                                        v = cycleVertices[cycleIndex];
-                                        int circleIndex = (i + circleOffset) % circlePositions.Length;
-                                        newPos = circlePositions[circleIndex];
-                                        Place(v, newPos);
-                                        belongsToCycle[v].Clear();
-
-                                        foreach (var neighbour in v.Edges.Select(e => e.GetOtherVertex(v)).Where(n => !verticesPlaced.Contains(n)))
-                                        {
-                                            if (!cycleVertices.Contains(neighbour))
-                                            {
-                                                todo.Push(Tuple.Create(neighbour, newPos));
-                                            }
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
-                            if (newPos == pos)
-                            {
-                                // TODO:
-                                throw new Exception("Circle not placable!");
-                            }
-                            pos = newPos;
+                            // TODO:
+                            throw new Exception("Circle not placable!");
                         }
-                    }
+                        pos = newPos;
+                    }                    
                 }
             } 
             catch(Exception e)
@@ -421,94 +404,7 @@ namespace TheAlchemist
                 Console.WriteLine(e.StackTrace);
                 Console.WriteLine(e.Message);
             }
-
-            /*
-            while(cycles.Count > 0)
-            {
-                var cycle = cycles[0];
-                var vertices = cycle.Vertices();
-                //int radius = (int)Math.Ceiling(vertices.Count / Math.PI) / 2;
-                //Console.WriteLine($"Cycle of length {vertices.Count} has radius {radius}");
-                cycles.RemoveAt(0);
-                var cyclePositions = Position.Zero.HexCircle(vertices.Count);
-            }
-            */
-
-            /*
-            Queue<Position> todo = new Queue<Position>();
-            Dictionary<Position, Vertex> roomLayout = new Dictionary<Position, Vertex>();
-
-            roomLayout.Add(Position.Zero, dungeonGraph.Vertices[0]);
-            todo.Enqueue(Position.Zero);
-
-            Position min = Position.Zero;
-            Position max = Position.Zero;
-
-            while (todo.Count > 0)
-            {
-                Position curPos = todo.Dequeue();
-                if (curPos.X < min.X) min.X = curPos.X;
-                if (curPos.Y < min.Y) min.Y = curPos.Y;
-                if (curPos.X > max.X) max.X = curPos.X;
-                if (curPos.Y > max.Y) max.Y = curPos.Y;
-                var curVertex = roomLayout[curPos];
-
-                var freeAdjacentPositions = curPos.GetNeighboursHexPointyTop().Where(p => !roomLayout.ContainsKey(p));
-
-                // TODO: place room
-                Console.WriteLine("Visiting " + curVertex + " at " + curPos);
-
-                var notVisited = curVertex.Edges.Select(e => e.GetOtherVertex(curVertex)).Where(v => !roomLayout.Values.Contains(v));
-                int neighbourCount = notVisited.Count();
-
-                // collapse neighbouring rooms into junctions that lead into those rooms
-                // until there's only max neighbours left
-                int maxNeighbours = freeAdjacentPositions.Count();
-                if(maxNeighbours == 0)
-                {
-                    // TODO: fallback/retry
-                    throw new Exception("No more room to place room!");
-                }
-                int iterationCount = neighbourCount - maxNeighbours;
-                for (int i = 0; i < iterationCount; i++)
-                {
-                    Console.WriteLine("Iteration " + i + " of neighbour count reduction on " + curVertex);
-
-                    // remember rooms/edges
-                    Edge edge1 = curVertex.Edges[i];
-                    Vertex room1 = edge1.GetOtherVertex(curVertex);
-                    Edge edge2 = curVertex.Edges[neighbourCount - i - 1];
-                    Vertex room2 = edge2.GetOtherVertex(curVertex);
-
-                    // add junction instead of room1 and remove edge to room2 entirely
-                    var junc = new Junction();
-                    dungeonGraph.AddVertex(junc);
-                    edge1.ReplaceVertex(room1, junc);
-                    dungeonGraph.RemoveEdge(edge2);
-
-                    // connect rooms to the junction
-                    Edge newEdge1 = new Edge(junc, room1);
-                    Edge newEdge2 = new Edge(junc, room2);
-                    dungeonGraph.AddEdge(newEdge1);
-                    dungeonGraph.AddEdge(newEdge2);
-                }
-
-                // update after possible reduction of neighbours
-                notVisited = curVertex.Edges.Select(e => e.GetOtherVertex(curVertex)).Where(v => !roomLayout.Values.Contains(v));
-
-                Console.WriteLine("Neighbours: " + notVisited.Count());
-                var randomizedAdjacentPositions = new Stack<Position>(Util.Shuffle(freeAdjacentPositions));
-                foreach (var vertex in notVisited)
-                {
-                    var pos = randomizedAdjacentPositions.Pop();
-                    roomLayout.Add(pos, vertex);
-                    todo.Enqueue(pos);
-                    Console.WriteLine("Placing " + vertex + " at " + pos);
-                }
-            }
-
-            File.WriteAllText("advancedDungeon.gv", GraphPrinter.ToDot(dungeonGraph));
-            */
+          
             var layoutAsText = DrawLayout(grid, min, max);
             File.WriteAllText("roomLayout.txt", layoutAsText);
         }
