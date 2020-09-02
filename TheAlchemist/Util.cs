@@ -125,19 +125,18 @@ namespace TheAlchemist
             return result;
         }
 
-        public Position[] HexCircle(int circumference)
+        public Position[] HexCircle(Position direction, int circumference)
         {
+
+            // TODO: start from existing line + (counter)clockwise
+
             var result = new Position[circumference];
-            int stepDirectionIndex = Game.Random.Next(0, HexDirections.Length);
-            Position step = HexDirections[stepDirectionIndex];
-            int radius = (int)Math.Ceiling(circumference / Math.PI) / 2;
-            Position start = this + step * radius;
-            stepDirectionIndex = (stepDirectionIndex + 2) % 6;
-            step = HexDirections[stepDirectionIndex];
-            Console.WriteLine($"Making circle with circumf. {circumference}, center {this}, start {start}, startStep {step}");
+            int stepDirectionIndex = Array.IndexOf(HexDirections, direction);
+
+            Position step = direction;
             int maxPool = circumference;
             int pool = maxPool;
-            Position cur = start;
+            Position cur = this;
             for (int i = 0; i < circumference; i++)            
             {
                 result[i] = cur;
@@ -151,6 +150,52 @@ namespace TheAlchemist
                 }
             }
             return result;
+        }
+
+        public Position[] HexCircle(Position[] alreadyPlaced, int circumference, int clockwiseIn = 0)
+        {
+            int prevIndex = 0;
+            int maxPool = circumference;
+            int pool = maxPool;
+            int clockwise = clockwiseIn == 0 ? 1 : clockwiseIn;
+            Position step;
+            for (int i = 0; i < alreadyPlaced.Length - 1; i++)
+            {
+                step = alreadyPlaced[i + 1] - alreadyPlaced[i];
+                pool -= 6;
+                if(i == 0)
+                {
+                    prevIndex = Array.IndexOf(HexDirections, step);
+                }
+                else
+                {
+                    int neighbourIndex = Array.IndexOf(HexDirections, step);
+                    if(neighbourIndex - prevIndex > 2)
+                    {
+                        clockwise = -1;
+                    }
+                    int rotations = Math.Abs(prevIndex - (clockwise > 0 ? neighbourIndex : 6 - neighbourIndex));
+                    pool += rotations * maxPool;
+                    prevIndex = neighbourIndex;
+                }
+            }
+            List<Position> result = new List<Position>(alreadyPlaced);
+            Position cur = alreadyPlaced[alreadyPlaced.Length - 1];
+            int stepDirectionIndex = prevIndex;
+            step = HexDirections[prevIndex];
+            for (int i = alreadyPlaced.Length; i < circumference; i++)
+            {           
+                while (pool <= 0)
+                {
+                    stepDirectionIndex = (stepDirectionIndex + (clockwise > 0 ? 1 : 5)) % 6;
+                    step = HexDirections[stepDirectionIndex];
+                    pool += maxPool;
+                }
+                cur += step;
+                result.Add(cur);
+                pool -= 6;          
+            }
+            return result.ToArray();
         }
 
         public static implicit operator Position(Vector2 other) { return new Position((int)other.X, (int)other.Y); }
@@ -487,6 +532,11 @@ namespace TheAlchemist
         public static T PickRandomElement<T>(List<T> list)
         {
             return list[Game.Random.Next(0, list.Count)];
+        }
+
+        public static T PickRandomElement<T>(T[] arr)
+        {
+            return arr[Game.Random.Next(0, arr.Length)];
         }
 
         // based on Fisher-Yates shuffle
