@@ -269,78 +269,85 @@ namespace TheAlchemist
                     List<Cycle> inCycles = belongsToCycle[v];
                     if (inCycles.Count > 1)
                     {
-                        if (inCycles.Count > 2)
+                        // List of line segments that overlap between two circles respectively for every circle
+                        // overlaps[circle][segment][edge]
+                        var overlaps = new List<List<List<Edge>>>();
+
+                        for (int i = 0; i < (inCycles.Count - 1); i++)
                         {
-                            throw new Exception("Vertex in more than 2 cylces... Can't handle that (yet)!");
+                            overlaps.Add(inCycles[i].Overlap(inCycles[i + 1]));
                         }
 
-                        var overlaps = inCycles[0].Overlap(inCycles[1]);
+                        if (overlaps.Count > 2)
+                        {
+                            throw new Exception("Vertex in more than 2 cylces... Can't handle that (yet)!");
+                        }                    
 
-                        if (overlaps.Count > 1)
+                        var curOverlap = overlaps.First();
+
+                        if (curOverlap.Count > 1)
                         {
                             throw new Exception("Can't handle cycles with more than one overlap!");
                         }
 
+                        var sharedSegment = curOverlap.First();
+
                         var oldPos = pos;
-                        int sharedVertexCount = overlaps.First().Count + 1; // vertices = edges + 1
-                        var sharedLine = new List<Position>();
+                        int sharedVertexCount = sharedSegment.Count + 1; // vertices = edges + 1
+                        var sharedGridPositions = new List<Position>();
                         for (int directionIndex = 0; directionIndex < 6; directionIndex++)
                         {
                             var dir = Position.HexDirections[directionIndex];
                             pos = oldPos;
-                            sharedLine.Clear();
+                            sharedGridPositions.Clear();
 
                             for (int i = 0; i < sharedVertexCount; i++)
                             {
                                 pos += dir;
                                 if (grid.ContainsKey(pos))
-                                {
                                     break;
-                                }
-                                sharedLine.Add(pos);
+                                sharedGridPositions.Add(pos);
                             }
 
-                            if (sharedLine.Count != sharedVertexCount)
+                            if (sharedGridPositions.Count != sharedVertexCount)
                                 continue; // try other direction
 
-                            Place(v, sharedLine[0]);
-                            for (int i = 0; i < sharedVertexCount - 1; i++)
+                            Place(v, sharedGridPositions.First());
+                            for (int i = 0; i < (sharedVertexCount - 1); i++)
                             {                               
-                                v = overlaps.First()[i].GetOtherVertex(v);
-                                Place(v, sharedLine[i + 1]);                                
+                                v = sharedSegment[i].GetOtherVertex(v);
+                                Place(v, sharedGridPositions[i + 1]);                                
                             }
 
                             var dir0 = Position.HexDirections[(directionIndex + 1) % 6];
                             var dir1 = Position.HexDirections[(directionIndex + 5) % 6];                                    
 
-                            var cycle0 = sharedLine[sharedVertexCount - 1].HexCircle(sharedLine.ToArray(), inCycles[0].EdgeCount, 1);
-                            var cycle1 = sharedLine[sharedVertexCount - 1].HexCircle(sharedLine.ToArray(), inCycles[1].EdgeCount, -1);
+                            var cycle0 = sharedGridPositions[sharedVertexCount - 1].HexCircle(sharedGridPositions.ToArray(), inCycles[0].EdgeCount, 1);
+                            var cycle1 = sharedGridPositions[sharedVertexCount - 1].HexCircle(sharedGridPositions.ToArray(), inCycles[1].EdgeCount, -1);
 
-                            var overlappingCyclesPositions = new Position[][] { cycle0, cycle1 };
+                            var cyclesOnGrid = new Position[][] { cycle0, cycle1 };
 
-                            bool cyclesPlacable = overlappingCyclesPositions.All(c => c.All(p => sharedLine.Contains(p) || !grid.ContainsKey(p)));
+                            bool cyclesPlacable = cyclesOnGrid.All(c => c.All(p => sharedGridPositions.Contains(p) || !grid.ContainsKey(p)));
 
                             if (!cyclesPlacable)
                                 continue; // try new direction
 
-                            var overlappingCycles = new List<Vertex>[] { inCycles[0].Vertices(), inCycles[1].Vertices() };
-                                       
-                            var overlap = overlaps.First();
+                            var overlappingCycles = new List<Vertex>[] { inCycles[0].Vertices(), inCycles[1].Vertices() };                                      
 
                             for(int cycleIndex = 0; cycleIndex < overlappingCycles.Count(); cycleIndex++) 
                             {
                                 var cycleVerts = overlappingCycles[cycleIndex];
-                                var cyclePositions = overlappingCyclesPositions[cycleIndex];
+                                var cyclePositions = cyclesOnGrid[cycleIndex];
 
                                 // check if vertices in cycle are (counter)clockwise
-                                bool increaseIndex = overlap.First().GetOtherVertex(cycleVerts[0]) == cycleVerts[1];
+                                bool increaseIndex = sharedSegment.First().GetOtherVertex(cycleVerts[0]) == cycleVerts[1];
                                 int increment = increaseIndex ? 1 : cycleVerts.Count - 1;
 
                                 int vertIndex = 0;
                                 int posIndex = 0;
                                 while(posIndex < cyclePositions.Count())
                                 {
-                                    if (!sharedLine.Contains(cyclePositions[posIndex]))
+                                    if (!sharedGridPositions.Contains(cyclePositions[posIndex]))
                                     {
                                         pos = cyclePositions[posIndex];
                                         v = cycleVerts[vertIndex];
