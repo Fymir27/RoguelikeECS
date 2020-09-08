@@ -229,6 +229,33 @@ namespace TheAlchemist
                 File.WriteAllText("roomLayout.txt", tmpLayout);
             }
 
+            List<Tuple<Vertex, Position>> PlaceableLine(Position startPos, Position dir, Vertex startVert, List<Edge> segment)
+            {
+                if (!segment.First().AttachedTo(startVert))
+                    throw new ArgumentException("Segment doesn't start with 'start' vertex!");
+
+                var line = new List<Tuple<Vertex, Position>>();
+
+                if (grid.ContainsKey(startPos))
+                    return line;
+
+                line.Add(Tuple.Create(startVert, startPos));
+
+                var curVert = startVert;
+                var curPos = startPos;
+
+                for (int i = 0; i < segment.Count; i++)
+                {
+                    curPos += dir;
+                    if (grid.ContainsKey(curPos))
+                        return line; // incomplete; return how far we got
+                    curVert = segment[i].GetOtherVertex(curVert);
+                    line.Add(Tuple.Create(curVert, curPos));
+                }                
+
+                return line;
+            }
+
             Place(v, pos);
 
             try
@@ -282,7 +309,7 @@ namespace TheAlchemist
                         {
                             throw new Exception("Vertex in more than 2 cylces... Can't handle that (yet)!");
                         }                    
-
+                      
                         var curOverlap = overlaps.First();
 
                         if (curOverlap.Count > 1)
@@ -292,35 +319,28 @@ namespace TheAlchemist
 
                         var sharedSegment = curOverlap.First();
 
-                        var oldPos = pos;
                         int sharedVertexCount = sharedSegment.Count + 1; // vertices = edges + 1
-                        var sharedGridPositions = new List<Position>();
+
                         for (int directionIndex = 0; directionIndex < 6; directionIndex++)
                         {
                             var dir = Position.HexDirections[directionIndex];
-                            pos = oldPos;
-                            sharedGridPositions.Clear();
 
-                            for (int i = 0; i < sharedVertexCount; i++)
-                            {
-                                pos += dir;
-                                if (grid.ContainsKey(pos))
-                                    break;
-                                sharedGridPositions.Add(pos);
-                            }
+                            var sharedMapping = PlaceableLine(pos + dir, dir, v, sharedSegment);
 
-                            if (sharedGridPositions.Count != sharedVertexCount)
+                            if (sharedMapping.Count != sharedVertexCount)
                                 continue; // try other direction
 
-                            Place(v, sharedGridPositions.First());
-                            for (int i = 0; i < (sharedVertexCount - 1); i++)
-                            {                               
-                                v = sharedSegment[i].GetOtherVertex(v);
-                                Place(v, sharedGridPositions[i + 1]);                                
+                            foreach(var vertPosTuple in sharedMapping)
+                            {
+                                Place(vertPosTuple.Item1, vertPosTuple.Item2);
+                                pos = vertPosTuple.Item2;
+                                v = vertPosTuple.Item1;
                             }
 
                             var dir0 = Position.HexDirections[(directionIndex + 1) % 6];
-                            var dir1 = Position.HexDirections[(directionIndex + 5) % 6];                                    
+                            var dir1 = Position.HexDirections[(directionIndex + 5) % 6];
+
+                            var sharedGridPositions = sharedMapping.Select(t => t.Item2).ToArray();
 
                             var cycle0 = sharedGridPositions[sharedVertexCount - 1].HexCircle(sharedGridPositions.ToArray(), inCycles[0].EdgeCount, 1);
                             var cycle1 = sharedGridPositions[sharedVertexCount - 1].HexCircle(sharedGridPositions.ToArray(), inCycles[1].EdgeCount, -1);
