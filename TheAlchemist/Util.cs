@@ -136,6 +136,10 @@ namespace TheAlchemist
             Position step = direction;
             int maxPool = circumference;
             int pool = maxPool;
+
+            if (circumference % 6 == 5)
+                pool -= 2;
+
             Position cur = this;
             for (int i = 0; i < circumference; i++)            
             {
@@ -180,7 +184,7 @@ namespace TheAlchemist
                 }
             }
             List<Position> result = new List<Position>(alreadyPlaced);
-            Position cur = alreadyPlaced[alreadyPlaced.Length - 1];
+            Position cur = alreadyPlaced.Length > 0 ? alreadyPlaced[alreadyPlaced.Length - 1] : this;
             int stepDirectionIndex = prevIndex;
             step = HexDirections[prevIndex];
             for (int i = alreadyPlaced.Length; i < circumference; i++)

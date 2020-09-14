@@ -39,7 +39,13 @@ namespace TheAlchemist
         RenderSystem renderSystem;
         UISystem uiSystem;
 
-        public static int Seed = 66094; // (int)DateTime.Now.TimeOfDay.TotalSeconds;
+        // working seeds:
+        // 67680; 66094; 69762; 76367
+        // not working (more than one overlap)
+        // 74651
+        // incorrect (too many cycles):
+        // 75849, 75976, 76177
+        public static int Seed = 76367; // (int)DateTime.Now.TimeOfDay.TotalSeconds; 
         public static Random Random { get; } = new Random(Seed);
 
 
