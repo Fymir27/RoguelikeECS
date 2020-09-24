@@ -98,11 +98,11 @@ namespace TheAlchemist
                 Tuple.Create(transformJunction, 1)
             };
 
-            return rules;     
-    }
+            return rules;
+        }
 
         private Graph GenerateGraph()
-        {  
+        {
             var builder = new ReplacementRuleBuilder();
 
             builder.MappedVertex<StartingRoom>("start")
@@ -197,9 +197,6 @@ namespace TheAlchemist
 
             HashSet<Vertex> verticesPlaced = new HashSet<Vertex>();
             Dictionary<Position, Vertex> grid = new Dictionary<Position, Vertex>();
-          
-            // tuples consist of vertex to place and position of ancestor(=neighbour)
-            Stack<Tuple<Vertex, Position>> todo = new Stack<Tuple<Vertex, Position>>();
 
             Vertex v = dungeonGraph.Vertices.First();
             Position pos = Position.Zero;
@@ -207,215 +204,206 @@ namespace TheAlchemist
             Position min = Position.Zero;
             Position max = Position.Zero;
 
-            void Place(Vertex vertex, Position position)
+            bool Placeable(Position p) { return !grid.ContainsKey(p); }
+
+            // Picks neighbours with the most distance to a Position, 
+            // that doesn't exceed a threshold
+            List<Tuple<Position, int>> DjkstraMap(Position from, Position to, int threshold)
             {
-                min.X = Math.Min(min.X, position.X);
-                min.Y = Math.Min(min.Y, position.Y);
-                max.X = Math.Max(max.X, position.X);
-                max.Y = Math.Max(max.Y, position.Y);
+                var result = new List<Tuple<Position, int>>();
+
+                var posRequired = from.GetNeighboursHexPointyTop().Where(Placeable);
+                var posRequiredCount = posRequired.Count();
+
+                var distances = new Dictionary<Position, int>();
+                var todo = new Queue<Position>();
+
+                distances.Add(to, 0);
+                todo.Enqueue(to);
+
+                int requiredPositionsFound = 0;
+                while (todo.Count > 0)
+                {
+                    var curPos = todo.Dequeue();
+                    foreach (var neighbour in curPos.GetNeighboursHexPointyTop().Where(Placeable))
+                    {
+                        if (distances.ContainsKey(neighbour)) continue; // already visited
+                        int newDist = distances[curPos] + 1;
+                        if (newDist > threshold) continue;
+                        if (posRequired.Contains(neighbour))
+                        {
+                            result.Add(Tuple.Create(neighbour, newDist));
+                            if (++requiredPositionsFound == posRequiredCount) break;
+                        }
+                        distances.Add(neighbour, newDist);
+                        todo.Enqueue(neighbour);
+                    }
+                }
+                return result;
+            }
+
+            List<List<Tuple<Position, int>>> validNextPositionsForCycles(List<Cycle> inCycles, Position curPos, Vertex curVert, Vertex vertToAdd)
+            {
+                var result = new List<List<Tuple<Position, int>>>();
+                foreach (var cycle in inCycles)
+                {
+                    var cycleResult = new List<Tuple<Position, int>>();
+                    var cycleVerts = cycle.Vertices();
+                    // closest vertices that have already been placed (in both directions)
+                    int prevIndex = -1;
+                    int nextIndex = -1;
+                    int vertToAddIndex = int.MaxValue;
+                    for (int i = 0; i < cycleVerts.Count; i++)
+                    {
+                        var vert = cycleVerts[i];
+                        if (vert == vertToAdd)
+                        {
+                            vertToAddIndex = i;
+                            continue;
+                        }
+
+                        if (verticesPlaced.Contains(vert))
+                        {
+                            if (i > vertToAddIndex)
+                            {
+                                if (nextIndex < vertToAddIndex)
+                                {
+                                    nextIndex = i;
+                                    if (prevIndex >= 0) break;
+                                }
+                                prevIndex = i;
+                            }
+                            else
+                            {
+                                prevIndex = i;
+                                if (nextIndex < 0) nextIndex = i;
+                            }
+                        }
+                    }
+
+                    int pathLenToPrev = prevIndex < vertToAddIndex ? vertToAddIndex - prevIndex : vertToAddIndex + cycleVerts.Count() - prevIndex;
+                    int pathLenToNext = nextIndex > vertToAddIndex ? nextIndex - vertToAddIndex : nextIndex + cycleVerts.Count() - vertToAddIndex;
+
+                    if (prevIndex == -1 && nextIndex == -1)
+                    {
+                        result.Add(curPos.GetNeighboursHexPointyTop().Where(Placeable).Select(p => Tuple.Create(p, int.MaxValue)).ToList());
+                        continue;
+                    }
+
+
+                    if (cycleVerts[prevIndex] == curVert)
+                    {
+                        result.Add(DjkstraMap(curPos, grid.Keys.First(k => grid[k] == cycleVerts[nextIndex]), pathLenToNext));
+                        continue;
+                    }
+
+                    if (cycleVerts[nextIndex] == curVert)
+                    {
+                        result.Add(DjkstraMap(curPos, grid.Keys.First(k => grid[k] == cycleVerts[prevIndex]), pathLenToPrev));
+                        continue;
+                    }
+
+
+
+                    var possibleStepsTowardsPrev = DjkstraMap(curPos, grid.Keys.First(k => grid[k] == cycleVerts[prevIndex]), pathLenToPrev);
+                    if (possibleStepsTowardsPrev.Count() == 0)
+                    {
+                        result.Add(new List<Tuple<Position, int>>());
+                        continue;
+                    }
+                    var possibleStepsTowardsNext = DjkstraMap(curPos, grid.Keys.First(k => grid[k] == cycleVerts[nextIndex]), pathLenToNext);
+                    if (possibleStepsTowardsNext.Count() == 0)
+                    {
+                        result.Add(new List<Tuple<Position, int>>());
+                        continue;
+                    }
+                    var possibleCombinedSteps = possibleStepsTowardsPrev.Union(possibleStepsTowardsNext);
+                    result.Add(possibleCombinedSteps.ToList());
+                }
+                return result;
+            }
+
+            IEnumerable<Position> NextPosForCycles(List<Cycle> inCycles, Position curPos, Vertex curVert, Vertex vertToAdd)
+            {
+                var validPositions = validNextPositionsForCycles(inCycles, curPos, curVert, vertToAdd); // doesnt place 260 so it can reach 266
+                var seed = validPositions.First();
+                return validPositions
+                    .Aggregate(seed, (aggr, cur) => cur.Intersect(aggr).ToList(), aggr => aggr)
+                    .OrderBy(t => t.Item2)
+                    .Select(t => t.Item1);
+            }
+
+            bool Place(Vertex vertex, Position position)
+            {
+                if (!Placeable(position) || verticesPlaced.Contains(vertex))
+                    return false;
 
                 grid.Add(position, vertex);
                 verticesPlaced.Add(vertex);
 
-                foreach (var neighbour in vertex.Edges.Select(e => 
-                    e.GetOtherVertex(vertex)).Where(n => 
-                        !verticesPlaced.Contains(n) && 
-                        !(todo.Select(t => t.Item1).Contains(n))))
-                {
-                    todo.Push(Tuple.Create(neighbour, position));
-                }
-
+                #region drawLayout
+                min.X = Math.Min(min.X, position.X);
+                min.Y = Math.Min(min.Y, position.Y);
+                max.X = Math.Max(max.X, position.X);
+                max.Y = Math.Max(max.Y, position.Y);
                 var tmpLayout = DrawLayout(grid, min, max);
                 File.WriteAllText("roomLayout.txt", tmpLayout);
-            }
+                #endregion
 
-            List<Tuple<Vertex, Position>> PlaceableLine(Position startPos, Position dir, Vertex startVert, List<Edge> segment)
-            {  
-                var line = new List<Tuple<Vertex, Position>>();
-
-                if (grid.ContainsKey(startPos))
-                    return line;              
-
-                line.Add(Tuple.Create(startVert, startPos));
-
-                if (segment.Count == 0)
-                    return line;
-
-                if (!segment.First().AttachedTo(startVert))
-                    throw new ArgumentException("Segment doesn't start with 'start' vertex!");
-
-                var curVert = startVert;
-                var curPos = startPos;
-
-                for (int i = 0; i < segment.Count; i++)
+                var neighboursSuccessfullyPlaced = new List<Tuple<Position, Vertex>>();
+                foreach (var neighbour in vertex.Edges.Select(e =>
+                    e.GetOtherVertex(vertex)).Where(n => !verticesPlaced.Contains(n)))
                 {
-                    curPos += dir;
-                    if (grid.ContainsKey(curPos))
-                        return line; // incomplete; return how far we got
-                    curVert = segment[i].GetOtherVertex(curVert);
-                    line.Add(Tuple.Create(curVert, curPos));
-                }                
-
-                return line;
-            }
-
-            Place(v, pos);
-
-            try
-            {
-
-                int totalVertexCount = dungeonGraph.Vertices.Count;
-                while (verticesPlaced.Count < totalVertexCount)
-                {
-                    // get next neighbour that hasn't been placed yet
-                    while (verticesPlaced.Contains(v))
+                    IEnumerable<Position> validPositions;
+                    if (belongsToCycle[neighbour].Count > 0)
                     {
-                        var next = todo.Pop();
-                        v = next.Item1;
-                        pos = next.Item2;
+                        validPositions = NextPosForCycles(belongsToCycle[neighbour], position, vertex, neighbour).ToList();
+                    }
+                    else
+                    {
+                        validPositions = position.GetNeighboursHexPointyTop().Where(Placeable);
                     }
 
-                    if (belongsToCycle[v].Count == 0)
+                    bool success = false;
+                    foreach (var neighbourPos in validPositions)
                     {
-                        var newPos = pos;
-                        foreach (var dir in Position.HexDirections)
+                        Console.WriteLine(neighbour.ToString() + ";" + neighbourPos);
+                        if (success = Place(neighbour, neighbourPos))
                         {
-                            if (!grid.ContainsKey(pos + dir))
-                            {
-                                newPos = pos + dir;
-                            }
-                        }
-                        if (newPos == pos)
-                        {
-                            // TODO:
-                            throw new Exception("No neighbours reachable!");
-                        }
-
-                        Place(v, newPos);
-                        pos = newPos;
-                        continue;
-                    }
-                    
-                    List<Cycle> inCycles = belongsToCycle[v];
-                    if (inCycles.Count > 0)
-                    {
-                        // List of line segments that overlap between two circles respectively for every circle
-                        // overlaps[circle][segment][edge]
-                        var overlaps = new List<List<List<Edge>>>();
-
-                        for (int i = 0; i < (inCycles.Count - 1); i++)
-                        {
-                            overlaps.Add(inCycles[i].Overlap(inCycles[i + 1]));
-                        }
-
-                        if (overlaps.Count > 2)
-                        {
-                            throw new Exception("Vertex in more than 2 cylces... Can't handle that (yet)!");
-                        }   
-
-                        if (overlaps.Any(o => o.Count > 1))
-                        {
-                            throw new Exception("Can't handle cycles with more than one overlap!");
-                        }
-
-                        List<Edge> sharedSegment;
-                        int sharedVertexCount = 1; // counts the vertex itself
-
-                        if (overlaps.Count == 0)
-                        {
-                            sharedSegment = new List<Edge>();
-                        }
-                        else 
-                        {
-                            sharedSegment = overlaps.First().First();
-                            sharedVertexCount = sharedSegment.Count + 1; // vertices = edges + 1
-                        }                        
-
-                        for (int directionIndex = 0; directionIndex < 6; directionIndex++)
-                        {
-                            var dir = Position.HexDirections[directionIndex];
-
-                            var sharedMapping = PlaceableLine(pos + dir, dir, v, sharedSegment);
-
-                            if (sharedMapping.Count != sharedVertexCount)
-                                continue; // try other direction                          
-
-                            var sharedGridPositions = sharedMapping.Select(t => t.Item2).ToArray();
-                         
-                            var cyclesOnGrid = new List<Position[]>();
-
-                            if (inCycles.Count == 1)
-                            {
-                                var start = sharedMapping[0].Item2;
-                                foreach (var cycleDir in Position.HexDirections) {
-                                    Position[] cyclePositions = sharedMapping[0].Item2.HexCircle(cycleDir, inCycles.First().EdgeCount);
-                                    bool placeable = cyclePositions.All(p => !grid.ContainsKey(p));
-                                    if (placeable)
-                                    {
-                                        cyclesOnGrid.Add(cyclePositions);
-                                        break;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                int clockwise = 1;
-                                for (int cycleNr = 0; cycleNr < inCycles.Count; cycleNr++)
-                                {
-                                    Position[] cyclePositions = sharedMapping[0].Item2.HexCircle(sharedGridPositions, inCycles[cycleNr].EdgeCount, clockwise);
-                                    cyclesOnGrid.Add(cyclePositions);
-                                    clockwise *= -1;
-                                }
-
-                                bool cyclesPlacable = cyclesOnGrid.All(c => c.All(p => !grid.ContainsKey(p)));
-
-                                if (!cyclesPlacable)
-                                    continue; // try new direction
-                            }
-
-                            foreach (var vertPosTuple in sharedMapping)
-                            {
-                                Place(vertPosTuple.Item1, vertPosTuple.Item2);
-                                pos = vertPosTuple.Item2;
-                                v = vertPosTuple.Item1;
-                            }
-
-                            for (int cycleIndex = 0; cycleIndex < inCycles.Count(); cycleIndex++) 
-                            {
-                                var cycleVerts = inCycles[cycleIndex].Vertices();
-                                var cyclePositions = cyclesOnGrid[cycleIndex];
-
-                                // check if vertices in cycle are (counter)clockwise
-                                bool increaseIndex = sharedSegment.Count == 0 || sharedSegment.First().GetOtherVertex(cycleVerts[0]) == cycleVerts[1];
-                                int increment = increaseIndex ? 1 : cycleVerts.Count - 1;
-
-                                int vertIndex = 0;
-                                int posIndex = 0;
-                                while(posIndex < cyclePositions.Count())
-                                {
-                                    if (!sharedGridPositions.Contains(cyclePositions[posIndex]))
-                                    {
-                                        pos = cyclePositions[posIndex];
-                                        v = cycleVerts[vertIndex];
-                                        Place(v, pos);
-                                    }
-                                    posIndex++;
-                                    vertIndex = (vertIndex + increment) % cycleVerts.Count;
-                                }                                                                          
-                            }
+                            neighboursSuccessfullyPlaced.Add(Tuple.Create(neighbourPos, neighbour));
                             break;
                         }
-                    }                                  
+                    }
+                    if (!success)
+                    {
+                        foreach (var tup in neighboursSuccessfullyPlaced)
+                        {
+                            verticesPlaced.Remove(tup.Item2);
+                            grid.Remove(tup.Item1);
+                        }
+                        verticesPlaced.Remove(vertex);
+                        grid.Remove(position);
+                        return false;
+                    }
                 }
-            } 
-            catch(Exception e)
+
+                return true;
+            }
+
+            // start of recursive placing   
+            try
+            {
+                bool success = Place(v, pos);
+                if (!success) throw new Exception("Failed to generate dungeon");
+            }
+            catch (Exception e)
             {
                 Console.WriteLine(e.StackTrace);
                 Console.WriteLine(e.Message);
                 Console.WriteLine("Graph generation failed!");
                 return;
             }
-          
+
             var layoutAsText = DrawLayout(grid, min, max);
             File.WriteAllText("roomLayout.txt", layoutAsText);
         }
@@ -496,11 +484,11 @@ namespace TheAlchemist
         {
             char[,] layout;
 
-            if(random)
+            if (random)
             {
                 layout = Util.PickRandomElement(template.Layouts);
             }
-            else if(layoutIndex >= 0 && layoutIndex < template.Layouts.Count)
+            else if (layoutIndex >= 0 && layoutIndex < template.Layouts.Count)
             {
                 layout = template.Layouts[layoutIndex];
             }
@@ -524,16 +512,16 @@ namespace TheAlchemist
                     TileTemplate tileTemplate;
                     Position tilePos = pos + new Position(x, y);
 
-                    if(IsOutOfBounds(tilePos))
+                    if (IsOutOfBounds(tilePos))
                     {
                         Log.Warning("Trying to place tile out of bounds! " + tilePos);
                     }
 
-                    if(RoomTemplate.DefaultTiles.TryGetValue(symbol, out tileTemplate))
+                    if (RoomTemplate.DefaultTiles.TryGetValue(symbol, out tileTemplate))
                     {
                         InitTileFromTemplate(tilePos, tileTemplate);
                     }
-                    else if(template.CustomTiles.TryGetValue(symbol, out tileTemplate))
+                    else if (template.CustomTiles.TryGetValue(symbol, out tileTemplate))
                     {
                         InitTileFromTemplate(tilePos, tileTemplate);
                     }
