@@ -233,7 +233,7 @@ namespace TheAlchemist
                         if (posRequired.Contains(neighbour))
                         {
                             result.Add(Tuple.Create(neighbour, newDist));
-                            if (++requiredPositionsFound == posRequiredCount) break;
+                            if (++requiredPositionsFound == posRequiredCount) return result;
                         }
                         distances.Add(neighbour, newDist);
                         todo.Enqueue(neighbour);
@@ -327,10 +327,8 @@ namespace TheAlchemist
             {
                 var validPositions = validNextPositionsForCycles(inCycles, curPos, curVert, vertToAdd); // doesnt place 260 so it can reach 266
                 var seed = validPositions.First();
-                return validPositions
-                    .Aggregate(seed, (aggr, cur) => cur.Intersect(aggr).ToList(), aggr => aggr)
-                    .OrderBy(t => t.Item2)
-                    .Select(t => t.Item1);
+                var positionsOrdered = validPositions.Select(l => l.OrderBy(t => t.Item2).Select(t => t.Item1));
+                return positionsOrdered.Aggregate(positionsOrdered.First(), (aggr, cur) => cur.Intersect(aggr), aggr => aggr);                                        
             }
 
             bool Place(Vertex vertex, Position position)

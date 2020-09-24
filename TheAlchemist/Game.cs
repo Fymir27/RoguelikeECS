@@ -40,10 +40,10 @@ namespace TheAlchemist
         UISystem uiSystem;
 
         // working seeds:
-        // 67680; 66094; 69762; 76367
+        // 67680; 66094; 69762; 76367, 75849, 75976, 76177
         // incorrect (too many cycles):
-        // 75849, 75976, 76177
-        public static int Seed = 69762; // (int)DateTime.Now.TimeOfDay.TotalSeconds; 
+        // 77815
+        public static int Seed = 77815; // (int)DateTime.Now.TimeOfDay.TotalSeconds; 
         public static Random Random { get; } = new Random(Seed);
 
 
