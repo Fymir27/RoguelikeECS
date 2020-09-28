@@ -317,7 +317,7 @@ namespace TheAlchemist
                         result.Add(new List<Tuple<Position, int>>());
                         continue;
                     }
-                    var possibleCombinedSteps = possibleStepsTowardsPrev.Union(possibleStepsTowardsNext);
+                    var possibleCombinedSteps = possibleStepsTowardsPrev.Intersect(possibleStepsTowardsNext);
                     result.Add(possibleCombinedSteps.ToList());
                 }
                 return result;
@@ -331,10 +331,10 @@ namespace TheAlchemist
                 return positionsOrdered.Aggregate(positionsOrdered.First(), (aggr, cur) => cur.Intersect(aggr), aggr => aggr);                                        
             }
 
-            bool Place(Vertex vertex, Position position)
+            HashSet<Position> Place(Vertex vertex, Position position)
             {
                 if (!Placeable(position) || verticesPlaced.Contains(vertex))
-                    return false;
+                    return null;
 
                 grid.Add(position, vertex);
                 verticesPlaced.Add(vertex);
@@ -348,7 +348,7 @@ namespace TheAlchemist
                 File.WriteAllText("roomLayout.txt", tmpLayout);
                 #endregion
 
-                var neighboursSuccessfullyPlaced = new List<Tuple<Position, Vertex>>();
+                var branchesFromCurrentPos = new List<HashSet<Position>>();
                 foreach (var neighbour in vertex.Edges.Select(e =>
                     e.GetOtherVertex(vertex)).Where(n => !verticesPlaced.Contains(n)))
                 {
@@ -362,37 +362,49 @@ namespace TheAlchemist
                         validPositions = position.GetNeighboursHexPointyTop().Where(Placeable);
                     }
 
-                    bool success = false;
+                    HashSet<Position> newBranch = null;
                     foreach (var neighbourPos in validPositions)
                     {
-                        Console.WriteLine(neighbour.ToString() + ";" + neighbourPos);
-                        if (success = Place(neighbour, neighbourPos))
+                        newBranch = Place(neighbour, neighbourPos);
+                        if (newBranch != null)
                         {
-                            neighboursSuccessfullyPlaced.Add(Tuple.Create(neighbourPos, neighbour));
+                            branchesFromCurrentPos.Add(newBranch);
                             break;
                         }
                     }
-                    if (!success)
+                    if (newBranch == null)
                     {
-                        foreach (var tup in neighboursSuccessfullyPlaced)
+                        foreach (var branch in branchesFromCurrentPos)
                         {
-                            verticesPlaced.Remove(tup.Item2);
-                            grid.Remove(tup.Item1);
+                            foreach(var p in branch)
+                            {
+                                verticesPlaced.Remove(grid[p]);
+                                grid.Remove(p);
+                            }
                         }
                         verticesPlaced.Remove(vertex);
                         grid.Remove(position);
-                        return false;
+                        return null;
                     }
                 }
 
-                return true;
+                var placedPositions = new HashSet<Position>();
+                foreach (var branch in branchesFromCurrentPos)
+                {
+                    foreach(var p in branch)
+                    {
+                        placedPositions.Add(p);
+                    }
+                }
+                placedPositions.Add(position);                
+                return placedPositions;
             }
 
             // start of recursive placing   
             try
             {
-                bool success = Place(v, pos);
-                if (!success) throw new Exception("Failed to generate dungeon");
+                var placedPositions = Place(v, pos);
+                if (placedPositions.Count == 0) throw new Exception("Failed to generate dungeon");
             }
             catch (Exception e)
             {
