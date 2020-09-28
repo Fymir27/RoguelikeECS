@@ -198,16 +198,8 @@ namespace TheAlchemist
             HashSet<Vertex> verticesPlaced = new HashSet<Vertex>();
             Dictionary<Position, Vertex> grid = new Dictionary<Position, Vertex>();
 
-            Vertex v = dungeonGraph.Vertices.First();
-            Position pos = Position.Zero;
-
-            Position min = Position.Zero;
-            Position max = Position.Zero;
-
             bool Placeable(Position p) { return !grid.ContainsKey(p); }
 
-            // Picks neighbours with the most distance to a Position, 
-            // that doesn't exceed a threshold
             List<Tuple<Position, int>> DjkstraMap(Position from, Position to, int threshold)
             {
                 var result = new List<Tuple<Position, int>>();
@@ -290,7 +282,6 @@ namespace TheAlchemist
                         continue;
                     }
 
-
                     if (cycleVerts[prevIndex] == curVert)
                     {
                         result.Add(DjkstraMap(curPos, grid.Keys.First(k => grid[k] == cycleVerts[nextIndex]), pathLenToNext));
@@ -303,20 +294,8 @@ namespace TheAlchemist
                         continue;
                     }
 
-
-
                     var possibleStepsTowardsPrev = DjkstraMap(curPos, grid.Keys.First(k => grid[k] == cycleVerts[prevIndex]), pathLenToPrev);
-                    if (possibleStepsTowardsPrev.Count() == 0)
-                    {
-                        result.Add(new List<Tuple<Position, int>>());
-                        continue;
-                    }
-                    var possibleStepsTowardsNext = DjkstraMap(curPos, grid.Keys.First(k => grid[k] == cycleVerts[nextIndex]), pathLenToNext);
-                    if (possibleStepsTowardsNext.Count() == 0)
-                    {
-                        result.Add(new List<Tuple<Position, int>>());
-                        continue;
-                    }
+                    var possibleStepsTowardsNext = DjkstraMap(curPos, grid.Keys.First(k => grid[k] == cycleVerts[nextIndex]), pathLenToNext);                    
                     var possibleCombinedSteps = possibleStepsTowardsPrev.Intersect(possibleStepsTowardsNext);
                     result.Add(possibleCombinedSteps.ToList());
                 }
@@ -325,12 +304,11 @@ namespace TheAlchemist
 
             IEnumerable<Position> NextPosForCycles(List<Cycle> inCycles, Position curPos, Vertex curVert, Vertex vertToAdd)
             {
-                var validPositions = validNextPositionsForCycles(inCycles, curPos, curVert, vertToAdd); // doesnt place 260 so it can reach 266
-                var seed = validPositions.First();
+                var validPositions = validNextPositionsForCycles(inCycles, curPos, curVert, vertToAdd);
                 var positionsOrdered = validPositions.Select(l => l.OrderBy(t => t.Item2).Select(t => t.Item1));
                 return positionsOrdered.Aggregate(positionsOrdered.First(), (aggr, cur) => cur.Intersect(aggr), aggr => aggr);                                        
             }
-
+           
             HashSet<Position> Place(Vertex vertex, Position position)
             {
                 if (!Placeable(position) || verticesPlaced.Contains(vertex))
@@ -339,81 +317,70 @@ namespace TheAlchemist
                 grid.Add(position, vertex);
                 verticesPlaced.Add(vertex);
 
-                #region drawLayout
-                min.X = Math.Min(min.X, position.X);
-                min.Y = Math.Min(min.Y, position.Y);
-                max.X = Math.Max(max.X, position.X);
-                max.Y = Math.Max(max.Y, position.Y);
-                var tmpLayout = DrawLayout(grid, min, max);
-                File.WriteAllText("roomLayout.txt", tmpLayout);
-                #endregion
-
-                var branchesFromCurrentPos = new List<HashSet<Position>>();
+                var positionsPlacedFromCur = new HashSet<Position>() { position };
                 foreach (var neighbour in vertex.Edges.Select(e =>
-                    e.GetOtherVertex(vertex)).Where(n => !verticesPlaced.Contains(n)))
+                    e.GetOtherVertex(vertex)).Where(other => !verticesPlaced.Contains(other)))
                 {
                     IEnumerable<Position> validPositions;
                     if (belongsToCycle[neighbour].Count > 0)
                     {
-                        validPositions = NextPosForCycles(belongsToCycle[neighbour], position, vertex, neighbour).ToList();
+                        validPositions = NextPosForCycles(belongsToCycle[neighbour], position, vertex, neighbour);
                     }
                     else
                     {
                         validPositions = position.GetNeighboursHexPointyTop().Where(Placeable);
                     }
 
-                    HashSet<Position> newBranch = null;
+                    bool success = false;
                     foreach (var neighbourPos in validPositions)
                     {
-                        newBranch = Place(neighbour, neighbourPos);
-                        if (newBranch != null)
-                        {
-                            branchesFromCurrentPos.Add(newBranch);
-                            break;
-                        }
+                        var newPositions = Place(neighbour, neighbourPos); // recursive call
+                        if (newPositions == null) continue;
+                        success = true;
+                        positionsPlacedFromCur.UnionWith(newPositions);
+                        break;
                     }
-                    if (newBranch == null)
+                 
+                    if (!success) 
                     {
-                        foreach (var branch in branchesFromCurrentPos)
-                        {
-                            foreach(var p in branch)
-                            {
-                                verticesPlaced.Remove(grid[p]);
-                                grid.Remove(p);
-                            }
+                        // no neighbour position was found therefore we abort and
+                        // clean up every pos placed from here (including the current position)
+                        foreach (var pos in positionsPlacedFromCur)
+                        {                           
+                            verticesPlaced.Remove(grid[pos]);
+                            grid.Remove(pos);
                         }
-                        verticesPlaced.Remove(vertex);
-                        grid.Remove(position);
+                        
                         return null;
                     }
                 }
-
-                var placedPositions = new HashSet<Position>();
-                foreach (var branch in branchesFromCurrentPos)
-                {
-                    foreach(var p in branch)
-                    {
-                        placedPositions.Add(p);
-                    }
-                }
-                placedPositions.Add(position);                
-                return placedPositions;
+                             
+                return positionsPlacedFromCur;
             }
 
             // start of recursive placing   
             try
             {
-                var placedPositions = Place(v, pos);
-                if (placedPositions.Count == 0) throw new Exception("Failed to generate dungeon");
+                var placedPositions = Place(dungeonGraph.Vertices.First(), Position.Zero);
+                if (placedPositions.Count == 0) throw new Exception("Failed to generate dungeon");               
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.StackTrace);
                 Console.WriteLine(e.Message);
-                Console.WriteLine("Graph generation failed!");
                 return;
             }
 
+            // write layout to text file for debugging
+            var min = Position.Zero;
+            var max = Position.Zero;
+            foreach(var pos in grid.Keys)
+            {
+                min.X = Math.Min(min.X, pos.X);
+                min.Y = Math.Min(min.Y, pos.Y);
+                max.X = Math.Max(max.X, pos.X);
+                max.Y = Math.Max(max.Y, pos.Y);
+            }
             var layoutAsText = DrawLayout(grid, min, max);
             File.WriteAllText("roomLayout.txt", layoutAsText);
         }
