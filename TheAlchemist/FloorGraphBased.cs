@@ -307,13 +307,30 @@ namespace TheAlchemist
                 return positionsOrdered.Aggregate(positionsOrdered.First(), (aggr, cur) => cur.Intersect(aggr), aggr => aggr);                                        
             }
            
-            HashSet<Position> Place(Vertex vertex, Position position)
+            HashSet<Position> Place(Vertex vertex, Position position, bool debug = false)
             {
                 if (!Placeable(position) || verticesPlaced.Contains(vertex))
                     return null;
 
                 grid.Add(position, vertex);
                 verticesPlaced.Add(vertex);
+
+                if(debug)
+                {
+                    Console.WriteLine(vertex + " " + position);
+
+                    // write layout to text file for debugging
+                    var localMin = Position.Zero;
+                    var localMax = Position.Zero;
+                    foreach (var pos in grid.Keys)
+                    {
+                        localMin.X = Math.Min(localMin.X, pos.X);
+                        localMin.Y = Math.Min(localMin.Y, pos.Y);
+                        localMax.X = Math.Max(localMax.X, pos.X);
+                        localMax.Y = Math.Max(localMax.Y, pos.Y);
+                    }                    
+                    File.WriteAllText("roomLayout.txt", DrawLayout(grid, localMin, localMax));
+                }
 
                 var positionsPlacedFromCur = new HashSet<Position>() { position };
                 foreach (var neighbour in vertex.Edges.Select(e =>
@@ -332,7 +349,7 @@ namespace TheAlchemist
                     bool success = false;
                     foreach (var neighbourPos in validPositions)
                     {
-                        var newPositions = Place(neighbour, neighbourPos); // recursive call
+                        var newPositions = Place(neighbour, neighbourPos, debug); // recursive call
                         if (newPositions == null) continue;
                         success = true;
                         positionsPlacedFromCur.UnionWith(newPositions);
@@ -359,14 +376,14 @@ namespace TheAlchemist
             // start of recursive placing   
             try
             {
-                var placedPositions = Place(dungeonGraph.Vertices.First(), Position.Zero);
+                var placedPositions = Place(dungeonGraph.Vertices.First(), Position.Zero, true);
                 if (placedPositions == null) throw new Exception("Failed to generate dungeon");               
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.StackTrace);
                 Console.WriteLine(e.Message);
-                return;
+                throw e;
             }
 
             // write layout to text file for debugging
