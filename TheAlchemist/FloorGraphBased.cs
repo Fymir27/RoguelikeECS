@@ -174,9 +174,7 @@ namespace TheAlchemist
             Graph dungeonGraph = GenerateGraph();
             File.WriteAllText("advancedDungeon.gv", GraphPrinter.ToDot(dungeonGraph, true, true));
 
-            var room = GenerateRoom(Position.Zero, GameData.Instance.RoomTemplates["fountain"]);
-
-            InitPlayer(new Position(4, 6));
+            var room = GenerateRoom(Position.Zero, GameData.Instance.RoomTemplates["fountain"]);           
 
 
             List<Cycle> cycles = dungeonGraph.GetCycles(true);
@@ -362,7 +360,7 @@ namespace TheAlchemist
             try
             {
                 var placedPositions = Place(dungeonGraph.Vertices.First(), Position.Zero);
-                if (placedPositions.Count == 0) throw new Exception("Failed to generate dungeon");               
+                if (placedPositions == null) throw new Exception("Failed to generate dungeon");               
             }
             catch (Exception e)
             {
@@ -383,7 +381,79 @@ namespace TheAlchemist
             }
             var layoutAsText = DrawLayout(grid, min, max);
             File.WriteAllText("roomLayout.txt", layoutAsText);
+
+            CreateRoomsFromGrid(grid, min, max);
+
+            CreateStructures();
+            SpawnEnemies();
+            SpawnItems();
+
         }
+
+        public void CreateRoomsFromGrid(Dictionary<Position, Vertex> roomLayout, Position min, Position max)
+        {
+
+            assignedToRoom = new bool[width, height];
+            roomNrs = new int[width, height];
+
+            // instantiate tiles and set terrain
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    tiles[x, y] = new Tile();
+                    PlaceTerrain(new Position(x, y), CreateWall());
+                }
+            }
+
+            rooms = new List<Room>();
+
+            int roomWidth = 10;
+            int roomHeight = 7;
+            int margin = 5;
+
+            bool playerInitialized = false;
+
+            for (int y = min.Y; y <= max.Y; y++)            {
+                
+                int normalizedY = y - min.Y;
+                Position offset = new Position(normalizedY * ((roomWidth + margin) / 2), 0);
+                for (int x = min.X; x <= max.X; x++)
+                {
+                    var roomGridCoordinate = new Position(x, y);
+                    if (!roomLayout.Keys.Contains(roomGridCoordinate)) continue;
+
+                    int normalizedX = x - min.X;
+
+                    var worldPos = new Position((roomWidth + margin) * normalizedX + 1, (roomHeight + margin) * normalizedY + 1) + offset;
+
+                    Console.WriteLine(worldPos);
+
+                    var room = PlaceRoom(worldPos, roomWidth, roomHeight, RoomShape.Rectangle);
+                    rooms.Add(room);
+
+                    Position from = worldPos + new Position(roomWidth / 2, roomHeight / 2);
+
+                    if(!playerInitialized)
+                    {
+                        InitPlayer(from);
+                        playerInitialized = true;
+                    }
+
+                    foreach (var neighbourGridCoordinate in roomGridCoordinate.GetNeighboursHexPointyTop().Take(3)
+                        .Where(roomLayout.Keys.Contains)
+                        .Where(pos => roomLayout[pos].Edges.Any(e => e.AttachedTo(roomLayout[roomGridCoordinate])))) {
+
+                        var normNeighbourCoord = neighbourGridCoordinate - min;
+                        var otherWorldPos = normNeighbourCoord * new Position(roomWidth + margin, roomHeight + margin) + Position.One + new Position(normNeighbourCoord.Y * (roomWidth + margin) / 2, 0); ;
+   
+                        var line = GetRandomLineNonDiagonal(from, otherWorldPos);
+                        line.ForEach(RemoveTerrain);
+                    }
+                }
+            }
+        }
+
 
         public string DrawLayout(Dictionary<Position, Vertex> roomLayout, Position min, Position max)
         {

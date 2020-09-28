@@ -223,6 +223,10 @@ namespace TheAlchemist
         {
             return new Position(pos.X * factor, pos.Y * factor);
         }
+        public static Position operator *(Position first, Position second)
+        {
+            return new Position(first.X * second.X, first.Y * second.Y);
+        }
 
         public static bool operator ==(Position first, Position second)
         {

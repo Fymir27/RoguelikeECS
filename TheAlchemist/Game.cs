@@ -39,6 +39,8 @@ namespace TheAlchemist
         RenderSystem renderSystem;
         UISystem uiSystem;
 
+        // broken seeds:
+        // 75782
         public static int Seed = (int)DateTime.Now.TimeOfDay.TotalSeconds; 
         public static Random Random { get; } = new Random(Seed);
 
@@ -90,7 +92,7 @@ namespace TheAlchemist
             var circle = pos.HexCircle(alreadyPlaced, 12);
 
             //Floor test = new Floor(Content.RootDirectory + "/map.txt");
-            Floor testFloor = new Floor(100, 70);
+            Floor testFloor = new Floor(500, 500);
             //testFloor.GenerateSimple();
             testFloor.GenerateGraphBased();
 
