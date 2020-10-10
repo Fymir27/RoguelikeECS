@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 
 using GraphUtilities;
 using Microsoft.Xna.Framework.Graphics;
-using System.Security.Cryptography.X509Certificates;
+
+using TheAlchemist.Components;
+using TheAlchemist.Systems;
 
 namespace TheAlchemist
 {
@@ -172,9 +174,7 @@ namespace TheAlchemist
             }
 
             Graph dungeonGraph = GenerateGraph();
-            File.WriteAllText("advancedDungeon.gv", GraphPrinter.ToDot(dungeonGraph, true, true));
-
-            var room = GenerateRoom(Position.Zero, GameData.Instance.RoomTemplates["fountain"]);           
+            File.WriteAllText("advancedDungeon.gv", GraphPrinter.ToDot(dungeonGraph, true, true));        
 
 
             List<Cycle> cycles = dungeonGraph.GetCycles(true);
@@ -399,76 +399,181 @@ namespace TheAlchemist
             var layoutAsText = DrawLayout(grid, min, max);
             File.WriteAllText("roomLayout.txt", layoutAsText);
 
-            CreateRoomsFromGrid(grid, min, max);
+            var roomLayout = new Vertex[max.X - min.X + 1, max.Y - min.Y + 1];
 
-            CreateStructures();
-            SpawnEnemies();
-            SpawnItems();
+            foreach(var pos in grid.Keys)
+            {
+                var normalizedPos = pos - min;
+                roomLayout[normalizedPos.X, normalizedPos.Y] = grid[pos];
+            }
+
+            CreateRoomsFromGrid(roomLayout);
+
+            //CreateStructures();
+            //SpawnEnemies();
+            //SpawnItems();
 
         }
 
-        public void CreateRoomsFromGrid(Dictionary<Position, Vertex> roomLayout, Position min, Position max)
+        public void CreateRoomsFromGrid(Vertex[,] roomLayout)
         {
-
-            assignedToRoom = new bool[width, height];
-            roomNrs = new int[width, height];
-
             // instantiate tiles and set terrain
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    tiles[x, y] = new Tile();
                     PlaceTerrain(new Position(x, y), CreateWall());
                 }
             }
 
-            rooms = new List<Room>();
-
-            int roomWidth = 10;
-            int roomHeight = 7;
-            int margin = 5;
-
             bool playerInitialized = false;
 
-            for (int y = min.Y; y <= max.Y; y++)            {
-                
-                int normalizedY = y - min.Y;
-                Position offset = new Position(normalizedY * ((roomWidth + margin) / 2), 0);
-                for (int x = min.X; x <= max.X; x++)
+            int roomGridWidth = roomLayout.GetLength(0);
+            int roomGridHeight = roomLayout.GetLength(1);
+
+            Tile[,][,] rooms = new Tile[roomGridWidth, roomGridHeight][,];
+
+            var rowY = new int[roomGridHeight];
+            rowY[0] = 1;
+
+            int verMargin = 5;
+
+            int maxRoomWidth = 0;
+
+            // Generate rooms
+            for (int roomGridY = 0; roomGridY < roomGridHeight; roomGridY++)
+            {
+                int rowHeight = 0;
+                for (int roomGridX = 0; roomGridX < roomGridWidth; roomGridX++)
+                {                
+                    Vertex vert = roomLayout[roomGridX, roomGridY];
+
+                    if (vert == null)
+                        continue;                    
+
+                    var template = GameData.Instance.RoomTemplates["empty"]; //Util.PickRandomElement(GameData.Instance.RoomTemplates.Values.ToList());
+                    Tile[,] room = GenerateRoom(template);
+
+                    rooms[roomGridX, roomGridY] = room;
+
+                    int roomWidth = room.GetLength(0);
+                    int roomHeight = room.GetLength(1);
+
+                    maxRoomWidth = Math.Max(maxRoomWidth, roomWidth);
+                    rowHeight = Math.Max(rowHeight, roomHeight);
+                }
+
+                // set Y of next row
+                if(roomGridY < (roomGridHeight - 1))
+                    rowY[roomGridY + 1] = rowY[roomGridY] + rowHeight + verMargin;
+            }
+
+            int horMargin = 5;
+
+            var anchors = new Position[roomGridWidth, roomGridHeight];
+
+            // Place rooms
+            for (int roomGridX = 0; roomGridX < roomGridWidth; roomGridX++)
+            {
+                for (int roomGridY = 0; roomGridY < roomGridHeight; roomGridY++)
                 {
-                    var roomGridCoordinate = new Position(x, y);
-                    if (!roomLayout.Keys.Contains(roomGridCoordinate)) continue;
+                    var room = rooms[roomGridX, roomGridY];
+                    if (room == null) continue;
 
-                    int normalizedX = x - min.X;
+                    var anchor = new Position(1 + maxRoomWidth / 2 * roomGridY + (maxRoomWidth + horMargin) * roomGridX, rowY[roomGridY]);
 
-                    var worldPos = new Position((roomWidth + margin) * normalizedX + 1, (roomHeight + margin) * normalizedY + 1) + offset;
+                    anchors[roomGridX, roomGridY] = anchor;
 
-                    Console.WriteLine(worldPos);
+                    int roomWidth = room.GetLength(0);
+                    int roomHeight = room.GetLength(1);                  
 
-                    var room = PlaceRoom(worldPos, roomWidth, roomHeight, RoomShape.Rectangle);
-                    rooms.Add(room);
+                    Console.WriteLine("Room at: " + anchor);
 
-                    Position from = worldPos + new Position(roomWidth / 2, roomHeight / 2);
-
-                    if(!playerInitialized)
+                    // place room in world
+                    for (int localY = 0; localY < roomHeight; localY++)
                     {
-                        InitPlayer(from);
+                        for (int localX = 0; localX < roomWidth; localX++)
+                        {
+                            Position tilePos = anchor + new Position(localX, localY);
+                            RemoveTerrain(tilePos);
+                            var newTile = room[localX, localY];
+                            foreach(int entity in newTile.GetAllEntities())
+                            {
+                                var transform = EntityManager.GetComponent<TransformComponent>(entity);
+
+                                if (transform == null)
+                                {
+                                    transform = new TransformComponent();
+                                    EntityManager.AddComponent(entity, transform);
+                                }
+
+                                transform.Position = tilePos;
+
+                                var sprite = EntityManager.GetComponent<RenderableSpriteComponent>(entity);
+
+                                if (sprite == null)
+                                {
+                                    // might be desirable in some cases
+                                    Log.Warning("Sprite missing for " + DescriptionSystem.GetNameWithID(entity) + "!");
+                                }
+                                else
+                                {
+                                    sprite.Visible = true;
+                                }
+                            }
+                            tiles[tilePos.X, tilePos.Y] = newTile;
+                        }
+                    }                    
+
+                    if (!playerInitialized)
+                    {
+                        InitPlayer(anchor + Position.One);
                         playerInitialized = true;
-                    }
+                    }                    
+                }
+            }
 
-                    foreach (var neighbourGridCoordinate in roomGridCoordinate.GetNeighboursHexPointyTop().Take(3)
-                        .Where(roomLayout.Keys.Contains)
-                        .Where(pos => roomLayout[pos].Edges.Any(e => e.AttachedTo(roomLayout[roomGridCoordinate])))) {
+            // Connect rooms
+            for (int roomGridX = 0; roomGridX < roomGridWidth; roomGridX++)
+            {
+                for (int roomGridY = 0; roomGridY < roomGridHeight; roomGridY++)
+                {
+                    var room = rooms[roomGridX, roomGridY];
+                    if (room == null)
+                        continue;
+                    var curRoomCenter = anchors[roomGridX, roomGridY] + new Position(room.GetLength(0) / 2, room.GetLength(1) / 2);
+                    var roomGridPos = new Position(roomGridX, roomGridY);
+                    var curVertex = roomLayout[roomGridX, roomGridY];
 
-                        var normNeighbourCoord = neighbourGridCoordinate - min;
-                        var otherWorldPos = normNeighbourCoord * new Position(roomWidth + margin, roomHeight + margin) + Position.One + new Position(normNeighbourCoord.Y * (roomWidth + margin) / 2, 0); ;
-   
-                        var line = GetRandomLineNonDiagonal(from, otherWorldPos);
-                        line.ForEach(RemoveTerrain);
+                    foreach (var neighbourRoomPos in roomGridPos.GetNeighboursHexPointyTop().Take(3))
+                    {
+                        if (neighbourRoomPos.X < 0 || neighbourRoomPos.X >= roomGridWidth ||
+                            neighbourRoomPos.Y < 0 || neighbourRoomPos.Y >= roomGridHeight)
+                            continue;
+
+                        var neighbour = rooms[neighbourRoomPos.X, neighbourRoomPos.Y];
+
+                        if (neighbour == null)
+                            continue;
+
+                        var neighbourVertex = roomLayout[neighbourRoomPos.X, neighbourRoomPos.Y];
+
+                        if(!curVertex.Edges.Any(e => e.AttachedTo(neighbourVertex)))
+                            continue;                        
+
+                        var neighbourCenter = anchors[neighbourRoomPos.X, neighbourRoomPos.Y] + new Position(neighbour.GetLength(0) / 2, neighbour.GetLength(1) / 2);
+                        var hallway = GetLineCardinal(curRoomCenter, neighbourCenter);
+                        foreach (var pos in hallway)
+                        {
+                            var tile = GetTile(pos);
+                            if (tile.Terrain > 0)
+                                RemoveTerrain(pos);
+                        }
                     }
                 }
             }
+
+            File.WriteAllText("asciiLayout.txt", ASCII());
         }
 
 
@@ -544,7 +649,7 @@ namespace TheAlchemist
             return sb.ToString();
         }
 
-        public Tile[,] GenerateRoom(Position pos, RoomTemplate template, bool random = true, int layoutIndex = 0)
+        public Tile[,] GenerateRoom(RoomTemplate template, bool random = true, int layoutIndex = 0)
         {
             char[,] layout;
 
@@ -574,25 +679,27 @@ namespace TheAlchemist
                     char symbol = layout[x, y];
 
                     TileTemplate tileTemplate;
-                    Position tilePos = pos + new Position(x, y);
+                    Position tilePos = new Position(x, y);
 
                     if (IsOutOfBounds(tilePos))
                     {
                         Log.Warning("Trying to place tile out of bounds! " + tilePos);
                     }
 
+                    Tile newTile = null;
                     if (RoomTemplate.DefaultTiles.TryGetValue(symbol, out tileTemplate))
                     {
-                        InitTileFromTemplate(tilePos, tileTemplate);
+                        newTile = InitTileFromTemplate(tileTemplate);
                     }
                     else if (template.CustomTiles.TryGetValue(symbol, out tileTemplate))
                     {
-                        InitTileFromTemplate(tilePos, tileTemplate);
+                        newTile = InitTileFromTemplate(tileTemplate);
                     }
                     else
                     {
                         Log.Warning("Unkown symbol from Layout: " + symbol);
                     }
+                    room[x, y] = newTile; // TODO: what if it's null?
                 }
             }
 

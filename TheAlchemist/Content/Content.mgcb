@@ -36,6 +36,9 @@
 #begin GameData/keybindings.json
 /copy:GameData/keybindings.json
 
+#begin GameData/RoomTemplates/empty.json
+/copy:GameData/RoomTemplates/empty.json
+
 #begin GameData/RoomTemplates/fountain.json
 /copy:GameData/RoomTemplates/fountain.json
 

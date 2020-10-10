@@ -21,6 +21,16 @@ namespace TheAlchemist
             Items = items;
             Discovered = false;
         }
+
+        public List<int> GetAllEntities()
+        {
+            var entities = new List<int>();           
+            if (Terrain > 0) entities.Add(Terrain);
+            if (Structure > 0) entities.Add(Structure);
+            if (Character > 0) entities.Add(Character);
+            if (Items != null) entities.AddRange(Items);
+            return entities;
+        }
     }
 
     /*

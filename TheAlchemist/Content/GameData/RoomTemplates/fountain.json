@@ -1,16 +1,21 @@
 {
     "layouts": [
         [
-            "##########",
-            "#ammSmmma#",
-            "#arrmmrra#",
-            "#arwwwwra#",
-            "#arwwwwra#",
-            "#arrwwrra#",
-            "#mmmmmmmm#",
-            "####++####"
+            "a  S   a",
+            "arr  rra",
+            "arwwwwra",
+            "arwwwwra",
+            "arrwwrra",
+            "        "
         ]
     ],
+    " ": {
+        "terrains": [
+            {
+                "name": "mossyGround"
+            }
+        ]
+    },
     "a": {
         "terrains": [
             {
@@ -23,13 +28,6 @@
             },
             {
                 "name": "tree"
-            }
-        ]
-    },
-    "m": {
-        "terrains": [
-            {
-                "name": "mossyGround"
             }
         ]
     },

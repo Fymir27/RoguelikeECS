@@ -40,7 +40,7 @@ namespace TheAlchemist
         UISystem uiSystem;
 
         // broken seeds:
-        // 75782
+        // 75782, 79176
         public static int Seed = (int)DateTime.Now.TimeOfDay.TotalSeconds; 
         public static Random Random { get; } = new Random(Seed);
 
@@ -78,18 +78,6 @@ namespace TheAlchemist
 
             var gameData = GameData.Instance = new GameData();
             gameData.Load(Util.ContentPath + "/GameData");
-
-            Position pos = Position.Zero;
-            var alreadyPlaced = new Position[4];
-            alreadyPlaced[0] = pos;
-            pos += Position.HexDirections[0];
-            alreadyPlaced[1] = pos;
-            pos += Position.HexDirections[0];
-            alreadyPlaced[2] = pos;
-               pos += Position.HexDirections[5];
-            alreadyPlaced[3] = pos;
-
-            var circle = pos.HexCircle(alreadyPlaced, 12);
 
             //Floor test = new Floor(Content.RootDirectory + "/map.txt");
             Floor testFloor = new Floor(500, 500);

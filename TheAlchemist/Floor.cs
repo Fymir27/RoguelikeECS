@@ -1664,37 +1664,33 @@ namespace TheAlchemist
         // configuring/adding the the transform to the position and
         // setting the sprite to visible
         // returns true if successful
-        public void InitTileFromTemplate(Position pos, TileTemplate template)
+        public Tile InitTileFromTemplate(TileTemplate template)
         {
-            if (IsOutOfBounds(pos))
+            var tile = new Tile();
+            if(template.Terrains != null && template.Terrains.Count > 0) tile.Terrain = GameData.Instance.CreateTerrain(Util.PickRandomElementWeighted(template.Terrains).Name);
+            if (template.Structures != null && template.Structures.Count > 0) tile.Structure = GameData.Instance.CreateStructure(Util.PickRandomElementWeighted(template.Structures).Name);
+            if (template.Characters != null && template.Characters.Count > 0) tile.Character = GameData.Instance.CreateCharacter(Util.PickRandomElementWeighted(template.Characters).Name);
+
+            if (template.Items == null || template.Items.Count == 0) return tile;
+                       
+            var itemTemplate = Util.PickRandomElementWeighted(template.Items);
+            var itemID = GameData.Instance.CreateItem(itemTemplate.Name);
+
+            if (itemID == 0) return tile;
+
+            var itemC = EntityManager.GetComponent<ItemComponent>(itemID);
+            if (itemC == null) 
             {
-                Log.Warning("Trying to initialize tile out of bounds! " + pos);
-                return;
+                Log.Warning("Item template has no ItemComponent: " + itemTemplate.Name);               
+                return tile;
             }
 
-            void PickAndPlaceEntity(Position placementPos, SortedList<int, EntityTemplate> templateList, Func<string, int> loaderFunction, Action<Position, int> placementFunction)
-            {
-                if (templateList == null || templateList.Count == 0)
-                    return;
+            int itemCount = Game.Random.Next(itemTemplate.Min, itemTemplate.Max + 1);
+            itemC.Count = itemCount;
 
-                string name = Util.PickRandomElementWeighted(templateList).Name;
+            tile.Items = new List<int>() { itemID };
 
-                if (string.IsNullOrEmpty(name))
-                    return;
-
-                int entity = loaderFunction(name);
-
-                if (entity == 0)
-                    return;
-
-                placementFunction(placementPos, entity);
-            }
-
-            PickAndPlaceEntity(pos, template.Terrains, GameData.Instance.CreateTerrain, PlaceTerrain);
-            PickAndPlaceEntity(pos, template.Structures, GameData.Instance.CreateStructure, PlaceStructure);
-            PickAndPlaceEntity(pos, template.Items, GameData.Instance.CreateItem, PlaceItem);
-            PickAndPlaceEntity(pos, template.Characters, GameData.Instance.CreateCharacter, PlaceCharacter);
-           
+            return tile;    
         }
 
         private bool PlaceEntity(Position pos, int entity, int renderLayer = 0)
@@ -2243,6 +2239,26 @@ namespace TheAlchemist
             }
 
             Log.Data("Characters in the vicinity of player: \n" + sb.ToString());
+        }
+
+        public string ASCII()
+        {
+            var sb = new StringBuilder();
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    if(tiles[x, y].Terrain == 0)
+                    {
+                        sb.Append(" ");
+                    } else
+                    {
+                        sb.Append("#");
+                    }
+                }
+                sb.AppendLine();
+            }
+            return sb.ToString();
         }
     }
 }
