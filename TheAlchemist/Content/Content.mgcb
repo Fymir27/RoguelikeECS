@@ -42,12 +42,6 @@
 #begin GameData/RoomTemplates/fountain.json
 /copy:GameData/RoomTemplates/fountain.json
 
-#begin GameData/RoomTemplates/testRoom.json
-/copy:GameData/RoomTemplates/testRoom.json
-
-#begin GameData/RoomTemplates/testRoom2.json
-/copy:GameData/RoomTemplates/testRoom2.json
-
 #begin GameData/structures.json
 /copy:GameData/structures.json
 

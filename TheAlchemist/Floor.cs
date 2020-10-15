@@ -1664,33 +1664,47 @@ namespace TheAlchemist
         // configuring/adding the the transform to the position and
         // setting the sprite to visible
         // returns true if successful
-        public Tile InitTileFromTemplate(TileTemplate template)
+        public bool InitTileFromTemplate(Position pos, TileTemplate template)
         {
-            var tile = new Tile();
-            if(template.Terrains != null && template.Terrains.Count > 0) tile.Terrain = GameData.Instance.CreateTerrain(Util.PickRandomElementWeighted(template.Terrains).Name);
-            if (template.Structures != null && template.Structures.Count > 0) tile.Structure = GameData.Instance.CreateStructure(Util.PickRandomElementWeighted(template.Structures).Name);
-            if (template.Characters != null && template.Characters.Count > 0) tile.Character = GameData.Instance.CreateCharacter(Util.PickRandomElementWeighted(template.Characters).Name);
-
-            if (template.Items == null || template.Items.Count == 0) return tile;
-                       
-            var itemTemplate = Util.PickRandomElementWeighted(template.Items);
-            var itemID = GameData.Instance.CreateItem(itemTemplate.Name);
-
-            if (itemID == 0) return tile;
-
-            var itemC = EntityManager.GetComponent<ItemComponent>(itemID);
-            if (itemC == null) 
+            if(template.Terrains != null && template.Terrains.Count > 0)
             {
-                Log.Warning("Item template has no ItemComponent: " + itemTemplate.Name);               
-                return tile;
+                int terainID = GameData.Instance.CreateTerrain(Util.PickRandomElementWeighted(template.Terrains).Name);
+                if (terainID > 0) PlaceTerrain(pos, terainID);
             }
 
-            int itemCount = Game.Random.Next(itemTemplate.Min, itemTemplate.Max + 1);
-            itemC.Count = itemCount;
+            if (template.Structures != null && template.Structures.Count > 0)
+            {
+                int structureID = GameData.Instance.CreateStructure(Util.PickRandomElementWeighted(template.Structures).Name);
+                if (structureID > 0) PlaceStructure(pos, structureID);
+            }
+            
+            if (template.Characters != null && template.Characters.Count > 0)
+            {
+                int characterID = GameData.Instance.CreateCharacter(Util.PickRandomElementWeighted(template.Characters).Name);
+                if (characterID > 0) PlaceCharacter(pos, characterID);
+            }
 
-            tile.Items = new List<int>() { itemID };
+            if (template.Items != null && template.Items.Count > 0)
+            {
+                var itemTemplate = Util.PickRandomElementWeighted(template.Items);
+                var itemID = GameData.Instance.CreateItem(itemTemplate.Name);
 
-            return tile;    
+                if (itemID == 0) return true;
+
+                var itemC = EntityManager.GetComponent<ItemComponent>(itemID);
+                if (itemC == null)
+                {
+                    Log.Warning("Item template has no ItemComponent: " + itemTemplate.Name);
+                    return false;
+                }
+
+                int itemCount = Game.Random.Next(itemTemplate.Min, itemTemplate.Max + 1);
+                itemC.Count = itemCount;
+
+                PlaceItem(pos, itemID);
+            }   
+
+            return true; // TODO: can this function ever fail?    
         }
 
         private bool PlaceEntity(Position pos, int entity, int renderLayer = 0)

@@ -431,7 +431,7 @@ namespace TheAlchemist
             int roomGridWidth = roomLayout.GetLength(0);
             int roomGridHeight = roomLayout.GetLength(1);
 
-            Tile[,][,] rooms = new Tile[roomGridWidth, roomGridHeight][,];
+            TileTemplate[,][,] rooms = new TileTemplate[roomGridWidth, roomGridHeight][,];
 
             var rowY = new int[roomGridHeight];
             rowY[0] = 1;
@@ -451,8 +451,8 @@ namespace TheAlchemist
                     if (vert == null)
                         continue;                    
 
-                    var template = GameData.Instance.RoomTemplates["empty"]; //Util.PickRandomElement(GameData.Instance.RoomTemplates.Values.ToList());
-                    Tile[,] room = GenerateRoom(template);
+                    var template = Util.PickRandomElement(GameData.Instance.RoomTemplates.Values.ToList());
+                    TileTemplate[,] room = GenerateRoom(template);
 
                     rooms[roomGridX, roomGridY] = room;
 
@@ -472,7 +472,7 @@ namespace TheAlchemist
 
             var anchors = new Position[roomGridWidth, roomGridHeight];
 
-            // Place rooms
+            // Carve out room shapes
             for (int roomGridX = 0; roomGridX < roomGridWidth; roomGridX++)
             {
                 for (int roomGridY = 0; roomGridY < roomGridHeight; roomGridY++)
@@ -489,47 +489,15 @@ namespace TheAlchemist
 
                     Console.WriteLine("Room at: " + anchor);
 
-                    // place room in world
+                    // carve room shape
                     for (int localY = 0; localY < roomHeight; localY++)
                     {
                         for (int localX = 0; localX < roomWidth; localX++)
                         {
                             Position tilePos = anchor + new Position(localX, localY);
-                            RemoveTerrain(tilePos);
-                            var newTile = room[localX, localY];
-                            foreach(int entity in newTile.GetAllEntities())
-                            {
-                                var transform = EntityManager.GetComponent<TransformComponent>(entity);
-
-                                if (transform == null)
-                                {
-                                    transform = new TransformComponent();
-                                    EntityManager.AddComponent(entity, transform);
-                                }
-
-                                transform.Position = tilePos;
-
-                                var sprite = EntityManager.GetComponent<RenderableSpriteComponent>(entity);
-
-                                if (sprite == null)
-                                {
-                                    // might be desirable in some cases
-                                    Log.Warning("Sprite missing for " + DescriptionSystem.GetNameWithID(entity) + "!");
-                                }
-                                else
-                                {
-                                    sprite.Visible = true;
-                                }
-                            }
-                            tiles[tilePos.X, tilePos.Y] = newTile;
+                            RemoveTerrain(tilePos);                            
                         }
-                    }                    
-
-                    if (!playerInitialized)
-                    {
-                        InitPlayer(anchor + Position.One);
-                        playerInitialized = true;
-                    }                    
+                    } 
                 }
             }
 
@@ -569,6 +537,38 @@ namespace TheAlchemist
                             if (tile.Terrain > 0)
                                 RemoveTerrain(pos);
                         }
+                    }
+                }
+            }
+
+            // Populate rooms
+            for (int roomGridX = 0; roomGridX < roomGridWidth; roomGridX++)
+            {
+                for (int roomGridY = 0; roomGridY < roomGridHeight; roomGridY++)
+                {
+                    var room = rooms[roomGridX, roomGridY];
+                    if (room == null) continue;
+
+                    var anchor = anchors[roomGridX, roomGridY];
+
+                    int roomWidth = room.GetLength(0);
+                    int roomHeight = room.GetLength(1);
+
+                    // place room in world
+                    for (int localY = 0; localY < roomHeight; localY++)
+                    {
+                        for (int localX = 0; localX < roomWidth; localX++)
+                        {
+                            Position tilePos = anchor + new Position(localX, localY);                            
+                            var template = room[localX, localY];
+                            InitTileFromTemplate(tilePos, template);
+                        }
+                    }
+
+                    if (!playerInitialized)
+                    {
+                        InitPlayer(anchor + Position.One);
+                        playerInitialized = true;
                     }
                 }
             }
@@ -649,7 +649,7 @@ namespace TheAlchemist
             return sb.ToString();
         }
 
-        public Tile[,] GenerateRoom(RoomTemplate template, bool random = true, int layoutIndex = 0)
+        public TileTemplate[,] GenerateRoom(RoomTemplate template, bool random = true, int layoutIndex = 0)
         {
             char[,] layout;
 
@@ -670,7 +670,7 @@ namespace TheAlchemist
             int width = layout.GetLength(0);
             int height = layout.GetLength(1);
 
-            var room = new Tile[width, height];
+            var tiles = new TileTemplate[width, height];
 
             for (int y = 0; y < height; y++)
             {
@@ -686,24 +686,16 @@ namespace TheAlchemist
                         Log.Warning("Trying to place tile out of bounds! " + tilePos);
                     }
 
-                    Tile newTile = null;
-                    if (RoomTemplate.DefaultTiles.TryGetValue(symbol, out tileTemplate))
-                    {
-                        newTile = InitTileFromTemplate(tileTemplate);
-                    }
-                    else if (template.CustomTiles.TryGetValue(symbol, out tileTemplate))
-                    {
-                        newTile = InitTileFromTemplate(tileTemplate);
-                    }
-                    else
+                    if (!template.CustomTiles.TryGetValue(symbol, out tileTemplate) && 
+                        !RoomTemplate.DefaultTiles.TryGetValue(symbol, out tileTemplate))
                     {
                         Log.Warning("Unkown symbol from Layout: " + symbol);
                     }
-                    room[x, y] = newTile; // TODO: what if it's null?
+                    tiles[x, y] = tileTemplate;
                 }
             }
 
-            return room;
+            return tiles;
         }
     }
 }

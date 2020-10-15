@@ -68,6 +68,7 @@ namespace TheAlchemist
             TimeStamp();
             logFile.Write(GetHTMLString("font", new Dictionary<string, string>() { { "color", "red" } }, "[ERROR] " + message));
             Newline();
+            logFile.Write(GetHTMLString("pre", null, Environment.StackTrace));
             logFile.Flush();
 
             Util.ErrorOccured = true;

@@ -160,8 +160,11 @@ namespace TheAlchemist
 
                     HashSet<char> placeholders = new HashSet<char>();
 
+                    int layoutIndex = 0;
+                    bool formatError = false;
                     foreach (var serializedLayout in layouts)
-                    {                        
+                    {
+                        layoutIndex++;
                         var lines = serializedLayout.ToObject<string[]>();
                         if(lines.Length == 0)
                         {
@@ -175,19 +178,32 @@ namespace TheAlchemist
                         {
                             for (int x = 0; x < width; x++)
                             {
-                                char c = lines[y][x];                               
-                                layout[x, y] = c;
-                                if (char.IsLetter(c))
+                                try
                                 {
-                                    placeholders.Add(c);
-                                }
-                                else if (!RoomTemplate.DefaultTiles.ContainsKey(c))
-                                {
-                                    Log.Error("Unknown symbol in room layout: " + c);
+                                    char c = lines[y][x];
+                                    layout[x, y] = c;
+                                    if (char.IsLetter(c))
+                                    {
+                                        placeholders.Add(c);
+                                    }
+                                    else if (!RoomTemplate.DefaultTiles.ContainsKey(c))
+                                    {
+                                        Log.Error("Unknown symbol in room layout: " + c);
+                                    }
+                                } 
+                                catch(IndexOutOfRangeException)
+                                {                                    
+                                    formatError = true;
+                                    layout[x, y] = ' ';
                                 }
                             }
                         }
                         room.Layouts.Add(layout);
+
+                        if(formatError)
+                        {
+                            Log.Error($"Room format with index {layoutIndex} in file {file.Name}!");
+                        }
                     }
                     foreach (char ph in placeholders)
                     {
@@ -248,6 +264,7 @@ namespace TheAlchemist
 
         public int TryCreateEntity(Dictionary<string, string> dict, string name, EntityType type)
         {
+            if (name.Length == 0) return 0;
             try
             {
                 return EntityManager.CreateEntity(dict[name], type);

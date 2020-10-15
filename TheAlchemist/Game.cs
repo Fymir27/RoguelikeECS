@@ -40,7 +40,7 @@ namespace TheAlchemist
         UISystem uiSystem;
 
         // broken seeds:
-        // 75782, 79176
+        // 75782, 79176, 80725
         public static int Seed = (int)DateTime.Now.TimeOfDay.TotalSeconds; 
         public static Random Random { get; } = new Random(Seed);
 
@@ -150,7 +150,7 @@ namespace TheAlchemist
             combatSystem.HealthLostEvent += healthSystem.HandleLostHealth;
 
             Log.Message("Loading Keybindings...");
-            string keybindings = File.ReadAllText(Util.ContentPath + "/keybindings.json");
+            string keybindings = File.ReadAllText(Util.ContentPath + "/GameData/keybindings.json");
             input.LoadKeyBindings(keybindings);
             input.EnterDomain(InputManager.CommandDomain.Exploring); // start out with exploring as bottom level command domain
             input.ControlledEntity = Util.PlayerID;        
