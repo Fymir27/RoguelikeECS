@@ -2,10 +2,20 @@
     "layouts": [
         [
             "a  S   a",
-            "arr  rra",
+            " rr  rr ",
             "arwwwwra",
-            "arwwwwra",
+            " rwwwwr ",
             "arrwwrra",
+            "        "
+        ],
+        [
+            "        ",
+            " a ww a ",
+            "  wwww  ",
+            " wwS ww ",
+            " ww  ww ",
+            " awwwwa ",
+            "   ww   ",
             "        "
         ]
     ],
