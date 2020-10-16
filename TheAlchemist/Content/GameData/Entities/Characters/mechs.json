@@ -1,0 +1,138 @@
+{
+    "wheely": [
+        {
+            "$type": "TheAlchemist.Components.NPCComponent, TheAlchemist"
+        },
+        {
+            "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+            "Name": "Wheely",
+            "Description": "Very nimble mech on two wheels. Tries to run you over."
+        },
+        {
+            "$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
+            "Amount": 15.0,
+            "Max": 15.0,
+            "RegenerationAmount": 0.0,
+            "RegenerationProgress": 0.0
+        },
+        {
+            "$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+            "Solid": false
+        },
+        {
+            "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+            "Texture": "wheely",
+            "Visible": true
+        },
+        {
+            "$type": "TheAlchemist.Components.EquipmentComponent, TheAlchemist",
+            "weaponComponents": [
+                {
+                    "$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+                    "Damages": [
+                        {
+                            "Type": "Bludgeoning",
+                            "Min": 3,
+                            "Max": 5
+                        }
+                    ]
+                }
+            ],
+            "armorComponents": [
+                {
+                    "$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+                    "FlatMitigation": 1,
+                    "PercentMitigation": 10
+                }
+            ]
+        }
+    ],
+    "mech_dog": [
+        {
+            "$type": "TheAlchemist.Components.NPCComponent, TheAlchemist"
+        },
+        {
+            "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+            "Name": "Walking Dog",
+            "Description": "Small mech with sharp (probably rusty) teeth."
+        },
+        {
+            "$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
+            "Amount": 10.0,
+            "Max": 10.0,
+            "RegenerationAmount": 0.0,
+            "RegenerationProgress": 0.0
+        },
+        {
+            "$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+            "Solid": false
+        },
+        {
+            "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+            "Texture": "mech_dog",
+            "Visible": true
+        },
+        {
+            "$type": "TheAlchemist.Components.EquipmentComponent, TheAlchemist",
+            "weaponComponents": [
+                {
+                    "$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+                    "Damages": [
+                        {
+                            "Type": "Piercing",
+                            "Min": 3,
+                            "Max": 5
+                        }
+                    ]
+                }
+            ],
+            "armorComponents": [
+                {
+                    "$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+                    "FlatMitigation": 1
+                }
+            ]
+        }
+    ],
+    "cannon": [
+        {
+            "$type": "TheAlchemist.Components.NPCComponent, TheAlchemist"
+        },
+        {
+            "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+            "Name": "Walking Cannon",
+            "Description": "Literal bipedal cannon."
+        },
+        {
+            "$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
+            "Amount": 10.0,
+            "Max": 10.0,
+            "RegenerationAmount": 0.0,
+            "RegenerationProgress": 0.0
+        },
+        {
+            "$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+            "Solid": false
+        },
+        {
+            "$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+            "Texture": "cannon",
+            "Visible": true
+        },
+        {
+            "$type": "TheAlchemist.Components.EquipmentComponent, TheAlchemist",
+            "weaponComponents": [
+                {
+                    "$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+                    "Damages": [
+                        {
+                            "Type": "Bludgeoning",
+                            "Min": 5,
+                            "Max": 10
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

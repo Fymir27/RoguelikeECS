@@ -55,6 +55,15 @@ namespace TheAlchemist
             }
         }
 
+        class RandomMechsRoom : RoomVertex
+        {
+            public RandomMechsRoom() { roomTemplateName = "randomMechs"; }
+            public override string ToString()
+            {
+                return "Rand.Mechs." + ID;
+            }
+        }
+
         private Tuple<ReplacementRule, int>[] GetReplacementRules()
         {
             var builder = new ReplacementRuleBuilder();
@@ -96,17 +105,24 @@ namespace TheAlchemist
 
             var createLoop = builder.GetResult();
 
-            var createFountain = new ReplacementRule();
+            builder.Reset()
+                .MappedVertex<EmptyRoom>()
+                .ReplacementEdge<Edge>()
+                .ReplacementVertex<FountainRoom>();
 
+
+            var createFountain = builder.GetResult();
+
+            var randomMechs = new ReplacementRule();
             var pattern = new Graph();
             pattern.AddVertex(new EmptyRoom());
-            createFountain.Pattern = pattern;
+            randomMechs.Pattern = pattern;
 
             var replacement = new Graph();
-            replacement.AddVertex(new FountainRoom());
-            createFountain.Replacement = replacement;
+            replacement.AddVertex(new RandomMechsRoom());
+            randomMechs.Replacement = replacement;
 
-            createFountain.Mapping = new Dictionary<Vertex, Vertex>()
+            randomMechs.Mapping = new Dictionary<Vertex, Vertex>()
             {
                 { pattern.Vertices.First(), replacement.Vertices.First() }
             };
@@ -117,7 +133,8 @@ namespace TheAlchemist
                 Tuple.Create(stretch, 2),
                 Tuple.Create(createLoop, 1),
                 Tuple.Create(transformJunction, 1),
-                Tuple.Create(createFountain, 1)
+                Tuple.Create(createFountain, 1),
+                Tuple.Create(randomMechs, 4)
             };
 
             return rules;
@@ -137,29 +154,28 @@ namespace TheAlchemist
             var dungeon = new Graph();
             dungeon.Random = Game.Random;
             dungeon.AddVertex(new StartingRoom());
-            dungeon.Replace(initialRule, true);
+            dungeon.Replace(initialRule, true);       
 
-            for (int i = 0; i < 10; i++)
-            {
-                var rules = GetReplacementRules();
 
-                builder.Reset()
-                    .MappedVertex<EmptyRoom>()
-                    .ReplacementVertexWithEdge<EmptyRoom, Edge>();
-
-                var addRoom = builder.GetResult();
-
-                int acc = 0;
-                int[] absoluteDistribution = rules.Select(t => acc += t.Item2).ToArray();
-
+            for (int i = 0; i < 20; i++)
+            {    
                 int endurance = 10;
                 int ruleIndex;
                 bool ruleSuccess;
+
+                var rules = GetReplacementRules();
+                int acc = 0;
+                int[] absoluteDistribution = rules.Select(t => acc += t.Item2).ToArray();
 
                 do
                 {
                     if (endurance-- == 0)
                     {
+                        builder.Reset()
+                            .MappedVertex<EmptyRoom>()
+                            .ReplacementVertexWithEdge<EmptyRoom, Edge>();
+
+                        var addRoom = builder.GetResult();
                         dungeon.Replace(addRoom, true);
                         break;
                     }

@@ -30,6 +30,12 @@
 #begin GameData/characters.json
 /copy:GameData/characters.json
 
+#begin GameData/Entities/Characters/animals.json
+/copy:GameData/Entities/Characters/animals.json
+
+#begin GameData/Entities/Characters/mechs.json
+/copy:GameData/Entities/Characters/mechs.json
+
 #begin GameData/items.json
 /copy:GameData/items.json
 
@@ -44,6 +50,9 @@
 
 #begin GameData/RoomTemplates/junction.json
 /copy:GameData/RoomTemplates/junction.json
+
+#begin GameData/RoomTemplates/randomMechs.json
+/copy:GameData/RoomTemplates/randomMechs.json
 
 #begin GameData/structures.json
 /copy:GameData/structures.json
@@ -214,6 +223,42 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Sprites/inventoryOpen.png
+
+#begin Sprites/Mechs/cannon.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/Mechs/cannon.png
+
+#begin Sprites/Mechs/mech_dog.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/Mechs/mech_dog.png
+
+#begin Sprites/Mechs/wheely.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/Mechs/wheely.png
 
 #begin Sprites/messageLogBox.png
 /importer:TextureImporter

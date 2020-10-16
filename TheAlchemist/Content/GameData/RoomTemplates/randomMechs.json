@@ -1,0 +1,68 @@
+{
+    "layouts": [
+        [
+            "        ",
+            " rr  A  ",
+            " rr     ",
+            "    rr  ",
+            "  r  A  ",
+            "  r     ",
+            "        "
+        ],
+        [
+            "        ",
+            " www A  ",
+            " www a  ",
+            " www    ",
+            "    Aa  ",
+            "  a     ",
+            "        "
+        ]
+    ],
+    "a": {
+        "structures": [
+            {
+                "name": "bush"
+            },
+            {
+                "name": "tree"
+            },
+            {}
+        ]
+    },
+    "w": {
+        "terrains": [
+            {
+                "name": "water"
+            },
+            {
+                "name": "mossyGround"
+            }
+        ]
+    },
+    "r": {
+        "structures": [
+            {
+                "name": "rocks"
+            },
+            {}
+        ]
+    },
+    "A": {
+        "characters": [
+            {
+                "name": "wheely",
+                "weight": 1
+            },
+            {
+                "name": "cannon",
+                "weight": 1
+            },
+            {
+                "name": "mech_dog",
+                "weight": 2
+            }
+        ]
+    },
+    "tileset": "default"
+}

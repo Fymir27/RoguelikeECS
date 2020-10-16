@@ -129,7 +129,15 @@ namespace TheAlchemist
                 Entities[EntityType.Structure] = LoadEntities(contentPath + "/structures.json");             
 
                 Log.Message("Loading characters...");
-                Entities[EntityType.Character] = LoadEntities(contentPath + "/characters.json");
+                Entities[EntityType.Character] = new Dictionary<string, string>();
+                foreach (var filepath in Directory.GetFiles(contentPath + "/Entities/Characters", "*.json"))
+                {                    
+                    var deserialized = LoadEntities(filepath);
+                    foreach (var keyValPair in deserialized)
+                    {
+                        Entities[EntityType.Character].Add(keyValPair.Key, keyValPair.Value);
+                    }
+                }                
 
                 Log.Message("Loading room templates...");
                 LoadRoomTemplates(contentPath);

@@ -40,7 +40,7 @@ namespace TheAlchemist
         UISystem uiSystem;
 
         // broken seeds:
-        // 75782, 79176, 80725
+        // 75782, 79176, 80725, 85376
         public static int Seed = (int)DateTime.Now.TimeOfDay.TotalSeconds; 
         public static Random Random { get; } = new Random(Seed);
 
@@ -227,6 +227,7 @@ namespace TheAlchemist
             TextureManager.Init(Content);
             //TextureManager.LoadTextures(textures);
             TextureManager.LoadAllTextures("Sprites");
+            TextureManager.LoadAllTextures(@"Sprites\Mechs");
 
             Log.Message("Loading UI...");
             UI.Init(graphics.GraphicsDevice);

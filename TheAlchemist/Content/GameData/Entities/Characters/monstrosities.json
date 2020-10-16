@@ -1,0 +1,70 @@
+{
+	"mound": [
+		{
+			"$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+			"Name": "Mound",
+			"Description": "TODO"
+		},
+		{
+			"$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
+			"Amount": 20.0,
+			"Max": 20.0,
+			"RegenerationAmount": 1.0,
+			"RegenerationProgress": 0.0
+		},
+		{
+			"$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+			"Solid": false
+		},
+		{
+			"$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+			"Texture": "mound",
+			"Visible": true
+		},
+		{
+			"$type": "TheAlchemist.Components.MultiTileComponent, TheAlchemist",
+			"OccupationMatrix": [
+				[
+					1,
+					1,
+					1
+				],
+				[
+					1,
+					0,
+					1
+				]
+			]
+		},
+		{
+			"$type": "TheAlchemist.Components.NPCComponent, TheAlchemist"
+		},
+		{
+			"$type": "TheAlchemist.Components.EquipmentComponent, TheAlchemist",
+			"weaponComponents": [
+				{
+					"$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+					"Damages": [
+						{
+							"Type": "Piercing",
+							"Min": 4,
+							"Max": 6
+						},
+						{
+							"Type": "Slashing",
+							"Min": 4,
+							"Max": 6
+						}
+					]
+				}
+			],
+			"armorComponents": [
+				{
+					"$type": "TheAlchemist.Components.ArmorComponent, TheAlchemist",
+					"PercentMitigation": 20,
+					"FlatMitigation": 2
+				}
+			]
+		}
+	]
+}

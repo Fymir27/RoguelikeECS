@@ -1,0 +1,136 @@
+{
+	"rat": [
+		{
+			"$type": "TheAlchemist.Components.NPCComponent, TheAlchemist"
+		},
+		{
+			"$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+			"Name": "Rat",
+			"Description": "A small dirty animal."
+		},
+		{
+			"$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
+			"Amount": 10.0,
+			"Max": 10.0,
+			"RegenerationAmount": 0.3,
+			"RegenerationProgress": 0.0
+		},
+		{
+			"$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+			"Solid": false
+		},
+		{
+			"$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+			"Texture": "rat",
+			"Visible": true
+		},
+		{
+			"$type": "TheAlchemist.Components.EquipmentComponent, TheAlchemist",
+			"weaponComponents": [
+				{
+					"$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+					"Damages": [
+						{
+							"Type": "Piercing",
+							"Min": 3,
+							"Max": 7
+						}
+					]
+				}
+			],
+			"armorComponents": []
+		}
+	],
+	"bat_fire": [
+		{
+			"$type": "TheAlchemist.Components.NPCComponent, TheAlchemist"
+		},
+		{
+			"$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+			"Name": "Fire Bat",
+			"Description": "Fiery flying animal that navigates using echolocation."
+		},
+		{
+			"$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
+			"Amount": 10.0,
+			"Max": 10.0,
+			"RegenerationAmount": 0.1,
+			"RegenerationProgress": 0.0
+		},
+		{
+			"$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+			"Solid": false
+		},
+		{
+			"$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+			"Texture": "bat_fire",
+			"Visible": true
+		},
+		{
+			"$type": "TheAlchemist.Components.EquipmentComponent, TheAlchemist",
+			"weaponComponents": [
+				{
+					"$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+					"Damages": [
+						{
+							"Type": "Piercing",
+							"Min": 1,
+							"Max": 3
+						},
+						{
+							"Type": "Fire",
+							"Min": 2,
+							"Max": 5
+						}
+					]
+				}
+			]
+		}
+	],
+	"spider": [
+		{
+			"$type": "TheAlchemist.Components.NPCComponent, TheAlchemist"
+		},
+		{
+			"$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+			"Name": "Spider",
+			"Description": "A small eight legged animal."
+		},
+		{
+			"$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
+			"Amount": 10.0,
+			"Max": 10.0,
+			"RegenerationAmount": 0.1,
+			"RegenerationProgress": 0.0
+		},
+		{
+			"$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+			"Solid": false
+		},
+		{
+			"$type": "TheAlchemist.Components.RenderableSpriteComponent, TheAlchemist",
+			"Texture": "spider",
+			"Visible": true
+		},
+		{
+			"$type": "TheAlchemist.Components.EquipmentComponent, TheAlchemist",
+			"weaponComponents": [
+				{
+					"$type": "TheAlchemist.Components.WeaponComponent, TheAlchemist",
+					"Damages": [
+						{
+							"Type": "Piercing",
+							"Min": 2,
+							"Max": 5
+						},
+						{
+							"Type": "Nature",
+							"Min": 2,
+							"Max": 5
+						}
+					]
+				}
+			]
+		}
+	]
+}
