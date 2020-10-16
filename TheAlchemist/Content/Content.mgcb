@@ -42,6 +42,9 @@
 #begin GameData/RoomTemplates/fountain.json
 /copy:GameData/RoomTemplates/fountain.json
 
+#begin GameData/RoomTemplates/junction.json
+/copy:GameData/RoomTemplates/junction.json
+
 #begin GameData/structures.json
 /copy:GameData/structures.json
 

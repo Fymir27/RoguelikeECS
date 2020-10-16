@@ -15,24 +15,23 @@ namespace TheAlchemist
 {
     partial class Floor
     {
-        class RoomVertex : Vertex
+        abstract class RoomVertex : Vertex
         {
+            public string roomTemplateName = "empty";
             public override string ToString()
             {
                 return "Room" + ID;
             }
         }
 
-        class FragmentVertex : Vertex
+        class EmptyRoom : RoomVertex
         {
-            public override string ToString()
-            {
-                return "Fragment" + ID;
-            }
+ 
         }
 
-        class Junction : FragmentVertex
+        class Junction : RoomVertex
         {
+            public Junction() { roomTemplateName = "junction"; }
             public override string ToString()
             {
                 return "Junc." + ID;
@@ -47,57 +46,78 @@ namespace TheAlchemist
             }
         }
 
-        class BasicRoom : RoomVertex { }
-
-        class FinalRoom : RoomVertex { }
+        class FountainRoom : RoomVertex 
+        {
+            public FountainRoom() { roomTemplateName = "fountain"; }
+            public override string ToString()
+            {
+                return "Fount." + ID;
+            }
+        }
 
         private Tuple<ReplacementRule, int>[] GetReplacementRules()
         {
             var builder = new ReplacementRuleBuilder();
 
             builder.Reset()
-                   .MappedVertex<BasicRoom>("a")
-                   .PatternVertexWithEdge<BasicRoom, Edge>("b")
+                   .MappedVertex<EmptyRoom>("a")
+                   .PatternVertexWithEdge<EmptyRoom, Edge>("b")
                    .MoveToTag("a").ReplacementVertexWithEdge<Junction, Edge>("j")
-                   .ReplacementVertexWithEdge<BasicRoom, Edge>().MoveToTag("j")
-                   .ReplacementVertexWithEdge<BasicRoom, Edge>().MapToTag("b");
+                   .ReplacementVertexWithEdge<EmptyRoom, Edge>().MoveToTag("j")
+                   .ReplacementVertexWithEdge<EmptyRoom, Edge>().MapToTag("b");
 
             var addJunction = builder.GetResult();
 
             builder.Reset()
-                .MappedVertex<BasicRoom>("a")
-                .PatternVertexWithEdge<BasicRoom, Edge>("b").MoveToTag("a")
-                .ReplacementVertexWithEdge<BasicRoom, Edge>()
-                .ReplacementVertexWithEdge<BasicRoom, Edge>().MapToTag("b");
+                .MappedVertex<EmptyRoom>("a")
+                .PatternVertexWithEdge<EmptyRoom, Edge>("b").MoveToTag("a")
+                .ReplacementVertexWithEdge<EmptyRoom, Edge>()
+                .ReplacementVertexWithEdge<EmptyRoom, Edge>().MapToTag("b");
 
             var stretch = builder.GetResult();
 
             builder.Reset()
-                .MappedVertex<BasicRoom>("a")
+                .MappedVertex<EmptyRoom>("a")
                 .PatternVertexWithEdge<Junction, Edge>("j")
-                .PatternVertexWithEdge<BasicRoom, Edge>("b").MoveToTag("j")
-                .PatternVertexWithEdge<BasicRoom, Edge>("c").MoveToTag("a")
-                .ReplacementVertexWithEdge<BasicRoom, Edge>().MapToTag("b")
-                .ReplacementVertexWithEdge<BasicRoom, Edge>().MapToTag("c")
+                .PatternVertexWithEdge<EmptyRoom, Edge>("b").MoveToTag("j")
+                .PatternVertexWithEdge<EmptyRoom, Edge>("c").MoveToTag("a")
+                .ReplacementVertexWithEdge<EmptyRoom, Edge>().MapToTag("b")
+                .ReplacementVertexWithEdge<EmptyRoom, Edge>().MapToTag("c")
                 .ReplacementEdge<Edge>().MoveToTag("a");
 
             var transformJunction = builder.GetResult();
 
             builder.Reset()
-                .MappedVertex<BasicRoom>("a")
-                .MappedVertexWithEdge<BasicRoom, Edge>()
-                .MappedVertexWithEdge<BasicRoom, Edge>()
-                .MappedVertexWithEdge<BasicRoom, Edge>()
+                .MappedVertex<EmptyRoom>("a")
+                .MappedVertexWithEdge<EmptyRoom, Edge>()
+                .MappedVertexWithEdge<EmptyRoom, Edge>()
+                .MappedVertexWithEdge<EmptyRoom, Edge>()
                 .ReplacementEdge<Edge>().MoveToTag("a");
 
             var createLoop = builder.GetResult();
+
+            var createFountain = new ReplacementRule();
+
+            var pattern = new Graph();
+            pattern.AddVertex(new EmptyRoom());
+            createFountain.Pattern = pattern;
+
+            var replacement = new Graph();
+            replacement.AddVertex(new FountainRoom());
+            createFountain.Replacement = replacement;
+
+            createFountain.Mapping = new Dictionary<Vertex, Vertex>()
+            {
+                { pattern.Vertices.First(), replacement.Vertices.First() }
+            };
 
             var rules = new Tuple<ReplacementRule, int>[]
             {
                 Tuple.Create(addJunction, 3),
                 Tuple.Create(stretch, 2),
                 Tuple.Create(createLoop, 1),
-                Tuple.Create(transformJunction, 1)
+                Tuple.Create(transformJunction, 1),
+                Tuple.Create(createFountain, 1)
             };
 
             return rules;
@@ -108,9 +128,9 @@ namespace TheAlchemist
             var builder = new ReplacementRuleBuilder();
 
             builder.MappedVertex<StartingRoom>("start")
-                .ReplacementVertexWithEdge<BasicRoom, Edge>().ReplacementVertexWithEdge<BasicRoom, Edge>().MoveToTag("start")
-                .ReplacementVertexWithEdge<BasicRoom, Edge>().ReplacementVertexWithEdge<BasicRoom, Edge>().MoveToTag("start")
-                .ReplacementVertexWithEdge<BasicRoom, Edge>().ReplacementVertexWithEdge<BasicRoom, Edge>();
+                .ReplacementVertexWithEdge<EmptyRoom, Edge>().ReplacementVertexWithEdge<EmptyRoom, Edge>().MoveToTag("start")
+                .ReplacementVertexWithEdge<EmptyRoom, Edge>().ReplacementVertexWithEdge<EmptyRoom, Edge>().MoveToTag("start")
+                .ReplacementVertexWithEdge<EmptyRoom, Edge>().ReplacementVertexWithEdge<EmptyRoom, Edge>();
 
             var initialRule = builder.GetResult();
 
@@ -124,8 +144,8 @@ namespace TheAlchemist
                 var rules = GetReplacementRules();
 
                 builder.Reset()
-                    .MappedVertex<BasicRoom>()
-                    .ReplacementVertexWithEdge<BasicRoom, Edge>();
+                    .MappedVertex<EmptyRoom>()
+                    .ReplacementVertexWithEdge<EmptyRoom, Edge>();
 
                 var addRoom = builder.GetResult();
 
@@ -446,13 +466,24 @@ namespace TheAlchemist
                 int rowHeight = 0;
                 for (int roomGridX = 0; roomGridX < roomGridWidth; roomGridX++)
                 {                
-                    Vertex vert = roomLayout[roomGridX, roomGridY];
+                    var vert = roomLayout[roomGridX, roomGridY] as RoomVertex;
 
                     if (vert == null)
-                        continue;                    
+                        continue;
 
-                    var template = Util.PickRandomElement(GameData.Instance.RoomTemplates.Values.ToList());
-                    TileTemplate[,] room = GenerateRoom(template);
+                    string templateName = vert.roomTemplateName;
+
+                    RoomTemplate roomTemplate = GameData.Instance.RoomTemplates["empty"];
+                    if (GameData.Instance.RoomTemplates.ContainsKey(templateName))
+                    {
+                        roomTemplate = GameData.Instance.RoomTemplates[templateName];
+                    } 
+                    else
+                    {
+                        Log.Error($"Unknown room template '{templateName}' for room '{vert.ToString()}'");
+                    }
+
+                    TileTemplate[,] room = GenerateRoom(roomTemplate);
 
                     rooms[roomGridX, roomGridY] = room;
 
@@ -461,6 +492,7 @@ namespace TheAlchemist
 
                     maxRoomWidth = Math.Max(maxRoomWidth, roomWidth);
                     rowHeight = Math.Max(rowHeight, roomHeight);
+                    
                 }
 
                 // set Y of next row
@@ -541,6 +573,8 @@ namespace TheAlchemist
                 }
             }
 
+            File.WriteAllText("asciiLayout.txt", ASCII());
+
             // Populate rooms
             for (int roomGridX = 0; roomGridX < roomGridWidth; roomGridX++)
             {
@@ -571,9 +605,7 @@ namespace TheAlchemist
                         playerInitialized = true;
                     }
                 }
-            }
-
-            File.WriteAllText("asciiLayout.txt", ASCII());
+            }           
         }
 
 
