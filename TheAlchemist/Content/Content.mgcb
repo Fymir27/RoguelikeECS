@@ -27,17 +27,26 @@
 /processorParam:TextureFormat=Compressed
 /build:default.spritefont
 
-#begin GameData/characters.json
-/copy:GameData/characters.json
-
 #begin GameData/Entities/Characters/animals.json
 /copy:GameData/Entities/Characters/animals.json
 
 #begin GameData/Entities/Characters/mechs.json
 /copy:GameData/Entities/Characters/mechs.json
 
-#begin GameData/items.json
-/copy:GameData/items.json
+#begin GameData/Entities/Characters/monstrosities.json
+/copy:GameData/Entities/Characters/monstrosities.json
+
+#begin GameData/Entities/Items/items.json
+/copy:GameData/Entities/Items/items.json
+
+#begin GameData/Entities/Items/templateItems.json
+/copy:GameData/Entities/Items/templateItems.json
+
+#begin GameData/Entities/Structures/structures.json
+/copy:GameData/Entities/Structures/structures.json
+
+#begin GameData/Entities/Terrains/terrain.json
+/copy:GameData/Entities/Terrains/terrain.json
 
 #begin GameData/keybindings.json
 /copy:GameData/keybindings.json
@@ -53,15 +62,6 @@
 
 #begin GameData/RoomTemplates/randomMechs.json
 /copy:GameData/RoomTemplates/randomMechs.json
-
-#begin GameData/structures.json
-/copy:GameData/structures.json
-
-#begin GameData/templateItems.json
-/copy:GameData/templateItems.json
-
-#begin GameData/terrain.json
-/copy:GameData/terrain.json
 
 #begin map.txt
 /copy:map.txt

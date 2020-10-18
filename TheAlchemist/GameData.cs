@@ -110,43 +110,33 @@ namespace TheAlchemist
         // string json = Entities[type][name]
         public Dictionary<EntityType, Dictionary<string, string>> Entities = new Dictionary<EntityType, Dictionary<string, string>>();
 
-        public Dictionary<string, string> TemplateItems = new Dictionary<string, string>();
-
         public Dictionary<string, RoomTemplate> RoomTemplates = new Dictionary<string, RoomTemplate>();
 
-        public void Load(string contentPath)
+        public void LoadEntities(EntityType entityType, string entityDirectory, bool recursive = true, string prefix = "")
         {
             try
             {
-                Log.Message("Loading terrain...");
-                Entities[EntityType.Terrain] = LoadEntities(contentPath + "/terrain.json");
+                foreach (var file in Directory.GetFiles(entityDirectory, "*.json"))
+                {
+                    if (!Entities.ContainsKey(entityType)) 
+                        Entities[entityType] = new Dictionary<string, string>();
 
-                Log.Message("Loading items...");
-                Entities[EntityType.Item] = LoadEntities(contentPath + "/items.json");
-                TemplateItems = LoadEntities(contentPath + "/templateItems.json");
+                    Entities[entityType] = LoadEntities(file, Entities[entityType], prefix);
+                }
 
-                Log.Message("Loading structures...");
-                Entities[EntityType.Structure] = LoadEntities(contentPath + "/structures.json");             
-
-                Log.Message("Loading characters...");
-                Entities[EntityType.Character] = new Dictionary<string, string>();
-                foreach (var filepath in Directory.GetFiles(contentPath + "/Entities/Characters", "*.json"))
-                {                    
-                    var deserialized = LoadEntities(filepath);
-                    foreach (var keyValPair in deserialized)
+                if (recursive)
+                {
+                    foreach (var directory in Directory.GetDirectories(entityDirectory))
                     {
-                        Entities[EntityType.Character].Add(keyValPair.Key, keyValPair.Value);
+                        var info = new DirectoryInfo(directory);
+                        LoadEntities(entityType, directory, true, prefix + info.Name + "/");
                     }
-                }                
-
-                Log.Message("Loading room templates...");
-                LoadRoomTemplates(contentPath);
-            }
-            catch (JsonException e)
+                }
+            }           
+            catch (DirectoryNotFoundException)
             {
-                Log.Error("GameData failed to load: " + e.ToString());
-                throw e;
-            }
+                Log.Error("Invalid directory: " + entityDirectory);
+            }           
         }
 
         public void LoadRoomTemplates(string contentPath)
@@ -292,12 +282,7 @@ namespace TheAlchemist
         public int CreateItem(string name)
         {
             return TryCreateEntity(Entities[EntityType.Item], name, EntityType.Item);
-        }
-
-        public int CreateTemplateItem(string name)
-        {
-            return TryCreateEntity(TemplateItems, name, EntityType.Item);
-        }
+        }       
 
         public int CreateTerrain(string name)
         {
@@ -309,18 +294,18 @@ namespace TheAlchemist
             return TryCreateEntity(Entities[EntityType.Structure], name, EntityType.Structure);
         }
 
-        private Dictionary<string, string> LoadEntities(string path)
+        private Dictionary<string, string> LoadEntities(string path, Dictionary<string, string> existingDict = null, string prefix = "")
         {
             try
             {
                 string rawText = File.ReadAllText(path);
                 JObject entitiesJson = JObject.Parse(rawText);
 
-                var dict = new Dictionary<string, string>();
+                var dict = existingDict ?? new Dictionary<string, string>();
 
                 foreach (var entity in entitiesJson)
                 {
-                    dict.Add(entity.Key, entity.Value.ToString());
+                    dict.Add(prefix + entity.Key, entity.Value.ToString());
                 }
 
                 return dict; //Util.DeserializeObject<Dictionary<string, string>>(rawText);

@@ -16,11 +16,11 @@ namespace TheAlchemist.Components
         { 
             if(weaponName != null && weaponName != "")
             {
-                Weapon = GameData.Instance.CreateTemplateItem(weaponName);
+                Weapon = GameData.Instance.CreateItem(weaponName);
             }
             if (armorName != null && armorName != "")
             {
-                Armor = GameData.Instance.CreateTemplateItem(armorName);
+                Armor = GameData.Instance.CreateItem(armorName);
             }
         }
 

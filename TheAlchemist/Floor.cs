@@ -1012,7 +1012,7 @@ namespace TheAlchemist
                 PlaceStructure(spawnPos, bush);
 
                 // create berries to grow on bush
-                int berries = data.CreateTemplateItem("berry");
+                int berries = data.CreateItem("berry");
 
                 // add to bush
                 var interactable = EntityManager.GetComponent<InteractableComponent>(bush);
@@ -2084,8 +2084,8 @@ namespace TheAlchemist
         public static int CreatePlayer()
         {
             int player = EntityManager.CreateEntity(EntityType.Character);
-            int playerWeapon = GameData.Instance.CreateTemplateItem("dagger");
-            int playerArmor = GameData.Instance.CreateTemplateItem("lightArmor");        
+            int playerWeapon = GameData.Instance.CreateItem("dagger");
+            int playerArmor = GameData.Instance.CreateItem("lightArmor");        
 
             List<IComponent> playerComponents = new List<IComponent>()
             {
