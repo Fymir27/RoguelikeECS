@@ -701,6 +701,12 @@ namespace TheAlchemist
         {
             char[,] layout;
 
+            if(!GameData.Instance.Tilesets.ContainsKey(template.tileset))
+            {
+                Log.Error("Unkown tileset: " + template.tileset);
+                template.tileset = "default";
+            }
+
             if (random)
             {
                 layout = Util.PickRandomElement(template.Layouts);
@@ -726,7 +732,6 @@ namespace TheAlchemist
                 {
                     char symbol = layout[x, y];
 
-                    TileTemplate tileTemplate;
                     Position tilePos = new Position(x, y);
 
                     if (IsOutOfBounds(tilePos))
@@ -734,12 +739,26 @@ namespace TheAlchemist
                         Log.Warning("Trying to place tile out of bounds! " + tilePos);
                     }
 
-                    if (!template.CustomTiles.TryGetValue(symbol, out tileTemplate) && 
-                        !RoomTemplate.DefaultTiles.TryGetValue(symbol, out tileTemplate))
+                    if (template.CustomTiles.ContainsKey(symbol))
                     {
-                        Log.Warning("Unkown symbol from Layout: " + symbol);
+                        tiles[x, y] = template.CustomTiles[symbol];
+                    } 
+                    else
+                    {
+                        GameData.Instance.Tilesets.TryGetValue(template.tileset, out var tileset);
+                        if (tileset == null) {
+                            tiles[x, y] = new TileTemplate();
+                        } 
+                        else if(tileset.ContainsKey(symbol))
+                        {
+                            tiles[x, y] = tileset[symbol];
+                        } 
+                        else
+                        {
+                            Log.Warning("Unkown symbol from Layout: " + symbol);
+                            tiles[x, y] = new TileTemplate(); 
+                        }
                     }
-                    tiles[x, y] = tileTemplate;
                 }
             }
 

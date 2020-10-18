@@ -1,4 +1,5 @@
 {
+    "tileset": "mossy",
     "layouts": [
         [
             "        ",
@@ -72,6 +73,5 @@
                 "name": "rocks"
             }
         ]
-    },
-    "tileset": "default"
+    }
 }

@@ -63,6 +63,9 @@
 #begin GameData/RoomTemplates/randomMechs.json
 /copy:GameData/RoomTemplates/randomMechs.json
 
+#begin GameData/tilesets.json
+/copy:GameData/tilesets.json
+
 #begin map.txt
 /copy:map.txt
 

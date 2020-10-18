@@ -1,0 +1,57 @@
+{
+    "stone": {
+        "#": {
+            "Terrains": [
+                {
+                    "Name": "wall",
+                    "Weight": 1,
+                    "Min": 1,
+                    "Max": 1
+                }
+            ]
+        },
+        "+": {
+            "Structures": [
+                {
+                    "Name": "door",
+                    "Weight": 1,
+                    "Min": 1,
+                    "Max": 1
+                }
+            ]
+        },
+        " ": {}
+    },
+    "mossy": {
+        "#": {
+            "Terrains": [
+                {
+                    "Name": "wall",
+                    "Weight": 1,
+                    "Min": 1,
+                    "Max": 1
+                }
+            ]
+        },
+        "+": {
+            "Structures": [
+                {
+                    "Name": "door",
+                    "Weight": 1,
+                    "Min": 1,
+                    "Max": 1
+                }
+            ]
+        },
+        " ": {
+            "Terrains": [
+                {
+                    "Name": "mossyGround",
+                    "Weight": 1,
+                    "Min": 1,
+                    "Max": 1
+                }
+            ]
+        }
+    }
+}

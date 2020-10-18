@@ -93,13 +93,8 @@ namespace TheAlchemist
     public struct RoomTemplate
     {
         public List<char[,]> Layouts;
-        public Dictionary<char, TileTemplate> CustomTiles;
-        public static Dictionary<char, TileTemplate> DefaultTiles = new Dictionary<char, TileTemplate>()
-            {
-                { '#', new TileTemplate() { Terrains = new SortedList<int, EntityTemplate>() { { 1, new EntityTemplate("wall") } } } },
-                { '+', new TileTemplate() { Structures = new SortedList<int, EntityTemplate>() { { 1, new EntityTemplate("door") } } } },
-                { ' ', new TileTemplate() { } }
-            };
+        public string tileset;
+        public Dictionary<char, TileTemplate> CustomTiles;        
     }
 
     // This class loads and saves JSON representations of template enemies/items/terrain...
@@ -111,6 +106,8 @@ namespace TheAlchemist
         public Dictionary<EntityType, Dictionary<string, string>> Entities = new Dictionary<EntityType, Dictionary<string, string>>();
 
         public Dictionary<string, RoomTemplate> RoomTemplates = new Dictionary<string, RoomTemplate>();
+
+        public Dictionary<string, Dictionary<char, TileTemplate>> Tilesets = new Dictionary<string, Dictionary<char, TileTemplate>>();
 
         public void LoadEntities(EntityType entityType, string entityDirectory, bool recursive = true, string prefix = "")
         {
@@ -139,6 +136,34 @@ namespace TheAlchemist
             }           
         }
 
+        public void LoadTilesets(string file)
+        {
+            try
+            {
+                string json = File.ReadAllText(file);
+                Tilesets = Util.DeserializeObject<Dictionary<string, Dictionary<char, TileTemplate>>>(json);
+                if(!Tilesets.ContainsKey("default"))
+                {
+                    Tilesets["default"] = new Dictionary<char, TileTemplate>()
+                    {
+                        { '#', new TileTemplate() { Terrains = new SortedList<int, EntityTemplate>() { { 1, new EntityTemplate("wall") } } } },
+                        { '+', new TileTemplate() { Structures = new SortedList<int, EntityTemplate>() { { 1, new EntityTemplate("door") } } } },
+                        { ' ', new TileTemplate() { } }
+                    };
+                }
+            }
+            catch(JsonException e)
+            {
+                Log.Error("Failed parsing tilesets:");
+                Log.Data(e.Message);
+            }
+            catch(IOException e)
+            {
+                Log.Error("Failed reading tilesets from: " + file);
+                Log.Data(e.Message);
+            }
+        }
+
         public void LoadRoomTemplates(string contentPath)
         {
             try
@@ -155,6 +180,19 @@ namespace TheAlchemist
                     RoomTemplate room;
                     room.Layouts = new List<char[,]>();
                     room.CustomTiles = new Dictionary<char, TileTemplate>();
+
+                    obj.TryGetValue("tileset", StringComparison.OrdinalIgnoreCase, out var tilesetToken);
+                    room.tileset = tilesetToken == null ? "default" : tilesetToken.Value<string>();
+
+                    var tileset = Tilesets["default"];
+                    if (Tilesets.ContainsKey(room.tileset)) 
+                    {
+                        tileset = Tilesets[room.tileset];
+                    } 
+                    else
+                    {
+                        Log.Error("Unkown tileset: " + room.tileset);
+                    }
 
                     HashSet<char> placeholders = new HashSet<char>();
 
@@ -184,7 +222,7 @@ namespace TheAlchemist
                                     {
                                         placeholders.Add(c);
                                     }
-                                    else if (!RoomTemplate.DefaultTiles.ContainsKey(c))
+                                    else if (!tileset.ContainsKey(c))
                                     {
                                         Log.Error("Unknown symbol in room layout: " + c);
                                     }

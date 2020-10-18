@@ -84,6 +84,7 @@ namespace TheAlchemist
             gameData.LoadEntities(EntityType.Character, dataPath + "Entities/Characters");
             gameData.LoadEntities(EntityType.Item, dataPath + "Entities/Items");
             
+            gameData.LoadTilesets(dataPath + "tilesets.json");
             gameData.LoadRoomTemplates(dataPath);
 
             //Floor test = new Floor(Content.RootDirectory + "/map.txt");
