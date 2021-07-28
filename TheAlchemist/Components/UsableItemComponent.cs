@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace TheAlchemist.Components
 {
-    using static TheAlchemist.Systems.ItemSystem;
-
     [JsonConverter(typeof(StringEnumConverter))]
     public enum ItemUsage
     {

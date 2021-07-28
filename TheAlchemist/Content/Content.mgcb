@@ -36,6 +36,9 @@
 #begin GameData/Entities/Characters/monstrosities.json
 /copy:GameData/Entities/Characters/monstrosities.json
 
+#begin GameData/Entities/Items/herbs.json
+/copy:GameData/Entities/Items/herbs.json
+
 #begin GameData/Entities/Items/items.json
 /copy:GameData/Entities/Items/items.json
 

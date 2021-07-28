@@ -83,6 +83,9 @@ namespace TheAlchemist
             gameData.LoadEntities(EntityType.Structure, dataPath + "Entities/Structures");
             gameData.LoadEntities(EntityType.Character, dataPath + "Entities/Characters");
             gameData.LoadEntities(EntityType.Item, dataPath + "Entities/Items");
+
+            var herb = gameData.CreateItem("randomHerb");
+            var herbSubstance = EntityManager.GetComponent<SubstanceComponent>(herb);
             
             gameData.LoadTilesets(dataPath + "tilesets.json");
             gameData.LoadRoomTemplates(dataPath);

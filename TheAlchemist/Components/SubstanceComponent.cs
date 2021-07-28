@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace TheAlchemist.Components
 {
@@ -153,6 +154,19 @@ namespace TheAlchemist.Components
             }
 
             return true;
+        }
+
+        [JsonConstructor]
+        public SubstanceComponent(MaterialType materialType, Dictionary<Property, int> properties = null, bool propertiesKnown = false, 
+            bool generateRandomly = false, int count = 1, int min = 1, int max = 99)
+        {
+            MaterialType = materialType;
+            if (properties == null)
+                properties = new Dictionary<Property, int>();
+            if (generateRandomly)
+                properties = Systems.ItemSystem.GenerateRandomProperties(count, min, max);
+            Properties = properties;
+            PropertiesKnown = propertiesKnown;
         }
         /*
         interface PropertyGroup
