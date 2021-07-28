@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
-
 using TheAlchemist.Components;
 
 namespace TheAlchemist
@@ -169,6 +169,12 @@ namespace TheAlchemist
         public static int CreateEntity(string json, EntityType type)
         {
             var components = Util.DeserializeObject<List<IComponent>>(json);
+            if (components == null)
+            {
+                Log.Error("Failed to load components of entity from JSON!");
+                Log.Data(json);
+                components = new List<IComponent>();
+            }
             return CreateEntity(components, type);
         }
 

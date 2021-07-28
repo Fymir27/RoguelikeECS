@@ -1,9 +1,0 @@
-Tilesets
-Graph Replacement Rule Reuse
-Input rework
-Player Sound/Stealth (Stealth potion?)
-Correct Stat stacking
-Better enemy AI
-Better dungeon layout generation
-Instability of potions (crafted too often)
-Remove weight 0 warning when reading in room templates with no weight set

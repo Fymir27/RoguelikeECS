@@ -464,9 +464,9 @@ namespace TheAlchemist
             }
             catch (JsonException e)
             {
-                Log.Error("Deserialization went wrong! " + typeof(T));
+                Log.Error("Deserialization went wrong! " + typeof(T), false);
                 Log.Error(e.Message);
-                return default(T);
+                return default;
             }
         }
 

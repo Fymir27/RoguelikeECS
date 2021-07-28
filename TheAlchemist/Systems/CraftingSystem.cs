@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TheAlchemist.Systems
 {
     using Components;
-    using static TheAlchemist.Components.CraftingMaterialComponent;
 
     public delegate void AddCraftingIngredientHandler(int item);
     public delegate bool CraftItemHandler();

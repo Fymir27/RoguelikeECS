@@ -88,6 +88,13 @@ namespace TheAlchemist.Systems
 
             var itemInfo = EntityManager.GetComponent<ItemComponent>(item);
 
+            if (itemInfo == null)
+            {
+                Log.Error("Trying to add item entity to character that's not an item!");
+                Log.Data(DescriptionSystem.GetDescription(item));
+                return false;
+            }
+
             if (itemInfo.Count == 0) // happens if item comes back from e.g. crafting reset
             {
                 itemInfo.Count = 1;

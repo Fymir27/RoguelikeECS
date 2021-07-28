@@ -63,12 +63,16 @@ namespace TheAlchemist
             logFile.Flush();
         }
 
-        public static void Error(string message)
+        public static void Error(string message, bool stacktrace = true)
         {
             TimeStamp();
             logFile.Write(GetHTMLString("font", new Dictionary<string, string>() { { "color", "red" } }, "[ERROR] " + message));
             Newline();
-            logFile.Write(GetHTMLString("pre", null, Environment.StackTrace));
+            
+            if (stacktrace) {
+                logFile.Write(GetHTMLString("pre", null, Environment.StackTrace));
+            }
+                
             logFile.Flush();
 
             Util.ErrorOccured = true;

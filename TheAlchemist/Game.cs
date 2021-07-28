@@ -41,17 +41,13 @@ namespace TheAlchemist
 
         // broken seeds:
         // 75782, 79176, 80725, 85376
-        public static int Seed = (int)DateTime.Now.TimeOfDay.TotalSeconds; 
+        public static int Seed = 63958; //(int)DateTime.Now.TimeOfDay.TotalSeconds; 
         public static Random Random { get; } = new Random(Seed);
 
 
         public Game()
         {
-            graphics = new GraphicsDeviceManager(this)
-            {
-                PreferredBackBufferWidth = Util.ScreenWidth,
-                PreferredBackBufferHeight = Util.ScreenHeight
-            };
+            graphics = new GraphicsDeviceManager(this);
             //graphics.IsFullScreen = true;
 
             Util.GraphicsDevice = GraphicsDevice;
@@ -69,8 +65,10 @@ namespace TheAlchemist
         /// </summary>
         protected override void Initialize()
         {
-            Console.Write(typeof(string).Assembly.ImageRuntimeVersion);
-
+            graphics.PreferredBackBufferWidth = Util.ScreenWidth;
+            graphics.PreferredBackBufferHeight = Util.ScreenHeight;
+            graphics.ApplyChanges();
+            
             Util.ContentPath = Content.RootDirectory;
 
             Log.Init(AppDomain.CurrentDomain.BaseDirectory);
