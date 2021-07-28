@@ -1,6 +1,4 @@
 .vs
-TheAlchemist/bin
-TheAlchemist/obj
-TheAlchemist/Content/obj
-TheAlchemist/Content/bin
+**/bin
+**/obj
 /TheAlchemist/Content/TheAlchemistVS.code-workspace
