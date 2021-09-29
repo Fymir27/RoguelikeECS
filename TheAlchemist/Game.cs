@@ -39,9 +39,7 @@ namespace TheAlchemist
         RenderSystem renderSystem;
         UISystem uiSystem;
 
-        // broken seeds:
-        // 75782, 79176, 80725, 85376
-        public static int Seed = 63958; //(int)DateTime.Now.TimeOfDay.TotalSeconds; 
+        public static int Seed = (int)DateTime.Now.TimeOfDay.TotalSeconds;//62924;66888
         public static Random Random { get; } = new Random(Seed);
 
 
