@@ -1,10 +1,7 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
-using System.Threading.Tasks;
 using TheAlchemist.Components;
 
 namespace TheAlchemist
@@ -102,7 +99,7 @@ namespace TheAlchemist
             }
             catch (KeyNotFoundException)
             {
-                
+                Log.Error("No such entity! (" + entityID + ")");
                 throw;
             }
         }
@@ -232,10 +229,10 @@ namespace TheAlchemist
         {
             try
             {
-                var componentsToRemove = GetComponents(entityID).Where(c => c.TypeID == typeID);
-                if (componentsToRemove.Count() == 0)
+                var componentsToRemove = GetComponents(entityID).Where(c => c.TypeID == typeID).ToArray();
+                if (!componentsToRemove.Any())
                 {
-                    Log.Warning("No components of type " + componentsOfType[typeID][0].GetType().ToString() + " on " + Systems.DescriptionSystem.GetNameWithID(entityID));
+                    Log.Warning("No components of type " + componentsOfType[typeID][0].GetType() + " on " + Systems.DescriptionSystem.GetNameWithID(entityID));
                     Log.Data(Systems.DescriptionSystem.GetDebugInfoEntity(entityID));
                     return;
                 }

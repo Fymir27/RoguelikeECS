@@ -202,18 +202,22 @@ namespace TheAlchemist
                 if (character != 0)
                 {
                     descrEntity = character;
+                    Log.Data("Character", DescriptionSystem.GetDebugInfoEntity(character));
                 }
                 else if (item != 0)
                 {
                     descrEntity = item;
+                    Log.Data("Item", DescriptionSystem.GetDebugInfoEntity(item));
                 }
                 else if(structure != 0)
                 {
                     descrEntity = structure;
+                    Log.Data("Structure", DescriptionSystem.GetDebugInfoEntity(structure));
                 }
                 else if (terrain != 0)
                 {
                     descrEntity = terrain;
+                    Log.Data("Terrain", DescriptionSystem.GetDebugInfoEntity(terrain));
                 }
 
                 if (descrEntity == 0)

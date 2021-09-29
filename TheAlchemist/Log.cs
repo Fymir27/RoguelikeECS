@@ -47,8 +47,13 @@ namespace TheAlchemist
 
         public static void Data(string data)
         {
+            Data("[DATA]", data);
+        }
+
+        public static void Data(string label, string data)
+        {
             TimeStamp();
-            logFile.WriteLine("[DATA]");
+            logFile.WriteLine(label);
             Newline();
             logFile.Write(GetHTMLString("pre", null, data));
             Newline();
