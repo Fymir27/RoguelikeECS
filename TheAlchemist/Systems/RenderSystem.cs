@@ -69,12 +69,7 @@ namespace TheAlchemist.Systems
             graphics.Clear(Color.White);
 
             // seen by player
-            var seenPositions = Util.CurrentFloor.GetSeenPositions();
-
-            var renderedTerrain = new List<RenderableSpriteComponent>();
-            var renderedItems = new List<RenderableSpriteComponent>();
-            var renderedCharacters = new List<RenderableSpriteComponent>();
-            var renderedDarkness = new List<RenderableSpriteComponent>();
+            var seenPositions = Util.CurrentFloor.GetSeenPositions().ToArray();
 
             Position playerPos = Util.GetPlayerPos();
             Floor floor = Util.CurrentFloor;
@@ -173,6 +168,11 @@ namespace TheAlchemist.Systems
                                 DrawSpriteMultiTile(sprite, relScreenPos, relAnchor, multiTileC.Width);
                             }
                         }
+                    }
+
+                    if (tile.DebugInfo.Length > 0)
+                    {
+                        spriteBatch.DrawString(Util.SmallFont, tile.DebugInfo, Util.WorldToScreenPosition(relScreenPos), Color.Red);
                     }
                 }
             }

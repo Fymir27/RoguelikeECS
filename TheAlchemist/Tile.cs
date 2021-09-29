@@ -13,6 +13,7 @@ namespace TheAlchemist
         public int Character;
         public List<int> Items;
         public bool Discovered;
+        public string DebugInfo = ""; 
 
         public Tile(int terrain = 0, int character = 0, List<int> items = null)
         {

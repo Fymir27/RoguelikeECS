@@ -646,7 +646,7 @@ namespace TheAlchemist
         // discovered by the player
         // bool[,] discovered;      
 
-        public Floor(int width, int height)
+        public Floor(int width, int height) // TODO: remove width/height
         {
             Width = width;
             Height = height;
@@ -1500,7 +1500,7 @@ namespace TheAlchemist
         {
             if (entity == 0)
             {
-                Log.Warning("Trying to remove entity from " + pos + ": No entity of that type here!");
+                //Log.Warning("Trying to remove entity from " + pos + ": No entity of that type here!");
                 return false;
             }
 
@@ -2230,7 +2230,7 @@ namespace TheAlchemist
             texFloor.SaveAsPng(fileStream, Width, Height);
         }
 
-        public void LogCharactersAroundPlayer()
+        public void LogEntitiesAroundPlayer(EntityType type = EntityType.Character)
         {
             var playerPos = Util.GetPlayerPos();
             int xRadius = 5;
@@ -2246,7 +2246,14 @@ namespace TheAlchemist
             {
                 for (int x = xMin; x < xMax; x++)
                 {
-                    sb.AppendFormat(" {0,5} ", GetTile(x,y).Character);
+                    sb.AppendFormat(" {0,5} ", type switch
+                    {
+                        EntityType.Terrain => GetTile(x,y).Terrain,
+                        EntityType.Structure => GetTile(x,y).Structure,
+                        EntityType.Item => Util.GetStringFromCollection(GetTile(x,y).Items),
+                        EntityType.Character => GetTile(x,y).Character,
+                        _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+                    });
                 }
                 sb.AppendLine();
             }

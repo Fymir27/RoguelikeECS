@@ -86,6 +86,12 @@ namespace TheAlchemist
         public Position(int x, int y) { X = x; Y = y; }
         public Position(Position other) { X = other.X; Y = other.Y; }
 
+        public void Deconstruct(out int x, out int y)
+        {
+            x = X;
+            y = Y;
+        }
+
         public static readonly Position Zero = new Position(0, 0);
         public static readonly Position One = new Position(1, 1);
 
@@ -113,6 +119,12 @@ namespace TheAlchemist
             Down + Left,
             Left
         };
+
+        public Position(Point point)
+        {
+            (X, Y) = point;
+        }
+
         public Position[] GetNeighboursHexPointyTop()
         {
             Position[] result = new Position[6];
